@@ -61,23 +61,23 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
                       Case #{groupedCase.casefileNumber}
                     </span>
                   </div>
-                  <div className="flex items-center gap-4 mt-2">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm text-gray-600">
-                        Latest: {formatDate(groupedCase.latestDate)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm text-gray-600">
-                        Last check: {formatLastCheck()}
-                      </span>
-                    </div>
-                  </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col gap-1 text-right">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm text-gray-600">
+                      Latest: {formatDate(groupedCase.latestDate)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm text-gray-600">
+                      Last check: {formatLastCheck()}
+                    </span>
+                  </div>
+                </div>
                 <Badge variant={getStatusColor(groupedCase.currentStatus)}>
                   {groupedCase.currentStatus}
                 </Badge>
