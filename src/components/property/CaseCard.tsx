@@ -14,6 +14,9 @@ interface CaseCardProps {
 const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  // Get the primary address from the first record
+  const primaryAddress = groupedCase.records[0]?.address || 'Unknown Address';
+
   return (
     <Card className="hover:shadow-md transition-shadow duration-200">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -21,12 +24,17 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
           <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <FileText className="h-5 w-5 text-blue-600" />
+                <MapPin className="h-5 w-5 text-blue-600" />
                 <div>
                   <CardTitle className="text-lg">
-                    Case #{groupedCase.casefileNumber}
+                    {primaryAddress}
                   </CardTitle>
                   <div className="flex items-center gap-2 mt-1">
+                    <FileText className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm text-gray-600">
+                      Case #{groupedCase.casefileNumber}
+                    </span>
+                    <span className="text-gray-400">•</span>
                     <Calendar className="h-4 w-4 text-gray-500" />
                     <span className="text-sm text-gray-600">
                       Latest: {formatDate(groupedCase.latestDate)}
