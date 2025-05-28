@@ -18,6 +18,9 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
   const fullAddress = groupedCase.records[0]?.address || 'Unknown Address';
   const streetAddress = fullAddress.split(',')[0] || fullAddress;
 
+  // Get the investigation outcome from the latest record
+  const latestOutcome = groupedCase.records[0]?.investigation_outcome || 'No outcome recorded';
+
   // Fields to exclude from the expanded view
   const excludedFields = ['_id', 'full_text', '_full_text', 'casefile_number', 'address', 'parcel_id'];
 
@@ -56,6 +59,9 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
                     <Badge variant={getStatusColor(groupedCase.currentStatus)}>
                       {groupedCase.currentStatus}
                     </Badge>
+                    <div className="text-sm text-gray-600 max-w-xs text-right">
+                      <span className="font-medium">Outcome:</span> {latestOutcome}
+                    </div>
                     <div className="flex items-center gap-1">
                       <span className="text-sm text-gray-500">
                         {groupedCase.records.length} record{groupedCase.records.length !== 1 ? 's' : ''}
