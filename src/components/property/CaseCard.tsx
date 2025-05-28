@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronUp, FileText, MapPin } from 'lucide-react';
+import { ChevronDown, ChevronUp, FileText, MapPin, Calendar } from 'lucide-react';
 import { GroupedCase } from '@/types/propertyTypes';
 import { formatDate, getStatusColor } from '@/utils/propertyUtils';
 
@@ -51,18 +51,26 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <Badge variant={getStatusColor(groupedCase.currentStatus)}>
-                  {groupedCase.currentStatus}
-                </Badge>
-                <div className="flex items-center gap-1">
-                  <span className="text-sm text-gray-500">
-                    {groupedCase.records.length} record{groupedCase.records.length !== 1 ? 's' : ''}
-                  </span>
-                  {isOpen ? (
-                    <ChevronUp className="h-4 w-4 text-gray-500" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-gray-500" />
-                  )}
+                <div className="flex flex-col items-end gap-2">
+                  <div className="flex items-center gap-4">
+                    <Badge variant={getStatusColor(groupedCase.currentStatus)}>
+                      {groupedCase.currentStatus}
+                    </Badge>
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-gray-500">
+                        {groupedCase.records.length} record{groupedCase.records.length !== 1 ? 's' : ''}
+                      </span>
+                      {isOpen ? (
+                        <ChevronUp className="h-4 w-4 text-gray-500" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-gray-500" />
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <Calendar className="h-3 w-3" />
+                    <span>Last update: {formatDate(groupedCase.latestDate)}</span>
+                  </div>
                 </div>
               </div>
             </div>
