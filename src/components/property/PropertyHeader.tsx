@@ -1,15 +1,42 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, Search, FileText } from 'lucide-react';
+import { Loader2, Search, FileText, Calendar, Clock } from 'lucide-react';
 
 interface PropertyHeaderProps {
   onFetchData: () => void;
   isLoading: boolean;
   showResults: boolean;
+  latestDate?: string;
 }
 
-const PropertyHeader: React.FC<PropertyHeaderProps> = ({ onFetchData, isLoading, showResults }) => {
+const PropertyHeader: React.FC<PropertyHeaderProps> = ({ onFetchData, isLoading, showResults, latestDate }) => {
+  // Format current timestamp for "last check"
+  const formatLastCheck = () => {
+    const now = new Date();
+    return now.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
   return (
     <div className="text-center space-y-4">
       <div className="flex items-center justify-center gap-2 mb-4">
@@ -22,23 +49,40 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({ onFetchData, isLoading,
         View property investigation records from Pittsburgh's open data portal for specific addresses since 2024.
       </p>
       
-      <Button 
-        onClick={onFetchData}
-        disabled={isLoading}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Loading Data...
-          </>
-        ) : (
-          <>
-            <Search className="mr-2 h-4 w-4" />
-            {showResults ? 'Refresh Data' : 'Fetch Investigation Data'}
-          </>
+      <div className="flex items-center justify-center gap-4">
+        <Button 
+          onClick={onFetchData}
+          disabled={isLoading}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Loading Data...
+            </>
+          ) : (
+            <>
+              <Search className="mr-2 h-4 w-4" />
+              {showResults ? 'Refresh Data' : 'Fetch Investigation Data'}
+            </>
+          )}
+        </Button>
+        
+        {showResults && (
+          <div className="flex items-center gap-4 text-sm text-gray-600">
+            {latestDate && (
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4 text-gray-500" />
+                <span>Latest: {formatDate(latestDate)}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-1">
+              <Clock className="h-4 w-4 text-gray-500" />
+              <span>Last check: {formatLastCheck()}</span>
+            </div>
+          </div>
         )}
-      </Button>
+      </div>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { FileText } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPropertyData } from '@/services/propertyApi';
+import { groupRecordsByCase } from '@/utils/propertyUtils';
 import PropertyHeader from '@/components/property/PropertyHeader';
 import PropertyList from '@/components/property/PropertyList';
 
@@ -24,12 +25,20 @@ const PropertyInvestigationDashboard: React.FC = () => {
     }
   };
 
+  // Get the latest date from the grouped cases
+  const getLatestDate = () => {
+    if (!data?.result?.records) return undefined;
+    const groupedCases = groupRecordsByCase(data.result.records);
+    return groupedCases.length > 0 ? groupedCases[0].latestDate : undefined;
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
       <PropertyHeader 
         onFetchData={handleFetchData}
         isLoading={isLoading}
         showResults={showResults}
+        latestDate={getLatestDate()}
       />
 
       {error && (
