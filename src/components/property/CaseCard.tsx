@@ -21,9 +21,9 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
   // Fields to exclude from the expanded view
   const excludedFields = ['_id', 'full_text', '_full_text', 'casefile_number', 'address', 'parcel_id'];
 
-  // Field order for better presentation
+  // Field order for better presentation - moved investigation_outcome to the top
   const getOrderedFields = (record: any) => {
-    const orderedKeys = ['investigation_date', 'status', 'violation_type'];
+    const orderedKeys = ['investigation_date', 'status', 'violation_type', 'investigation_outcome'];
     const remainingKeys = Object.keys(record).filter(
       key => !excludedFields.includes(key) && !orderedKeys.includes(key)
     );
