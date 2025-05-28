@@ -13,8 +13,9 @@ interface CaseCardProps {
 const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Get the primary address from the first record
-  const primaryAddress = groupedCase.records[0]?.address || 'Unknown Address';
+  // Get the primary address from the first record and extract just the street
+  const fullAddress = groupedCase.records[0]?.address || 'Unknown Address';
+  const streetAddress = fullAddress.split(',')[0] || fullAddress;
 
   // Fields to exclude from the expanded view
   const excludedFields = ['_id', 'full_text', '_full_text', 'casefile_number', 'address', 'parcel_id'];
@@ -38,7 +39,7 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
                 <MapPin className="h-5 w-5 text-blue-600" />
                 <div>
                   <CardTitle className="text-lg">
-                    {primaryAddress}
+                    {streetAddress}
                   </CardTitle>
                   <div className="flex items-center gap-2 mt-1">
                     <FileText className="h-4 w-4 text-gray-500" />
