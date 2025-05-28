@@ -17,6 +17,9 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
   // Get the primary address from the first record
   const primaryAddress = groupedCase.records[0]?.address || 'Unknown Address';
 
+  // Fields to exclude from the expanded view
+  const excludedFields = ['_id', 'full_text', 'casefile_number', 'address', 'parcel_id'];
+
   return (
     <Card className="hover:shadow-md transition-shadow duration-200">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -67,18 +70,20 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
               {groupedCase.records.map((record, index) => (
                 <div key={record._id || index} className="border-l-2 border-blue-200 pl-4 py-2">
                   <div className="space-y-3">
-                    {Object.entries(record).map(([key, value]) => (
-                      <div key={key} className="grid grid-cols-3 gap-4">
-                        <div className="font-medium text-gray-700 capitalize">
-                          {key.replace(/_/g, ' ')}:
+                    {Object.entries(record)
+                      .filter(([key]) => !excludedFields.includes(key))
+                      .map(([key, value]) => (
+                        <div key={key} className="grid grid-cols-3 gap-4">
+                          <div className="font-medium text-gray-700 capitalize">
+                            {key.replace(/_/g, ' ')}:
+                          </div>
+                          <div className="col-span-2 text-gray-600">
+                            {key === 'investigation_date' ? formatDate(value as string) : 
+                             typeof value === 'object' ? JSON.stringify(value) : 
+                             String(value)}
+                          </div>
                         </div>
-                        <div className="col-span-2 text-gray-600">
-                          {key === 'investigation_date' ? formatDate(value as string) : 
-                           typeof value === 'object' ? JSON.stringify(value) : 
-                           String(value)}
-                        </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </div>
               ))}
