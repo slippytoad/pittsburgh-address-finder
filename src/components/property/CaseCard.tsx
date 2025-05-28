@@ -20,6 +20,15 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
   // Fields to exclude from the expanded view
   const excludedFields = ['_id', 'full_text', 'casefile_number', 'address', 'parcel_id'];
 
+  // Field order for better presentation
+  const getOrderedFields = (record: any) => {
+    const orderedKeys = ['investigation_date', 'status', 'violation_type'];
+    const remainingKeys = Object.keys(record).filter(
+      key => !excludedFields.includes(key) && !orderedKeys.includes(key)
+    );
+    return [...orderedKeys, ...remainingKeys].filter(key => record[key] !== undefined);
+  };
+
   return (
     <Card className="hover:shadow-md transition-shadow duration-200">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -68,24 +77,27 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
           <CardContent className="pt-0">
             <div className="space-y-4">
               {groupedCase.records.map((record, index) => (
-                <div key={record._id || index} className="border-l-2 border-blue-200 pl-4 py-2">
-                  <div className="space-y-3">
-                    {Object.entries(record)
-                      .filter(([key]) => !excludedFields.includes(key))
-                      .map(([key, value]) => (
-                        <div key={key} className="grid grid-cols-3 gap-4">
-                          <div className="font-medium text-gray-700 capitalize">
-                            {key.replace(/_/g, ' ')}:
+                <Card key={record._id || index} className="border border-gray-200 bg-gray-50">
+                  <CardContent className="p-4">
+                    <div className="space-y-3">
+                      {getOrderedFields(record).map((key) => {
+                        const value = record[key];
+                        return (
+                          <div key={key} className="grid grid-cols-3 gap-4">
+                            <div className="font-medium text-gray-700 capitalize">
+                              {key.replace(/_/g, ' ')}:
+                            </div>
+                            <div className="col-span-2 text-gray-600">
+                              {key === 'investigation_date' ? formatDate(value as string) : 
+                               typeof value === 'object' ? JSON.stringify(value) : 
+                               String(value)}
+                            </div>
                           </div>
-                          <div className="col-span-2 text-gray-600">
-                            {key === 'investigation_date' ? formatDate(value as string) : 
-                             typeof value === 'object' ? JSON.stringify(value) : 
-                             String(value)}
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </CardContent>
