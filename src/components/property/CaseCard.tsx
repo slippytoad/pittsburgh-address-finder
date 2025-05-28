@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +17,7 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
   const primaryAddress = groupedCase.records[0]?.address || 'Unknown Address';
 
   // Fields to exclude from the expanded view
-  const excludedFields = ['_id', 'full_text', 'casefile_number', 'address', 'parcel_id'];
+  const excludedFields = ['_id', 'full_text', '_full_text', 'casefile_number', 'address', 'parcel_id'];
 
   // Field order for better presentation
   const getOrderedFields = (record: any) => {
