@@ -6,6 +6,7 @@ export interface PropertyRecord {
   violation_type?: string;
   status?: string;
   inspector?: string;
+  casefile_number?: string;
   [key: string]: any;
 }
 
@@ -15,4 +16,11 @@ export interface ApiResponse {
     records: PropertyRecord[];
     total: number;
   };
+}
+
+export interface GroupedCase {
+  casefileNumber: string;
+  currentStatus: string;
+  records: PropertyRecord[];
+  latestDate: string;
 }
