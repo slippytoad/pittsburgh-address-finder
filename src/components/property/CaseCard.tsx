@@ -38,43 +38,46 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <MapPin className="h-5 w-5 text-blue-600" />
-                <div>
-                  <CardTitle className="text-lg">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <MapPin className="h-4 w-4 lg:h-5 lg:w-5 text-blue-600 flex-shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <CardTitle className="text-base lg:text-lg truncate">
                     {streetAddress}
                   </CardTitle>
                   <div className="flex items-center gap-2 mt-1">
-                    <FileText className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">
+                    <FileText className="h-3 w-3 lg:h-4 lg:w-4 text-gray-500 flex-shrink-0" />
+                    <span className="text-xs lg:text-sm text-gray-600 truncate">
                       Case #{groupedCase.casefileNumber}
                     </span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="flex flex-col items-end gap-2">
-                  <div className="flex items-center gap-4">
-                    <Badge variant={getStatusColor(groupedCase.currentStatus)}>
-                      {groupedCase.currentStatus}
-                    </Badge>
-                    <div className="text-sm text-gray-600 max-w-xs text-right">
-                      <span className="font-medium">Outcome:</span> {latestOutcome}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm text-gray-500">
-                        {groupedCase.records.length} record{groupedCase.records.length !== 1 ? 's' : ''}
-                      </span>
-                      {isOpen ? (
-                        <ChevronUp className="h-4 w-4 text-gray-500" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4 text-gray-500" />
-                      )}
-                    </div>
+              
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                  <Badge variant={getStatusColor(groupedCase.currentStatus)} className="w-fit">
+                    {groupedCase.currentStatus}
+                  </Badge>
+                  <div className="flex items-center gap-1 text-xs lg:text-sm text-gray-500">
+                    <span>
+                      {groupedCase.records.length} record{groupedCase.records.length !== 1 ? 's' : ''}
+                    </span>
+                    {isOpen ? (
+                      <ChevronUp className="h-3 w-3 lg:h-4 lg:w-4 text-gray-500 flex-shrink-0" />
+                    ) : (
+                      <ChevronDown className="h-3 w-3 lg:h-4 lg:w-4 text-gray-500 flex-shrink-0" />
+                    )}
                   </div>
-                  <div className="flex items-center gap-1 text-sm text-gray-500">
-                    <Calendar className="h-3 w-3" />
+                </div>
+                
+                <div className="text-xs lg:text-sm text-gray-600">
+                  <div className="mb-1">
+                    <span className="font-medium">Outcome:</span> 
+                    <span className="ml-1 break-words">{latestOutcome}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-gray-500">
+                    <Calendar className="h-3 w-3 flex-shrink-0" />
                     <span>Last update: {formatDate(groupedCase.latestDate)}</span>
                   </div>
                 </div>
@@ -88,16 +91,16 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
             <div className="space-y-4">
               {groupedCase.records.map((record, index) => (
                 <Card key={record._id || index} className="border border-gray-200 bg-gray-50">
-                  <CardContent className="p-4">
+                  <CardContent className="p-3 lg:p-4">
                     <div className="space-y-3">
                       {getOrderedFields(record).map((key) => {
                         const value = record[key];
                         return (
-                          <div key={key} className="grid grid-cols-3 gap-4">
-                            <div className="font-medium text-gray-700 capitalize">
+                          <div key={key} className="flex flex-col sm:grid sm:grid-cols-3 gap-1 sm:gap-4">
+                            <div className="font-medium text-gray-700 capitalize text-sm lg:text-base">
                               {key.replace(/_/g, ' ')}:
                             </div>
-                            <div className="col-span-2 text-gray-600">
+                            <div className="sm:col-span-2 text-gray-600 text-sm lg:text-base break-words">
                               {key === 'investigation_date' ? formatDate(value as string) : 
                                typeof value === 'object' ? JSON.stringify(value) : 
                                String(value)}
