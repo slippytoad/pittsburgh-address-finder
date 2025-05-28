@@ -33,7 +33,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
+    <div className="w-full max-w-7xl mx-auto p-2 sm:p-6 space-y-4 sm:space-y-6">
       <PropertyHeader 
         onFetchData={handleFetchData}
         isLoading={isLoading}
