@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronUp, FileText, Calendar, MapPin } from 'lucide-react';
+import { ChevronDown, ChevronUp, FileText, Calendar, MapPin, Clock } from 'lucide-react';
 import { GroupedCase } from '@/types/propertyTypes';
 import { formatDate, getStatusColor } from '@/utils/propertyUtils';
 
@@ -29,6 +30,19 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
     return [...orderedKeys, ...remainingKeys].filter(key => record[key] !== undefined);
   };
 
+  // Format current timestamp for "last check"
+  const formatLastCheck = () => {
+    const now = new Date();
+    return now.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
   return (
     <Card className="hover:shadow-md transition-shadow duration-200">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -46,11 +60,20 @@ const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
                     <span className="text-sm text-gray-600">
                       Case #{groupedCase.casefileNumber}
                     </span>
-                    <span className="text-gray-400">•</span>
-                    <Calendar className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">
-                      Latest: {formatDate(groupedCase.latestDate)}
-                    </span>
+                  </div>
+                  <div className="flex items-center gap-4 mt-2">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm text-gray-600">
+                        Latest: {formatDate(groupedCase.latestDate)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm text-gray-600">
+                        Last check: {formatLastCheck()}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
