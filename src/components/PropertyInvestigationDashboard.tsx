@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { FileText } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -7,9 +7,11 @@ import { fetchPropertyData } from '@/services/propertyApi';
 import { groupRecordsByCase } from '@/utils/propertyUtils';
 import PropertyHeader from '@/components/property/PropertyHeader';
 import PropertyList from '@/components/property/PropertyList';
+import StatusFilter from '@/components/property/StatusFilter';
 
 const PropertyInvestigationDashboard: React.FC = () => {
   const [showResults, setShowResults] = useState(false);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['propertyInvestigations'],
@@ -24,6 +26,31 @@ const PropertyInvestigationDashboard: React.FC = () => {
       refetch();
     }
   };
+
+  // Get available statuses and filtered data
+  const { availableStatuses, filteredRecords } = useMemo(() => {
+    if (!data?.result?.records) {
+      return { availableStatuses: [], filteredRecords: [] };
+    }
+
+    const groupedCases = groupRecordsByCase(data.result.records);
+    const statuses = Array.from(new Set(groupedCases.map(c => c.currentStatus)));
+    
+    // Initialize selected statuses to all statuses when data first loads
+    if (selectedStatuses.length === 0 && statuses.length > 0) {
+      setSelectedStatuses(statuses);
+    }
+
+    // Filter records based on selected statuses
+    const filtered = groupedCases.filter(caseGroup => 
+      selectedStatuses.includes(caseGroup.currentStatus)
+    );
+
+    return { 
+      availableStatuses: statuses,
+      filteredRecords: filtered.flatMap(c => c.records)
+    };
+  }, [data, selectedStatuses]);
 
   // Get the latest date from the grouped cases
   const getLatestDate = () => {
@@ -54,7 +81,18 @@ const PropertyInvestigationDashboard: React.FC = () => {
       )}
 
       {showResults && data && (
-        <PropertyList records={data.result.records} />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="lg:col-span-1">
+            <StatusFilter
+              availableStatuses={availableStatuses}
+              selectedStatuses={selectedStatuses}
+              onStatusChange={setSelectedStatuses}
+            />
+          </div>
+          <div className="lg:col-span-3">
+            <PropertyList records={filteredRecords} />
+          </div>
+        </div>
       )}
     </div>
   );
