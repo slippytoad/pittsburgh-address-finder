@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { FileText, Settings, ChevronDown, ChevronUp } from 'lucide-react';
@@ -9,6 +8,7 @@ import PropertyHeader from '@/components/property/PropertyHeader';
 import PropertyList from '@/components/property/PropertyList';
 import StatusFilter from '@/components/property/StatusFilter';
 import EmailSettings from '@/components/EmailSettings';
+import EmailTestButtons from '@/components/EmailTestButtons';
 import { Button } from '@/components/ui/button';
 
 const PropertyInvestigationDashboard: React.FC = () => {
@@ -103,8 +103,9 @@ const PropertyInvestigationDashboard: React.FC = () => {
           </Button>
           
           {showEmailSettings && (
-            <div className="mt-4">
+            <div className="mt-4 space-y-4">
               <EmailSettings />
+              <EmailTestButtons />
             </div>
           )}
         </CardContent>
