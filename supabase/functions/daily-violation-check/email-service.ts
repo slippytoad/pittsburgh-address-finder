@@ -49,7 +49,7 @@ export class EmailService {
       emailSubject = `New Property Violations Found - ${newRecords.length} records`;
       emailBody = `
         <h2>Daily Property Violation Report</h2>
-        <p>We found <strong>${newRecords.length} new violation records</strong> during today's check.</p>
+        <p>We found <strong>${newRecords.length} new violations</strong> during today's check.</p>
         
         <h3>New Records Summary:</h3>
         <ul>
@@ -71,17 +71,15 @@ export class EmailService {
       `;
     } else {
       // Email for when no new violations are found
-      emailSubject = `Daily Property Violation Report - No New Records`;
+      emailSubject = `Daily Property Violation Report - No New Violations Found`;
       emailBody = `
         <h2>Daily Property Violation Report</h2>
-        <p>We completed today's check and <strong>no new violation records</strong> were found.</p>
+        <p>We completed today's check and <strong>no new violations</strong> were found.</p>
         
         <h3>Check Summary:</h3>
         <ul>
-          <li><strong>Total Records Checked:</strong> ${totalRecords}</li>
-          <li><strong>New Records Found:</strong> 0</li>
-          <li><strong>Check Date:</strong> ${new Date().toLocaleDateString()}</li>
-          <li><strong>Check Time:</strong> ${new Date().toLocaleTimeString()}</li>
+          <li><strong>Total violations since 2024:</strong> ${totalRecords}</li>
+          <li><strong>New violations found:</strong> 0</li>
         </ul>
         
         <p>The system will continue to monitor for new violations and notify you when they are found.</p>
