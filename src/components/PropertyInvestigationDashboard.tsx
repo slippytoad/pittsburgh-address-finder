@@ -1,5 +1,4 @@
-
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { FileText } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -18,12 +17,14 @@ const PropertyInvestigationDashboard: React.FC = () => {
     queryKey: ['propertyInvestigations'],
     queryFn: fetchPropertyData,
     enabled: showResults,
-    onSuccess: (data: ApiResponseWithNewCount) => {
-      if (data.newRecordsCount !== undefined) {
-        setLastNewRecordsCount(data.newRecordsCount);
-      }
-    }
   });
+
+  // Handle updating the new records count when data changes
+  useEffect(() => {
+    if (data?.newRecordsCount !== undefined) {
+      setLastNewRecordsCount(data.newRecordsCount);
+    }
+  }, [data]);
 
   const handleFetchData = () => {
     console.log('Button clicked - fetching data...');
