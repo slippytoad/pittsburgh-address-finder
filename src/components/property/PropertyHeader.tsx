@@ -79,7 +79,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
               </>
             ) : (
               <>
-                <RefreshCw className="mr-2 h-3 w-3" />
+                <RefreshCw className={`mr-2 h-3 w-3 transition-transform duration-200 ${isLoading ? 'animate-spin' : ''}`} />
                 Refresh Data
               </>
             )}
