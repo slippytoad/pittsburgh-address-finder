@@ -40,29 +40,44 @@ export class EmailService {
     });
   }
 
-  private getStatusSummary(allRecords: ViolationRecord[]): string {
-    // Group records by case file number
-    const caseGroups: Record<string, ViolationRecord[]> = {};
-    
-    allRecords.forEach(record => {
+  private groupRecordsByCase(records: ViolationRecord[]) {
+    const grouped = records.reduce((acc, record) => {
       const caseNumber = record.casefile_number || 'Unknown';
-      if (!caseGroups[caseNumber]) {
-        caseGroups[caseNumber] = [];
+      
+      if (!acc[caseNumber]) {
+        acc[caseNumber] = [];
       }
-      caseGroups[caseNumber].push(record);
-    });
+      acc[caseNumber].push(record);
+      
+      return acc;
+    }, {} as Record<string, ViolationRecord[]>);
 
-    // Get the latest status for each case
-    const caseCounts: Record<string, number> = {};
-    
-    Object.values(caseGroups).forEach(caseRecords => {
-      // Sort by investigation date to get the latest record
+    return Object.entries(grouped).map(([caseNumber, caseRecords]) => {
+      // Sort records by date to get the most recent
       const sortedRecords = caseRecords.sort((a, b) => 
         new Date(b.investigation_date || '').getTime() - new Date(a.investigation_date || '').getTime()
       );
       
-      const latestStatus = sortedRecords[0]?.status || 'Unknown';
-      caseCounts[latestStatus] = (caseCounts[latestStatus] || 0) + 1;
+      const latestRecord = sortedRecords[0];
+      
+      return {
+        casefileNumber: caseNumber,
+        currentStatus: latestRecord.status || 'Unknown',
+        records: sortedRecords,
+        latestDate: latestRecord.investigation_date || ''
+      };
+    }).sort((a, b) => new Date(b.latestDate).getTime() - new Date(a.latestDate).getTime());
+  }
+
+  private getStatusSummary(allRecords: ViolationRecord[]): string {
+    // Use the same grouping logic as the dashboard
+    const groupedCases = this.groupRecordsByCase(allRecords);
+    
+    // Count cases by their current status
+    const caseCounts: Record<string, number> = {};
+    groupedCases.forEach(groupedCase => {
+      const status = groupedCase.currentStatus;
+      caseCounts[status] = (caseCounts[status] || 0) + 1;
     });
 
     const dashboardUrl = "https://pittsburgh-address-finder.lovable.app";
