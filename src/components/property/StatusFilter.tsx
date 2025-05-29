@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
 import { Filter } from 'lucide-react';
 import { getStatusColor } from '@/utils/propertyUtils';
 
@@ -17,11 +17,11 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
   selectedStatuses,
   onStatusChange,
 }) => {
-  const handleStatusToggle = (status: string, checked: boolean) => {
-    if (checked) {
-      onStatusChange([...selectedStatuses, status]);
-    } else {
+  const handleStatusToggle = (status: string) => {
+    if (selectedStatuses.includes(status)) {
       onStatusChange(selectedStatuses.filter(s => s !== status));
+    } else {
+      onStatusChange([...selectedStatuses, status]);
     }
   };
 
@@ -42,30 +42,27 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         </div>
         
         <div className="space-y-2">
-          <div className="flex items-center space-x-2 pb-2 border-b">
-            <Checkbox
-              id="select-all"
-              checked={selectedStatuses.length === availableStatuses.length}
-              onCheckedChange={handleSelectAll}
-            />
-            <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
-              Select All ({availableStatuses.length})
-            </label>
-          </div>
+          <Button
+            variant={selectedStatuses.length === availableStatuses.length ? "default" : "outline"}
+            size="sm"
+            onClick={handleSelectAll}
+            className="w-full justify-start text-xs"
+          >
+            {selectedStatuses.length === availableStatuses.length ? "Deselect All" : "Select All"} ({availableStatuses.length})
+          </Button>
           
           {availableStatuses.map((status) => (
-            <div key={status} className="flex items-center space-x-2">
-              <Checkbox
-                id={`status-${status}`}
-                checked={selectedStatuses.includes(status)}
-                onCheckedChange={(checked) => handleStatusToggle(status, checked as boolean)}
-              />
-              <label htmlFor={`status-${status}`} className="text-sm cursor-pointer flex-1">
-                <Badge variant={getStatusColor(status)} className="text-xs">
-                  {status}
-                </Badge>
-              </label>
-            </div>
+            <Button
+              key={status}
+              variant={selectedStatuses.includes(status) ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleStatusToggle(status)}
+              className="w-full justify-start text-xs"
+            >
+              <Badge variant={getStatusColor(status)} className="text-xs mr-2">
+                {status}
+              </Badge>
+            </Button>
           ))}
         </div>
       </CardContent>
