@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Mail, Settings } from 'lucide-react';
+import { Settings } from 'lucide-react';
 
 interface AppSettings {
   id: number;
@@ -103,36 +103,6 @@ const EmailSettings: React.FC = () => {
     }
   };
 
-  const testEmailFunction = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke('daily-violation-check', {
-        body: { test_run: true }
-      });
-
-      if (error) {
-        console.error('Error testing email function:', error);
-        toast({
-          title: "Test Failed",
-          description: "Failed to test email notification system",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      toast({
-        title: "Test Completed",
-        description: "Email notification test has been triggered. Check your email and the logs."
-      });
-    } catch (error) {
-      console.error('Error:', error);
-      toast({
-        title: "Test Failed",
-        description: "Failed to test email notification system",
-        variant: "destructive"
-      });
-    }
-  };
-
   if (loading) {
     return (
       <Card>
@@ -205,16 +175,6 @@ const EmailSettings: React.FC = () => {
         <div className="flex gap-3 pt-4 border-t">
           <Button onClick={saveSettings} disabled={saving}>
             {saving ? 'Saving...' : 'Save Settings'}
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            onClick={testEmailFunction}
-            disabled={!settings.email_reports_enabled || !settings.email_report_address}
-            className="flex items-center gap-2"
-          >
-            <Mail className="h-4 w-4" />
-            Test Email
           </Button>
         </div>
 
