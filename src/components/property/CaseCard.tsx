@@ -27,6 +27,13 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   // Get the investigation outcome from the latest record
   const latestOutcome = groupedCase.records[0]?.investigation_outcome || 'No outcome recorded';
 
+  // Get the earliest investigation date (when case was first opened)
+  const earliestDate = groupedCase.records.reduce((earliest, record) => {
+    if (!record.investigation_date) return earliest;
+    if (!earliest) return record.investigation_date;
+    return new Date(record.investigation_date) < new Date(earliest) ? record.investigation_date : earliest;
+  }, '');
+
   // Fields to exclude from the expanded view
   const excludedFields = ['_id', 'full_text', '_full_text', 'casefile_number', 'address', 'parcel_id'];
 
@@ -86,6 +93,12 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                     <span className="font-medium">Outcome:</span> 
                     <span className="ml-1 break-words">{latestOutcome}</span>
                   </div>
+                  {earliestDate && (
+                    <div className="flex items-center gap-1 text-gray-500 mb-1">
+                      <Calendar className="h-3 w-3 flex-shrink-0" />
+                      <span>Case opened: {formatDate(earliestDate)}</span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-1 text-gray-500">
                     <Calendar className="h-3 w-3 flex-shrink-0" />
                     <span>Last update: {formatDate(groupedCase.latestDate)}</span>
