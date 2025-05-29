@@ -19,6 +19,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
   const [lastNewRecordsCount, setLastNewRecordsCount] = useState<number | undefined>(undefined);
   const [showEmailSettings, setShowEmailSettings] = useState(false);
   const [useApiData, setUseApiData] = useState(false); // Toggle between database and API
+  const [lastApiCheckTime, setLastApiCheckTime] = useState<string | undefined>(undefined);
 
   // Query for database violations (enabled by default)
   const { data: dbData, isLoading: dbLoading, error: dbError, refetch: refetchDb } = useQuery({
@@ -50,6 +51,19 @@ const PropertyInvestigationDashboard: React.FC = () => {
     console.log('Button clicked - fetching data...');
     setUseApiData(true); // Switch to API data when button is clicked
     setShowResults(true);
+    
+    // Update the last API check time
+    const now = new Date();
+    const formattedTime = now.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+    setLastApiCheckTime(formattedTime);
+    
     if (showResults) {
       refetchApi();
     }
@@ -98,6 +112,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
         showResults={showResults}
         latestDate={getLatestDate()}
         newRecordsCount={lastNewRecordsCount}
+        lastApiCheckTime={lastApiCheckTime}
       />
 
       {/* Data Source Toggle */}

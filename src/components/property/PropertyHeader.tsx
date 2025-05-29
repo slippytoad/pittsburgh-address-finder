@@ -9,6 +9,7 @@ interface PropertyHeaderProps {
   showResults: boolean;
   latestDate?: string;
   newRecordsCount?: number;
+  lastApiCheckTime?: string;
 }
 
 const PropertyHeader: React.FC<PropertyHeaderProps> = ({ 
@@ -16,21 +17,9 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   isLoading, 
   showResults, 
   latestDate,
-  newRecordsCount 
+  newRecordsCount,
+  lastApiCheckTime
 }) => {
-  // Format current timestamp for "last check"
-  const formatLastCheck = () => {
-    const now = new Date();
-    return now.toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
-
   // Format date
   const formatDate = (dateString: string) => {
     try {
@@ -70,7 +59,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
           ) : (
             <>
               <Search className="mr-2 h-4 w-4" />
-              {showResults ? 'Refresh Data' : 'Fetch Investigation Data'}
+              Refresh Data
             </>
           )}
         </Button>
@@ -83,16 +72,18 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
                 <span>Latest: {formatDate(latestDate)}</span>
               </div>
             )}
-            <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4 text-gray-500" />
-              <span>Last check: {formatLastCheck()}</span>
-              {newRecordsCount !== undefined && (
-                <div className="flex items-center gap-1 ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                  <Plus className="h-3 w-3" />
-                  <span>{newRecordsCount} new</span>
-                </div>
-              )}
-            </div>
+            {lastApiCheckTime && (
+              <div className="flex items-center gap-1">
+                <Clock className="h-4 w-4 text-gray-500" />
+                <span>Last API check: {lastApiCheckTime}</span>
+                {newRecordsCount !== undefined && (
+                  <div className="flex items-center gap-1 ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                    <Plus className="h-3 w-3" />
+                    <span>{newRecordsCount} new</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
