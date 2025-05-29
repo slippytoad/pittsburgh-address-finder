@@ -10,7 +10,7 @@ interface PropertyListProps {
   records: PropertyRecord[];
 }
 
-const PropertyList: React.FC<PropertyListProps> = ({ records }) => {
+export const PropertyList: React.FC<PropertyListProps> = ({ records }) => {
   const groupedCases = groupRecordsByCase(records);
 
   return (

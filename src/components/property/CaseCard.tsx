@@ -11,7 +11,7 @@ interface CaseCardProps {
   groupedCase: GroupedCase;
 }
 
-const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
+export const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   // Get the primary address from the first record and extract just the street
