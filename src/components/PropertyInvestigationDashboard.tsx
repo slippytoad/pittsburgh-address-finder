@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { FileText, Settings, ChevronDown, ChevronUp } from 'lucide-react';
@@ -46,19 +47,22 @@ const PropertyInvestigationDashboard: React.FC = () => {
     const groupedCases = groupRecordsByCase(data.result.records);
     const statuses = Array.from(new Set(groupedCases.map(c => c.currentStatus)));
     
-    // Initialize selected statuses to all statuses when data first loads
-    if (selectedStatuses.length === 0 && statuses.length > 0) {
-      setSelectedStatuses(statuses);
+    console.log('Available statuses:', statuses);
+    console.log('Selected statuses:', selectedStatuses);
+
+    // Filter cases based on selected statuses
+    let filteredCases = groupedCases;
+    if (selectedStatuses.length > 0) {
+      filteredCases = groupedCases.filter(caseGroup => 
+        selectedStatuses.includes(caseGroup.currentStatus)
+      );
     }
 
-    // Filter records based on selected statuses
-    const filtered = groupedCases.filter(caseGroup => 
-      selectedStatuses.includes(caseGroup.currentStatus)
-    );
+    console.log('Filtered cases count:', filteredCases.length);
 
     return { 
       availableStatuses: statuses,
-      filteredRecords: filtered.flatMap(c => c.records)
+      filteredRecords: filteredCases.flatMap(c => c.records)
     };
   }, [data, selectedStatuses]);
 
