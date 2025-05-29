@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Filter } from 'lucide-react';
+import { Filter, Check } from 'lucide-react';
 import { getStatusColor } from '@/utils/propertyUtils';
 
 interface StatusFilterProps {
@@ -36,26 +36,32 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         </div>
         
         <div className="flex flex-wrap gap-2">
-          {availableStatuses.map((status) => (
-            <div
-              key={status}
-              onClick={() => handleStatusToggle(status)}
-              className={`
-                cursor-pointer p-2 rounded-md border transition-all duration-200
-                ${selectedStatuses.includes(status) 
-                  ? 'bg-blue-50 border-blue-200' 
-                  : 'bg-white border-gray-200 hover:bg-gray-50'
-                }
-              `}
-            >
-              <Badge 
-                variant={getStatusColor(status)} 
-                className="text-xs"
+          {availableStatuses.map((status) => {
+            const isSelected = selectedStatuses.includes(status);
+            return (
+              <div
+                key={status}
+                onClick={() => handleStatusToggle(status)}
+                className={`
+                  cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 relative
+                  ${isSelected 
+                    ? 'bg-blue-500 border-blue-600 shadow-md ring-2 ring-blue-200' 
+                    : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                  }
+                `}
               >
-                {status}
-              </Badge>
-            </div>
-          ))}
+                {isSelected && (
+                  <Check className="absolute top-1 right-1 h-4 w-4 text-white" />
+                )}
+                <Badge 
+                  variant={getStatusColor(status)} 
+                  className={`text-xs ${isSelected ? 'bg-white text-blue-900' : ''}`}
+                >
+                  {status}
+                </Badge>
+              </div>
+            );
+          })}
         </div>
       </CardContent>
     </Card>
