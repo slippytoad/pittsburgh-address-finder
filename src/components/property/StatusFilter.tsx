@@ -32,7 +32,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
           <h3 className="font-medium text-sm">Filter by Status</h3>
         </div>
         
-        <div className="space-y-2">
+        <div className="flex flex-wrap gap-2">
           {availableStatuses.map((status) => (
             <div
               key={status}
@@ -40,18 +40,14 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
               className={`
                 cursor-pointer p-2 rounded-md border transition-all duration-200
                 ${selectedStatuses.includes(status) 
-                  ? 'bg-gray-900 border-gray-900 text-white' 
-                  : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                  ? 'bg-blue-50 border-blue-200' 
+                  : 'bg-white border-gray-200 hover:bg-gray-50'
                 }
               `}
             >
               <Badge 
                 variant={getStatusColor(status)} 
-                className={`text-xs ${
-                  selectedStatuses.includes(status) 
-                    ? 'bg-white text-gray-900' 
-                    : ''
-                }`}
+                className="text-xs"
               >
                 {status}
               </Badge>

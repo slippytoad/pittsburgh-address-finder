@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { FileText, Settings, ChevronDown, ChevronUp } from 'lucide-react';
@@ -120,17 +119,13 @@ const PropertyInvestigationDashboard: React.FC = () => {
       )}
 
       {showResults && data && (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
-          <div className="lg:col-span-1">
-            <StatusFilter
-              availableStatuses={availableStatuses}
-              selectedStatuses={selectedStatuses}
-              onStatusChange={setSelectedStatuses}
-            />
-          </div>
-          <div className="lg:col-span-3">
-            <PropertyList records={filteredRecords} />
-          </div>
+        <div className="space-y-4 sm:space-y-6">
+          <StatusFilter
+            availableStatuses={availableStatuses}
+            selectedStatuses={selectedStatuses}
+            onStatusChange={setSelectedStatuses}
+          />
+          <PropertyList records={filteredRecords} />
         </div>
       )}
     </div>
