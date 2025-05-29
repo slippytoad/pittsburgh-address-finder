@@ -85,11 +85,11 @@ serve(async (req: Request) => {
       await dbService.saveNewViolations(violationRecords);
     }
 
-    // Send daily email notification
+    // Send daily email notification with all records for status summary
     const emailResponse = await emailService.sendDailyReport(
       settings.email_report_address, 
       newRecords, 
-      apiData.result.records.length
+      apiData.result.records
     );
 
     console.log("Email sent successfully:", emailResponse);

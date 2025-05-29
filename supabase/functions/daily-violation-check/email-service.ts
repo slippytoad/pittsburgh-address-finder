@@ -1,4 +1,3 @@
-
 import { Resend } from "npm:resend@2.0.0";
 import { ViolationRecord } from "./types.ts";
 
@@ -38,11 +37,26 @@ export class EmailService {
     });
   }
 
-  async sendDailyReport(emailAddress: string, newRecords: ViolationRecord[], totalRecords: number): Promise<any> {
+  private getStatusSummary(allRecords: ViolationRecord[]): string {
+    const statusCounts: Record<string, number> = {};
+    
+    allRecords.forEach(record => {
+      const status = record.status || 'Unknown';
+      statusCounts[status] = (statusCounts[status] || 0) + 1;
+    });
+
+    return Object.entries(statusCounts)
+      .map(([status, count]) => `<li><strong>${status}:</strong> ${count}</li>`)
+      .join('');
+  }
+
+  async sendDailyReport(emailAddress: string, newRecords: ViolationRecord[], allRecords: ViolationRecord[]): Promise<any> {
     console.log('Sending daily email notification to:', emailAddress);
     
     let emailSubject: string;
     let emailBody: string;
+
+    const statusSummary = this.getStatusSummary(allRecords);
 
     if (newRecords.length > 0) {
       // Email for when new violations are found
@@ -65,6 +79,11 @@ export class EmailService {
           ${newRecords.length > 10 ? `<li><em>... and ${newRecords.length - 10} more records</em></li>` : ''}
         </ul>
         
+        <h3>Check Summary - Number of violations in each state:</h3>
+        <ul>
+          ${statusSummary}
+        </ul>
+        
         <p>Please log into the system to view all details.</p>
         
         <p><em>This is an automated message from the Property Investigation Dashboard.</em></p>
@@ -76,10 +95,9 @@ export class EmailService {
         <h2>Daily Property Violation Report</h2>
         <p>We completed today's check and <strong>no new violations</strong> were found.</p>
         
-        <h3>Check Summary:</h3>
+        <h3>Check Summary - Number of violations in each state:</h3>
         <ul>
-          <li><strong>Total violations since 2024:</strong> ${totalRecords}</li>
-          <li><strong>New violations found:</strong> 0</li>
+          ${statusSummary}
         </ul>
         
         <p>The system will continue to monitor for new violations and notify you when they are found.</p>
