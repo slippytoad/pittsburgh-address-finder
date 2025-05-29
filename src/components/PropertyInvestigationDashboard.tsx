@@ -7,6 +7,7 @@ import { groupRecordsByCase } from '@/utils/propertyUtils';
 import PropertyHeader from '@/components/property/PropertyHeader';
 import PropertyList from '@/components/property/PropertyList';
 import StatusFilter from '@/components/property/StatusFilter';
+import EmailSettings from '@/components/EmailSettings';
 
 const PropertyInvestigationDashboard: React.FC = () => {
   const [showResults, setShowResults] = useState(false);
@@ -75,6 +76,8 @@ const PropertyInvestigationDashboard: React.FC = () => {
         latestDate={getLatestDate()}
         newRecordsCount={lastNewRecordsCount}
       />
+
+      <EmailSettings />
 
       {error && (
         <Card className="border-red-200 bg-red-50">

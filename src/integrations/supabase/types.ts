@@ -57,6 +57,30 @@ export type Database = {
         }
         Relationships: []
       }
+      email_notifications: {
+        Row: {
+          email_address: string
+          id: string
+          new_records_count: number
+          sent_at: string
+          status: string
+        }
+        Insert: {
+          email_address: string
+          id?: string
+          new_records_count: number
+          sent_at?: string
+          status?: string
+        }
+        Update: {
+          email_address?: string
+          id?: string
+          new_records_count?: number
+          sent_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       violations: {
         Row: {
           _id: number
