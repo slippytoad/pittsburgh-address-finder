@@ -64,4 +64,24 @@ export class DatabaseService {
       // Don't throw here - the email was sent successfully
     }
   }
+
+  async updateLastApiCheckTime(): Promise<void> {
+    const now = new Date().toISOString();
+    
+    const { error } = await this.supabase
+      .from('app_settings')
+      .upsert({
+        id: 1,
+        last_api_check_time: now
+      }, {
+        onConflict: 'id'
+      });
+
+    if (error) {
+      console.error('Error updating last API check time:', error);
+      throw new Error(`Failed to update last API check time: ${error.message}`);
+    }
+
+    console.log('Last API check time updated to:', now);
+  }
 }

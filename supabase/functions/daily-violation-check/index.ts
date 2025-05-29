@@ -97,6 +97,10 @@ serve(async (req: Request) => {
     // Log the email notification
     await dbService.logEmailNotification(newRecords.length, settings.email_report_address);
 
+    // Update the last API check timestamp
+    await dbService.updateLastApiCheckTime();
+    console.log("Last API check timestamp updated");
+
     return new Response(
       JSON.stringify({ 
         message: "Daily check completed successfully",
