@@ -69,8 +69,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                     </span>
                   </div>
                   {earliestDate && (
-                    <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
-                      <Calendar className="h-3 w-3 flex-shrink-0" />
+                    <div className="flex items-center gap-1 text-sm lg:text-base text-gray-500 mt-1">
+                      <Calendar className="h-3 w-3 lg:h-4 lg:w-4 flex-shrink-0" />
                       <span>Opened: {formatDate(earliestDate)}</span>
                     </div>
                   )}
