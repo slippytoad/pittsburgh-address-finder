@@ -1,5 +1,3 @@
-
-
 import { Resend } from "npm:resend@2.0.0";
 import { ViolationRecord } from "./types.ts";
 
@@ -28,7 +26,7 @@ export class EmailService {
       
       <p>If you received this email, your notification system is working properly!</p>
       
-      <p><a href="${Deno.env.get('SUPABASE_URL') || 'https://your-app.lovable.app'}" style="background-color: #2754C5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">View Dashboard</a></p>
+      <p><a href="https://preview--pittsburgh-address-finder.lovable.app" style="background-color: #2754C5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">View Dashboard</a></p>
       
       <p><em>This is a test message from the Property Investigation Dashboard.</em></p>
     `;
@@ -78,7 +76,7 @@ export class EmailService {
     let emailBody: string;
 
     const statusSummary = this.getStatusSummary(allRecords);
-    const dashboardUrl = Deno.env.get('SUPABASE_URL') || 'https://your-app.lovable.app';
+    const dashboardUrl = "https://preview--pittsburgh-address-finder.lovable.app";
 
     if (newRecords.length > 0) {
       // Email for when new violations are found
@@ -138,4 +136,3 @@ export class EmailService {
     });
   }
 }
-
