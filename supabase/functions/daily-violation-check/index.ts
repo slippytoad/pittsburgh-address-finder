@@ -140,66 +140,85 @@ serve(async (req: Request) => {
     const newRecords = apiData.result.records.filter((record: any) => !existingIds.has(record._id));
     console.log('Found', newRecords.length, 'new records');
 
-    if (newRecords.length === 0) {
-      console.log('No new records found, no email will be sent');
-      return new Response(
-        JSON.stringify({ message: "No new records found" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // Save new records to database if any exist
+    if (newRecords.length > 0) {
+      const violationRecords = newRecords.map((record: any) => ({
+        _id: record._id,
+        casefile_number: record.casefile_number || null,
+        address: record.address || null,
+        parcel_id: record.parcel_id || null,
+        status: record.status || null,
+        investigation_date: record.investigation_date || null,
+        violation_description: record.violation_description || null,
+        violation_code_section: record.violation_code_section || null,
+        violation_spec_instructions: record.violation_spec_instructions || null,
+        investigation_outcome: record.investigation_outcome || null,
+        investigation_findings: record.investigation_findings || null,
+      }));
+
+      const { error: insertError } = await supabase
+        .from('violations')
+        .insert(violationRecords);
+
+      if (insertError) {
+        console.error('Error saving new violations:', insertError);
+        throw new Error(`Failed to save new violations: ${insertError.message}`);
+      }
+
+      console.log('Successfully saved', newRecords.length, 'new violations to database');
     }
 
-    // Save new records to database
-    const violationRecords = newRecords.map((record: any) => ({
-      _id: record._id,
-      casefile_number: record.casefile_number || null,
-      address: record.address || null,
-      parcel_id: record.parcel_id || null,
-      status: record.status || null,
-      investigation_date: record.investigation_date || null,
-      violation_description: record.violation_description || null,
-      violation_code_section: record.violation_code_section || null,
-      violation_spec_instructions: record.violation_spec_instructions || null,
-      investigation_outcome: record.investigation_outcome || null,
-      investigation_findings: record.investigation_findings || null,
-    }));
-
-    const { error: insertError } = await supabase
-      .from('violations')
-      .insert(violationRecords);
-
-    if (insertError) {
-      console.error('Error saving new violations:', insertError);
-      throw new Error(`Failed to save new violations: ${insertError.message}`);
-    }
-
-    console.log('Successfully saved', newRecords.length, 'new violations to database');
-
-    // Send email notification
-    console.log('Sending email notification to:', settings.email_report_address);
+    // Send email notification regardless of whether new records were found
+    console.log('Sending daily email notification to:', settings.email_report_address);
     
-    const emailSubject = `New Property Violations Found - ${newRecords.length} records`;
-    const emailBody = `
-      <h2>Daily Property Violation Report</h2>
-      <p>We found <strong>${newRecords.length} new violation records</strong> during today's check.</p>
-      
-      <h3>New Records Summary:</h3>
-      <ul>
-        ${newRecords.slice(0, 10).map((record: any) => `
-          <li>
-            <strong>Address:</strong> ${record.address || 'N/A'}<br>
-            <strong>Case File:</strong> ${record.casefile_number || 'N/A'}<br>
-            <strong>Status:</strong> ${record.status || 'N/A'}<br>
-            <strong>Investigation Date:</strong> ${record.investigation_date || 'N/A'}<br>
-            <strong>Description:</strong> ${record.violation_description || 'N/A'}
-          </li>
-        `).join('')}
-        ${newRecords.length > 10 ? `<li><em>... and ${newRecords.length - 10} more records</em></li>` : ''}
-      </ul>
-      
-      <p>Please log into the system to view all details.</p>
-      
-      <p><em>This is an automated message from the Property Investigation Dashboard.</em></p>
-    `;
+    let emailSubject: string;
+    let emailBody: string;
+
+    if (newRecords.length > 0) {
+      // Email for when new violations are found
+      emailSubject = `New Property Violations Found - ${newRecords.length} records`;
+      emailBody = `
+        <h2>Daily Property Violation Report</h2>
+        <p>We found <strong>${newRecords.length} new violation records</strong> during today's check.</p>
+        
+        <h3>New Records Summary:</h3>
+        <ul>
+          ${newRecords.slice(0, 10).map((record: any) => `
+            <li>
+              <strong>Address:</strong> ${record.address || 'N/A'}<br>
+              <strong>Case File:</strong> ${record.casefile_number || 'N/A'}<br>
+              <strong>Status:</strong> ${record.status || 'N/A'}<br>
+              <strong>Investigation Date:</strong> ${record.investigation_date || 'N/A'}<br>
+              <strong>Description:</strong> ${record.violation_description || 'N/A'}
+            </li>
+          `).join('')}
+          ${newRecords.length > 10 ? `<li><em>... and ${newRecords.length - 10} more records</em></li>` : ''}
+        </ul>
+        
+        <p>Please log into the system to view all details.</p>
+        
+        <p><em>This is an automated message from the Property Investigation Dashboard.</em></p>
+      `;
+    } else {
+      // Email for when no new violations are found
+      emailSubject = `Daily Property Violation Report - No New Records`;
+      emailBody = `
+        <h2>Daily Property Violation Report</h2>
+        <p>We completed today's check and <strong>no new violation records</strong> were found.</p>
+        
+        <h3>Check Summary:</h3>
+        <ul>
+          <li><strong>Total Records Checked:</strong> ${apiData.result.records.length}</li>
+          <li><strong>New Records Found:</strong> 0</li>
+          <li><strong>Check Date:</strong> ${new Date().toLocaleDateString()}</li>
+          <li><strong>Check Time:</strong> ${new Date().toLocaleTimeString()}</li>
+        </ul>
+        
+        <p>The system will continue to monitor for new violations and notify you when they are found.</p>
+        
+        <p><em>This is an automated message from the Property Investigation Dashboard.</em></p>
+      `;
+    }
 
     const emailResponse = await resend.emails.send({
       from: "Property Alerts <onboarding@resend.dev>",
