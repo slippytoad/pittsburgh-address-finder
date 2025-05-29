@@ -19,16 +19,28 @@ const PropertyInvestigationDashboard: React.FC = () => {
   const [lastNewRecordsCount, setLastNewRecordsCount] = useState<number | undefined>(undefined);
   const [showEmailSettings, setShowEmailSettings] = useState(false);
   const [expandAllCards, setExpandAllCards] = useState(false);
+  const [highlightedCaseNumber, setHighlightedCaseNumber] = useState<string | null>(null);
 
-  // Check URL parameters for pre-selected status
+  // Check URL parameters for pre-selected status or case
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const statusParam = urlParams.get('status');
+    const caseParam = urlParams.get('case');
+    
     if (statusParam) {
       const decodedStatus = decodeURIComponent(statusParam);
       setSelectedStatuses([decodedStatus]);
       setExpandAllCards(true); // Expand cards when coming from email link
-      // Clear the URL parameter to keep URL clean
+    }
+    
+    if (caseParam) {
+      const decodedCase = decodeURIComponent(caseParam);
+      setHighlightedCaseNumber(decodedCase);
+      setExpandAllCards(true); // Expand cards when coming from case link
+    }
+    
+    // Clear the URL parameters to keep URL clean
+    if (statusParam || caseParam) {
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, []);
@@ -188,7 +200,11 @@ const PropertyInvestigationDashboard: React.FC = () => {
             selectedStatuses={selectedStatuses}
             onStatusChange={setSelectedStatuses}
           />
-          <PropertyList records={filteredRecords} expandAllCards={expandAllCards} />
+          <PropertyList 
+            records={filteredRecords} 
+            expandAllCards={expandAllCards}
+            highlightedCaseNumber={highlightedCaseNumber}
+          />
         </div>
       )}
     </div>

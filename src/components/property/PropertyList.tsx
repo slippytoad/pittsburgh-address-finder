@@ -9,9 +9,14 @@ import CaseCard from './CaseCard';
 interface PropertyListProps {
   records: PropertyRecord[];
   expandAllCards?: boolean;
+  highlightedCaseNumber?: string | null;
 }
 
-export const PropertyList: React.FC<PropertyListProps> = ({ records, expandAllCards = false }) => {
+export const PropertyList: React.FC<PropertyListProps> = ({ 
+  records, 
+  expandAllCards = false, 
+  highlightedCaseNumber = null 
+}) => {
   const groupedCases = groupRecordsByCase(records);
 
   return (
@@ -38,6 +43,7 @@ export const PropertyList: React.FC<PropertyListProps> = ({ records, expandAllCa
                 key={groupedCase.casefileNumber || index} 
                 groupedCase={groupedCase} 
                 defaultExpanded={expandAllCards}
+                isHighlighted={highlightedCaseNumber === groupedCase.casefileNumber}
               />
             ))}
           </div>

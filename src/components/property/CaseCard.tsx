@@ -10,9 +10,14 @@ import { formatDate, getStatusColor } from '@/utils/propertyUtils';
 interface CaseCardProps {
   groupedCase: GroupedCase;
   defaultExpanded?: boolean;
+  isHighlighted?: boolean;
 }
 
-export const CaseCard: React.FC<CaseCardProps> = ({ groupedCase, defaultExpanded = false }) => {
+export const CaseCard: React.FC<CaseCardProps> = ({ 
+  groupedCase, 
+  defaultExpanded = false, 
+  isHighlighted = false 
+}) => {
   const [isOpen, setIsOpen] = useState(defaultExpanded);
 
   // Get the primary address from the first record and extract just the street
@@ -35,7 +40,9 @@ export const CaseCard: React.FC<CaseCardProps> = ({ groupedCase, defaultExpanded
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200">
+    <Card className={`hover:shadow-md transition-shadow duration-200 ${
+      isHighlighted ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+    }`}>
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
@@ -48,7 +55,9 @@ export const CaseCard: React.FC<CaseCardProps> = ({ groupedCase, defaultExpanded
                   </CardTitle>
                   <div className="flex items-center gap-2 mt-1">
                     <FileText className="h-3 w-3 lg:h-4 lg:w-4 text-gray-500 flex-shrink-0" />
-                    <span className="text-xs lg:text-sm text-gray-600 truncate">
+                    <span className={`text-xs lg:text-sm truncate ${
+                      isHighlighted ? 'text-blue-700 font-medium' : 'text-gray-600'
+                    }`}>
                       Case #{groupedCase.casefileNumber}
                     </span>
                   </div>

@@ -76,6 +76,25 @@ export class EmailService {
       .join('');
   }
 
+  private formatNewRecordsList(newRecords: ViolationRecord[]): string {
+    const dashboardUrl = "https://preview--pittsburgh-address-finder.lovable.app";
+    
+    return newRecords.slice(0, 10).map((record: any) => {
+      const caseParam = encodeURIComponent(record.casefile_number || '');
+      const caseLink = `${dashboardUrl}?case=${caseParam}`;
+      
+      return `
+        <li style="margin-bottom: 15px; padding: 10px; border: 1px solid #e0e0e0; border-radius: 5px;">
+          <strong>Address:</strong> ${record.address || 'N/A'}<br>
+          <strong>Case File:</strong> <a href="${caseLink}" style="color: #2754C5; text-decoration: none;">${record.casefile_number || 'N/A'}</a><br>
+          <strong>Status:</strong> ${record.status || 'N/A'}<br>
+          <strong>Investigation Date:</strong> ${record.investigation_date || 'N/A'}<br>
+          <strong>Description:</strong> ${record.violation_description || 'N/A'}
+        </li>
+      `;
+    }).join('');
+  }
+
   async sendDailyReport(emailAddress: string, newRecords: ViolationRecord[], allRecords: ViolationRecord[]): Promise<any> {
     console.log('Sending daily email notification to:', emailAddress);
     
@@ -92,17 +111,9 @@ export class EmailService {
         <h2>Daily Property Violation Report</h2>
         <p>We found <strong>${newRecords.length} new violations</strong> during today's check.</p>
         
-        <h3>New Records Summary:</h3>
-        <ul>
-          ${newRecords.slice(0, 10).map((record: any) => `
-            <li>
-              <strong>Address:</strong> ${record.address || 'N/A'}<br>
-              <strong>Case File:</strong> ${record.casefile_number || 'N/A'}<br>
-              <strong>Status:</strong> ${record.status || 'N/A'}<br>
-              <strong>Investigation Date:</strong> ${record.investigation_date || 'N/A'}<br>
-              <strong>Description:</strong> ${record.violation_description || 'N/A'}
-            </li>
-          `).join('')}
+        <h3>New Records (click case numbers for direct access):</h3>
+        <ul style="list-style-type: none; padding: 0;">
+          ${this.formatNewRecordsList(newRecords)}
           ${newRecords.length > 10 ? `<li><em>... and ${newRecords.length - 10} more records</em></li>` : ''}
         </ul>
         
