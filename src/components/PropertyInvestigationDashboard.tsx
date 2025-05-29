@@ -20,6 +20,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
   const [showEmailSettings, setShowEmailSettings] = useState(false);
   const [expandAllCards, setExpandAllCards] = useState(false);
   const [highlightedCaseNumber, setHighlightedCaseNumber] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Check URL parameters for pre-selected status or case
   useEffect(() => {
@@ -59,11 +60,12 @@ const PropertyInvestigationDashboard: React.FC = () => {
 
   // Use database data
   const data = { result: { records: dbData || [] } };
-  const isLoading = dbLoading;
+  const isLoading = dbLoading || isRefreshing;
   const error = dbError;
 
   const handleFetchData = async () => {
     console.log('Button clicked - fetching data...');
+    setIsRefreshing(true);
     setShowResults(true);
     
     try {
@@ -85,6 +87,8 @@ const PropertyInvestigationDashboard: React.FC = () => {
       refetchDb();
     } catch (error) {
       console.error('Failed to update data:', error);
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
