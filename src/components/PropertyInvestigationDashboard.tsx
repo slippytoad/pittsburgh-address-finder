@@ -18,13 +18,16 @@ const PropertyInvestigationDashboard: React.FC = () => {
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [lastNewRecordsCount, setLastNewRecordsCount] = useState<number | undefined>(undefined);
   const [showEmailSettings, setShowEmailSettings] = useState(false);
+  const [expandAllCards, setExpandAllCards] = useState(false);
 
   // Check URL parameters for pre-selected status
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const statusParam = urlParams.get('status');
     if (statusParam) {
-      setSelectedStatuses([decodeURIComponent(statusParam)]);
+      const decodedStatus = decodeURIComponent(statusParam);
+      setSelectedStatuses([decodedStatus]);
+      setExpandAllCards(true); // Expand cards when coming from email link
       // Clear the URL parameter to keep URL clean
       window.history.replaceState({}, '', window.location.pathname);
     }
@@ -185,7 +188,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
             selectedStatuses={selectedStatuses}
             onStatusChange={setSelectedStatuses}
           />
-          <PropertyList records={filteredRecords} />
+          <PropertyList records={filteredRecords} expandAllCards={expandAllCards} />
         </div>
       )}
     </div>

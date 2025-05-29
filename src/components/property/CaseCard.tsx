@@ -9,10 +9,11 @@ import { formatDate, getStatusColor } from '@/utils/propertyUtils';
 
 interface CaseCardProps {
   groupedCase: GroupedCase;
+  defaultExpanded?: boolean;
 }
 
-export const CaseCard: React.FC<CaseCardProps> = ({ groupedCase }) => {
-  const [isOpen, setIsOpen] = useState(false);
+export const CaseCard: React.FC<CaseCardProps> = ({ groupedCase, defaultExpanded = false }) => {
+  const [isOpen, setIsOpen] = useState(defaultExpanded);
 
   // Get the primary address from the first record and extract just the street
   const fullAddress = groupedCase.records[0]?.address || 'Unknown Address';
