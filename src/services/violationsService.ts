@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { PropertyRecord } from '@/types/propertyTypes';
 
@@ -15,6 +14,40 @@ export interface ViolationRecord {
   investigation_outcome?: string;
   investigation_findings?: string;
 }
+
+export const fetchViolationsFromDatabase = async (): Promise<PropertyRecord[]> => {
+  console.log('Fetching violations from database...');
+  
+  const { data: violations, error } = await supabase
+    .from('violations')
+    .select('*')
+    .order('investigation_date', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching violations:', error);
+    throw new Error(`Failed to fetch violations: ${error.message}`);
+  }
+
+  console.log('Fetched', violations?.length || 0, 'violations from database');
+
+  // Map the database format to the expected PropertyRecord format
+  const propertyRecords: PropertyRecord[] = (violations || []).map(violation => ({
+    _id: violation._id,
+    address: violation.address || 'Unknown Address',
+    investigation_date: violation.investigation_date || '',
+    violation_type: violation.violation_description || '',
+    status: violation.status || 'Unknown',
+    casefile_number: violation.casefile_number || '',
+    parcel_id: violation.parcel_id || '',
+    violation_description: violation.violation_description || '',
+    violation_code_section: violation.violation_code_section || '',
+    violation_spec_instructions: violation.violation_spec_instructions || '',
+    investigation_outcome: violation.investigation_outcome || '',
+    investigation_findings: violation.investigation_findings || '',
+  }));
+
+  return propertyRecords;
+};
 
 export const saveViolationsToDatabase = async (records: PropertyRecord[]): Promise<number> => {
   console.log('Checking for new violations...', records.length, 'records from API');

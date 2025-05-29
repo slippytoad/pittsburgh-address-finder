@@ -1,8 +1,10 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { FileText, Settings, ChevronDown, ChevronUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPropertyData, ApiResponseWithNewCount } from '@/services/propertyApi';
+import { fetchViolationsFromDatabase } from '@/services/violationsService';
 import { groupRecordsByCase } from '@/utils/propertyUtils';
 import PropertyHeader from '@/components/property/PropertyHeader';
 import PropertyList from '@/components/property/PropertyList';
@@ -12,29 +14,44 @@ import EmailTestButtons from '@/components/EmailTestButtons';
 import { Button } from '@/components/ui/button';
 
 const PropertyInvestigationDashboard: React.FC = () => {
-  const [showResults, setShowResults] = useState(false);
+  const [showResults, setShowResults] = useState(true); // Show results by default
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [lastNewRecordsCount, setLastNewRecordsCount] = useState<number | undefined>(undefined);
   const [showEmailSettings, setShowEmailSettings] = useState(false);
+  const [useApiData, setUseApiData] = useState(false); // Toggle between database and API
 
-  const { data, isLoading, error, refetch } = useQuery({
+  // Query for database violations (enabled by default)
+  const { data: dbData, isLoading: dbLoading, error: dbError, refetch: refetchDb } = useQuery({
+    queryKey: ['violations-database'],
+    queryFn: fetchViolationsFromDatabase,
+    enabled: !useApiData,
+  });
+
+  // Query for API data (only when explicitly requested)
+  const { data: apiData, isLoading: apiLoading, error: apiError, refetch: refetchApi } = useQuery({
     queryKey: ['propertyInvestigations'],
     queryFn: fetchPropertyData,
-    enabled: showResults,
+    enabled: useApiData && showResults,
   });
+
+  // Use the appropriate data source
+  const data = useApiData ? apiData : { result: { records: dbData || [] } };
+  const isLoading = useApiData ? apiLoading : dbLoading;
+  const error = useApiData ? apiError : dbError;
 
   // Handle updating the new records count when data changes
   useEffect(() => {
-    if (data?.newRecordsCount !== undefined) {
-      setLastNewRecordsCount(data.newRecordsCount);
+    if (apiData?.newRecordsCount !== undefined) {
+      setLastNewRecordsCount(apiData.newRecordsCount);
     }
-  }, [data]);
+  }, [apiData]);
 
   const handleFetchData = () => {
     console.log('Button clicked - fetching data...');
+    setUseApiData(true); // Switch to API data when button is clicked
     setShowResults(true);
     if (showResults) {
-      refetch();
+      refetchApi();
     }
   };
 
@@ -83,6 +100,35 @@ const PropertyInvestigationDashboard: React.FC = () => {
         newRecordsCount={lastNewRecordsCount}
       />
 
+      {/* Data Source Toggle */}
+      <Card className="border border-gray-200">
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-4">
+            <span className="font-medium">Data Source:</span>
+            <Button
+              variant={!useApiData ? "default" : "outline"}
+              onClick={() => { setUseApiData(false); refetchDb(); }}
+              size="sm"
+            >
+              Database ({dbData?.length || 0} records)
+            </Button>
+            <Button
+              variant={useApiData ? "default" : "outline"}
+              onClick={() => setUseApiData(true)}
+              size="sm"
+            >
+              Live API
+            </Button>
+          </div>
+          <p className="text-sm text-gray-600 mt-2">
+            {useApiData 
+              ? "Showing live data from the external API" 
+              : "Showing stored data from the violations database"
+            }
+          </p>
+        </CardContent>
+      </Card>
+
       {/* Email Settings Toggle */}
       <Card className="border border-gray-200">
         <CardContent className="pt-6">
@@ -123,7 +169,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
         </Card>
       )}
 
-      {showResults && data && (
+      {data && (
         <div className="space-y-4 sm:space-y-6">
           <StatusFilter
             availableStatuses={availableStatuses}
