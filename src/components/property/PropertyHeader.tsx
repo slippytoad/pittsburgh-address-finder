@@ -72,17 +72,8 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
             size="sm"
             className="text-gray-600 hover:text-gray-800"
           >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-3 w-3 animate-spin" />
-                Updating...
-              </>
-            ) : (
-              <>
-                <RefreshCw className={`mr-2 h-3 w-3 transition-transform duration-200 ${isLoading ? 'animate-spin' : ''}`} />
-                Refresh Data
-              </>
-            )}
+            <RefreshCw className={`mr-2 h-3 w-3 transition-transform duration-200 ${isLoading ? 'animate-spin' : ''}`} />
+            {isLoading ? 'Updating...' : 'Refresh Data'}
           </Button>
         </div>
       )}
