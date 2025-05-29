@@ -1,16 +1,23 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, Search, FileText, Calendar, Clock } from 'lucide-react';
+import { Loader2, Search, FileText, Calendar, Clock, Plus } from 'lucide-react';
 
 interface PropertyHeaderProps {
   onFetchData: () => void;
   isLoading: boolean;
   showResults: boolean;
   latestDate?: string;
+  newRecordsCount?: number;
 }
 
-const PropertyHeader: React.FC<PropertyHeaderProps> = ({ onFetchData, isLoading, showResults, latestDate }) => {
+const PropertyHeader: React.FC<PropertyHeaderProps> = ({ 
+  onFetchData, 
+  isLoading, 
+  showResults, 
+  latestDate,
+  newRecordsCount 
+}) => {
   // Format current timestamp for "last check"
   const formatLastCheck = () => {
     const now = new Date();
@@ -79,6 +86,12 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({ onFetchData, isLoading,
             <div className="flex items-center gap-1">
               <Clock className="h-4 w-4 text-gray-500" />
               <span>Last check: {formatLastCheck()}</span>
+              {newRecordsCount !== undefined && (
+                <div className="flex items-center gap-1 ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                  <Plus className="h-3 w-3" />
+                  <span>{newRecordsCount} new</span>
+                </div>
+              )}
             </div>
           </div>
         )}

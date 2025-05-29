@@ -16,11 +16,33 @@ export interface ViolationRecord {
   investigation_findings?: string;
 }
 
-export const saveViolationsToDatabase = async (records: PropertyRecord[]): Promise<void> => {
-  console.log('Saving violations to database...', records.length, 'records');
+export const saveViolationsToDatabase = async (records: PropertyRecord[]): Promise<number> => {
+  console.log('Checking for new violations...', records.length, 'records from API');
   
-  // Map API records to database format
-  const violationRecords: ViolationRecord[] = records.map(record => ({
+  // Get existing record IDs from database
+  const { data: existingRecords, error: fetchError } = await supabase
+    .from('violations')
+    .select('_id');
+
+  if (fetchError) {
+    console.error('Error fetching existing violations:', fetchError);
+    throw new Error(`Failed to fetch existing violations: ${fetchError.message}`);
+  }
+
+  const existingIds = new Set(existingRecords?.map(record => record._id) || []);
+  console.log('Found', existingIds.size, 'existing records in database');
+
+  // Filter out records that already exist
+  const newRecords = records.filter(record => !existingIds.has(record._id));
+  console.log('Found', newRecords.length, 'new records to save');
+
+  if (newRecords.length === 0) {
+    console.log('No new records to save');
+    return 0;
+  }
+
+  // Map new records to database format
+  const violationRecords: ViolationRecord[] = newRecords.map(record => ({
     _id: record._id,
     casefile_number: record.casefile_number || null,
     address: record.address || null,
@@ -34,18 +56,16 @@ export const saveViolationsToDatabase = async (records: PropertyRecord[]): Promi
     investigation_findings: record.investigation_findings || null,
   }));
 
-  // Use upsert to handle duplicates based on _id
+  // Insert only new records
   const { data, error } = await supabase
     .from('violations')
-    .upsert(violationRecords, { 
-      onConflict: '_id',
-      ignoreDuplicates: false 
-    });
+    .insert(violationRecords);
 
   if (error) {
-    console.error('Error saving violations:', error);
-    throw new Error(`Failed to save violations: ${error.message}`);
+    console.error('Error saving new violations:', error);
+    throw new Error(`Failed to save new violations: ${error.message}`);
   }
 
-  console.log('Successfully saved violations to database:', data);
+  console.log('Successfully saved', newRecords.length, 'new violations to database');
+  return newRecords.length;
 };

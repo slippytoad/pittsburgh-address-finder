@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { FileText } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchPropertyData } from '@/services/propertyApi';
+import { fetchPropertyData, ApiResponseWithNewCount } from '@/services/propertyApi';
 import { groupRecordsByCase } from '@/utils/propertyUtils';
 import PropertyHeader from '@/components/property/PropertyHeader';
 import PropertyList from '@/components/property/PropertyList';
@@ -12,11 +12,17 @@ import StatusFilter from '@/components/property/StatusFilter';
 const PropertyInvestigationDashboard: React.FC = () => {
   const [showResults, setShowResults] = useState(false);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [lastNewRecordsCount, setLastNewRecordsCount] = useState<number | undefined>(undefined);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['propertyInvestigations'],
     queryFn: fetchPropertyData,
     enabled: showResults,
+    onSuccess: (data: ApiResponseWithNewCount) => {
+      if (data.newRecordsCount !== undefined) {
+        setLastNewRecordsCount(data.newRecordsCount);
+      }
+    }
   });
 
   const handleFetchData = () => {
@@ -66,6 +72,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
         isLoading={isLoading}
         showResults={showResults}
         latestDate={getLatestDate()}
+        newRecordsCount={lastNewRecordsCount}
       />
 
       {error && (
