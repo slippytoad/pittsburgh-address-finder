@@ -50,7 +50,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
           {latestDate && (
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4 text-gray-500" />
-              <span>Latest: {formatDate(latestDate)}</span>
+              <span>Last Violation Update: {formatDate(latestDate)}</span>
             </div>
           )}
           {lastApiCheckTime && (
