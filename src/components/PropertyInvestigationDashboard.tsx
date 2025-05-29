@@ -5,6 +5,7 @@ import { FileText, Settings, ChevronDown, ChevronUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPropertyData, ApiResponseWithNewCount } from '@/services/propertyApi';
 import { fetchViolationsFromDatabase } from '@/services/violationsService';
+import { getAppSettings, updateLastApiCheckTime } from '@/services/appSettingsService';
 import { groupRecordsByCase } from '@/utils/propertyUtils';
 import PropertyHeader from '@/components/property/PropertyHeader';
 import PropertyList from '@/components/property/PropertyList';
@@ -19,7 +20,12 @@ const PropertyInvestigationDashboard: React.FC = () => {
   const [lastNewRecordsCount, setLastNewRecordsCount] = useState<number | undefined>(undefined);
   const [showEmailSettings, setShowEmailSettings] = useState(false);
   const [useApiData, setUseApiData] = useState(false); // Toggle between database and API
-  const [lastApiCheckTime, setLastApiCheckTime] = useState<string | undefined>(undefined);
+
+  // Query for app settings to get the last API check time
+  const { data: appSettings, refetch: refetchAppSettings } = useQuery({
+    queryKey: ['app-settings'],
+    queryFn: getAppSettings,
+  });
 
   // Query for database violations (enabled by default)
   const { data: dbData, isLoading: dbLoading, error: dbError, refetch: refetchDb } = useQuery({
@@ -47,22 +53,19 @@ const PropertyInvestigationDashboard: React.FC = () => {
     }
   }, [apiData]);
 
-  const handleFetchData = () => {
+  const handleFetchData = async () => {
     console.log('Button clicked - fetching data...');
     setUseApiData(true); // Switch to API data when button is clicked
     setShowResults(true);
     
-    // Update the last API check time
-    const now = new Date();
-    const formattedTime = now.toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
-    setLastApiCheckTime(formattedTime);
+    try {
+      // Update the last API check time in the database
+      await updateLastApiCheckTime();
+      // Refetch app settings to get the updated timestamp
+      refetchAppSettings();
+    } catch (error) {
+      console.error('Failed to update last API check time:', error);
+    }
     
     if (showResults) {
       refetchApi();
@@ -104,6 +107,25 @@ const PropertyInvestigationDashboard: React.FC = () => {
     return groupedCases.length > 0 ? groupedCases[0].latestDate : undefined;
   };
 
+  // Format the last API check time for display
+  const formatLastApiCheckTime = (timestamp: string | null) => {
+    if (!timestamp) return undefined;
+    
+    try {
+      const date = new Date(timestamp);
+      return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    } catch {
+      return undefined;
+    }
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto p-2 sm:p-6 space-y-4 sm:space-y-6">
       <PropertyHeader 
@@ -112,7 +134,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
         showResults={showResults}
         latestDate={getLatestDate()}
         newRecordsCount={lastNewRecordsCount}
-        lastApiCheckTime={lastApiCheckTime}
+        lastApiCheckTime={formatLastApiCheckTime(appSettings?.last_api_check_time || null)}
       />
 
       {/* Data Source Toggle */}

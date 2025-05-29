@@ -33,6 +33,7 @@ export type Database = {
           email_report_address: string | null
           email_reports_enabled: boolean | null
           id: number
+          last_api_check_time: string | null
           next_violation_check_time: string | null
           updated_at: string | null
           violation_checks_enabled: boolean | null
@@ -42,6 +43,7 @@ export type Database = {
           email_report_address?: string | null
           email_reports_enabled?: boolean | null
           id?: number
+          last_api_check_time?: string | null
           next_violation_check_time?: string | null
           updated_at?: string | null
           violation_checks_enabled?: boolean | null
@@ -51,6 +53,7 @@ export type Database = {
           email_report_address?: string | null
           email_reports_enabled?: boolean | null
           id?: number
+          last_api_check_time?: string | null
           next_violation_check_time?: string | null
           updated_at?: string | null
           violation_checks_enabled?: boolean | null
