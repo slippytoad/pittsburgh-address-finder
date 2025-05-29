@@ -68,6 +68,12 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                       Case #{groupedCase.casefileNumber}
                     </span>
                   </div>
+                  {earliestDate && (
+                    <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                      <Calendar className="h-3 w-3 flex-shrink-0" />
+                      <span>Opened: {formatDate(earliestDate)}</span>
+                    </div>
+                  )}
                 </div>
               </div>
               
@@ -93,12 +99,6 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                     <span className="font-medium">Outcome:</span> 
                     <span className="ml-1 break-words">{latestOutcome}</span>
                   </div>
-                  {earliestDate && (
-                    <div className="flex items-center gap-1 text-gray-500 mb-1">
-                      <Calendar className="h-3 w-3 flex-shrink-0" />
-                      <span>Case opened: {formatDate(earliestDate)}</span>
-                    </div>
-                  )}
                   <div className="flex items-center gap-1 text-gray-500">
                     <Calendar className="h-3 w-3 flex-shrink-0" />
                     <span>Last update: {formatDate(groupedCase.latestDate)}</span>
