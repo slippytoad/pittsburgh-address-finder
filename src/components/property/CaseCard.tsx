@@ -53,51 +53,51 @@ export const CaseCard: React.FC<CaseCardProps> = ({
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex flex-col gap-3 min-w-0 flex-1">
-                <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <MapPin className="h-4 w-4 lg:h-5 lg:w-5 text-blue-600 flex-shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <CardTitle className="text-base lg:text-lg truncate">
-                      {streetAddress}
-                    </CardTitle>
-                    <div className="flex items-center gap-2 mt-1">
-                      <FileText className="h-3 w-3 lg:h-4 lg:w-4 text-gray-500 flex-shrink-0" />
-                      <span className={`text-xs lg:text-sm truncate ${
-                        isHighlighted ? 'text-blue-700 font-medium' : 'text-gray-600'
-                      }`}>
-                        Case #{groupedCase.casefileNumber}
-                      </span>
-                    </div>
-                    {earliestDate && (
-                      <div className="flex items-center gap-1 text-sm lg:text-base text-gray-500 mt-1">
-                        <Calendar className="h-3 w-3 lg:h-4 lg:w-4 flex-shrink-0" />
-                        <span>Opened: {formatDate(earliestDate)}</span>
-                      </div>
-                    )}
-                  </div>
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 lg:gap-4">
+              <div className="flex flex-col gap-2 min-w-0 flex-1">
+                <div className="flex items-center gap-2 min-w-0">
+                  <MapPin className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                  <CardTitle className="text-base lg:text-lg truncate">
+                    {streetAddress}
+                  </CardTitle>
                 </div>
+                
+                <div className="flex items-center gap-2">
+                  <FileText className="h-3 w-3 text-gray-500 flex-shrink-0" />
+                  <span className={`text-sm truncate ${
+                    isHighlighted ? 'text-blue-700 font-medium' : 'text-gray-600'
+                  }`}>
+                    Case #{groupedCase.casefileNumber}
+                  </span>
+                </div>
+                
+                {earliestDate && (
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Calendar className="h-3 w-3 flex-shrink-0" />
+                    <span>Opened: {formatDate(earliestDate)}</span>
+                  </div>
+                )}
               </div>
               
-              <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-2 lg:items-end lg:flex-shrink-0">
+                <div className="flex items-center justify-between lg:justify-end gap-2">
                   <Badge variant={getStatusColor(groupedCase.currentStatus)} className="w-fit">
                     {groupedCase.currentStatus}
                   </Badge>
-                  <div className="flex items-center gap-1 text-xs lg:text-sm text-gray-500">
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
                     <span>
                       {groupedCase.records.length} record{groupedCase.records.length !== 1 ? 's' : ''}
                     </span>
                     {isOpen ? (
-                      <ChevronUp className="h-3 w-3 lg:h-4 lg:w-4 text-gray-500 flex-shrink-0" />
+                      <ChevronUp className="h-4 w-4 text-gray-500 flex-shrink-0" />
                     ) : (
-                      <ChevronDown className="h-3 w-3 lg:h-4 lg:w-4 text-gray-500 flex-shrink-0" />
+                      <ChevronDown className="h-4 w-4 text-gray-500 flex-shrink-0" />
                     )}
                   </div>
                 </div>
                 
-                <div className="text-xs lg:text-sm text-gray-600 text-right">
-                  <div className="mb-1">
+                <div className="text-sm text-gray-600 lg:text-right space-y-1">
+                  <div>
                     <span className="font-medium">Outcome:</span> 
                     <span className="ml-1 break-words">{latestOutcome}</span>
                   </div>
