@@ -19,7 +19,6 @@ const PropertyInvestigationDashboard: React.FC = () => {
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [lastNewRecordsCount, setLastNewRecordsCount] = useState<number | undefined>(undefined);
   const [showEmailSettings, setShowEmailSettings] = useState(false);
-  const [useApiData, setUseApiData] = useState(false); // Toggle between database and API
 
   // Query for app settings to get the last API check time
   const { data: appSettings, refetch: refetchAppSettings } = useQuery({
@@ -27,48 +26,40 @@ const PropertyInvestigationDashboard: React.FC = () => {
     queryFn: getAppSettings,
   });
 
-  // Query for database violations (enabled by default)
+  // Query for database violations (always enabled)
   const { data: dbData, isLoading: dbLoading, error: dbError, refetch: refetchDb } = useQuery({
     queryKey: ['violations-database'],
     queryFn: fetchViolationsFromDatabase,
-    enabled: !useApiData,
   });
 
-  // Query for API data (only when explicitly requested)
-  const { data: apiData, isLoading: apiLoading, error: apiError, refetch: refetchApi } = useQuery({
-    queryKey: ['propertyInvestigations'],
-    queryFn: fetchPropertyData,
-    enabled: useApiData && showResults,
-  });
-
-  // Use the appropriate data source
-  const data = useApiData ? apiData : { result: { records: dbData || [] } };
-  const isLoading = useApiData ? apiLoading : dbLoading;
-  const error = useApiData ? apiError : dbError;
-
-  // Handle updating the new records count when data changes
-  useEffect(() => {
-    if (apiData?.newRecordsCount !== undefined) {
-      setLastNewRecordsCount(apiData.newRecordsCount);
-    }
-  }, [apiData]);
+  // Use database data
+  const data = { result: { records: dbData || [] } };
+  const isLoading = dbLoading;
+  const error = dbError;
 
   const handleFetchData = async () => {
     console.log('Button clicked - fetching data...');
-    setUseApiData(true); // Switch to API data when button is clicked
     setShowResults(true);
     
     try {
+      // Fetch fresh data from API
+      const apiData = await fetchPropertyData();
+      
       // Update the last API check time in the database
       await updateLastApiCheckTime();
+      
+      // Set the new records count if available
+      if (apiData?.newRecordsCount !== undefined) {
+        setLastNewRecordsCount(apiData.newRecordsCount);
+      }
+      
       // Refetch app settings to get the updated timestamp
       refetchAppSettings();
+      
+      // Refetch database data to show the updated records
+      refetchDb();
     } catch (error) {
-      console.error('Failed to update last API check time:', error);
-    }
-    
-    if (showResults) {
-      refetchApi();
+      console.error('Failed to update data:', error);
     }
   };
 
@@ -136,35 +127,6 @@ const PropertyInvestigationDashboard: React.FC = () => {
         newRecordsCount={lastNewRecordsCount}
         lastApiCheckTime={formatLastApiCheckTime(appSettings?.last_api_check_time || null)}
       />
-
-      {/* Data Source Toggle */}
-      <Card className="border border-gray-200">
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-4">
-            <span className="font-medium">Data Source:</span>
-            <Button
-              variant={!useApiData ? "default" : "outline"}
-              onClick={() => { setUseApiData(false); refetchDb(); }}
-              size="sm"
-            >
-              Database ({dbData?.length || 0} records)
-            </Button>
-            <Button
-              variant={useApiData ? "default" : "outline"}
-              onClick={() => setUseApiData(true)}
-              size="sm"
-            >
-              Live API
-            </Button>
-          </div>
-          <p className="text-sm text-gray-600 mt-2">
-            {useApiData 
-              ? "Showing live data from the external API" 
-              : "Showing stored data from the violations database"
-            }
-          </p>
-        </CardContent>
-      </Card>
 
       {/* Email Settings Toggle */}
       <Card className="border border-gray-200">
