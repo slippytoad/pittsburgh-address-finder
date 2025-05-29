@@ -53,7 +53,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+            <div className="flex flex-col gap-3">
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 <MapPin className="h-4 w-4 lg:h-5 lg:w-5 text-blue-600 flex-shrink-0" />
                 <div className="min-w-0 flex-1">
