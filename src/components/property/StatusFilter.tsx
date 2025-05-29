@@ -17,10 +17,13 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
   onStatusChange,
 }) => {
   const handleStatusToggle = (status: string) => {
+    // Radio button behavior - only one status can be selected
     if (selectedStatuses.includes(status)) {
-      onStatusChange(selectedStatuses.filter(s => s !== status));
+      // If clicking the already selected status, deselect it
+      onStatusChange([]);
     } else {
-      onStatusChange([...selectedStatuses, status]);
+      // Select only this status
+      onStatusChange([status]);
     }
   };
 
