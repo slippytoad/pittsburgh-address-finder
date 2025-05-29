@@ -1,6 +1,7 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText } from 'lucide-react';
+import { FileText, Settings, ChevronDown, ChevronUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPropertyData, ApiResponseWithNewCount } from '@/services/propertyApi';
 import { groupRecordsByCase } from '@/utils/propertyUtils';
@@ -8,11 +9,13 @@ import PropertyHeader from '@/components/property/PropertyHeader';
 import PropertyList from '@/components/property/PropertyList';
 import StatusFilter from '@/components/property/StatusFilter';
 import EmailSettings from '@/components/EmailSettings';
+import { Button } from '@/components/ui/button';
 
 const PropertyInvestigationDashboard: React.FC = () => {
   const [showResults, setShowResults] = useState(false);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [lastNewRecordsCount, setLastNewRecordsCount] = useState<number | undefined>(undefined);
+  const [showEmailSettings, setShowEmailSettings] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['propertyInvestigations'],
@@ -77,7 +80,32 @@ const PropertyInvestigationDashboard: React.FC = () => {
         newRecordsCount={lastNewRecordsCount}
       />
 
-      <EmailSettings />
+      {/* Email Settings Toggle */}
+      <Card className="border border-gray-200">
+        <CardContent className="pt-6">
+          <Button
+            variant="ghost"
+            onClick={() => setShowEmailSettings(!showEmailSettings)}
+            className="w-full justify-between p-0 h-auto font-medium text-left"
+          >
+            <div className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              <span>Email Notification Settings</span>
+            </div>
+            {showEmailSettings ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+          
+          {showEmailSettings && (
+            <div className="mt-4">
+              <EmailSettings />
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {error && (
         <Card className="border-red-200 bg-red-50">
