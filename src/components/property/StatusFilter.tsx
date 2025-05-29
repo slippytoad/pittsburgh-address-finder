@@ -2,7 +2,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Filter } from 'lucide-react';
 import { getStatusColor } from '@/utils/propertyUtils';
 
@@ -25,44 +24,38 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
     }
   };
 
-  const handleSelectAll = () => {
-    if (selectedStatuses.length === availableStatuses.length) {
-      onStatusChange([]);
-    } else {
-      onStatusChange(availableStatuses);
-    }
-  };
-
   return (
     <Card className="shadow-sm">
       <CardContent className="pt-4">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-4">
           <Filter className="h-4 w-4 text-blue-600" />
           <h3 className="font-medium text-sm">Filter by Status</h3>
         </div>
         
         <div className="space-y-2">
-          <Button
-            variant={selectedStatuses.length === availableStatuses.length ? "default" : "outline"}
-            size="sm"
-            onClick={handleSelectAll}
-            className="w-full justify-start text-xs"
-          >
-            {selectedStatuses.length === availableStatuses.length ? "Deselect All" : "Select All"} ({availableStatuses.length})
-          </Button>
-          
           {availableStatuses.map((status) => (
-            <Button
+            <div
               key={status}
-              variant={selectedStatuses.includes(status) ? "default" : "outline"}
-              size="sm"
               onClick={() => handleStatusToggle(status)}
-              className="w-full justify-start text-xs"
+              className={`
+                cursor-pointer p-2 rounded-md border transition-all duration-200
+                ${selectedStatuses.includes(status) 
+                  ? 'bg-gray-900 border-gray-900 text-white' 
+                  : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                }
+              `}
             >
-              <Badge variant={getStatusColor(status)} className="text-xs mr-2">
+              <Badge 
+                variant={getStatusColor(status)} 
+                className={`text-xs ${
+                  selectedStatuses.includes(status) 
+                    ? 'bg-white text-gray-900' 
+                    : ''
+                }`}
+              >
                 {status}
               </Badge>
-            </Button>
+            </div>
           ))}
         </div>
       </CardContent>
