@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { FileText, Settings, ChevronDown, ChevronUp } from 'lucide-react';
@@ -19,6 +18,17 @@ const PropertyInvestigationDashboard: React.FC = () => {
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [lastNewRecordsCount, setLastNewRecordsCount] = useState<number | undefined>(undefined);
   const [showEmailSettings, setShowEmailSettings] = useState(false);
+
+  // Check URL parameters for pre-selected status
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const statusParam = urlParams.get('status');
+    if (statusParam) {
+      setSelectedStatuses([decodeURIComponent(statusParam)]);
+      // Clear the URL parameter to keep URL clean
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
 
   // Query for app settings to get the last API check time
   const { data: appSettings, refetch: refetchAppSettings } = useQuery({

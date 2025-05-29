@@ -1,3 +1,4 @@
+
 import { Resend } from "npm:resend@2.0.0";
 import { ViolationRecord } from "./types.ts";
 
@@ -64,8 +65,14 @@ export class EmailService {
       caseCounts[latestStatus] = (caseCounts[latestStatus] || 0) + 1;
     });
 
+    const dashboardUrl = "https://preview--pittsburgh-address-finder.lovable.app";
+
     return Object.entries(caseCounts)
-      .map(([status, count]) => `<li><strong>${status}:</strong> ${count}</li>`)
+      .map(([status, count]) => {
+        const statusParam = encodeURIComponent(status);
+        const statusLink = `${dashboardUrl}?status=${statusParam}`;
+        return `<li><strong><a href="${statusLink}" style="color: #2754C5; text-decoration: none;">${status}</a>:</strong> ${count}</li>`;
+      })
       .join('');
   }
 
@@ -99,7 +106,7 @@ export class EmailService {
           ${newRecords.length > 10 ? `<li><em>... and ${newRecords.length - 10} more records</em></li>` : ''}
         </ul>
         
-        <h3>Check Summary - Number of cases in each state:</h3>
+        <h3>Check Summary - Number of cases in each state (click to filter):</h3>
         <ul>
           ${statusSummary}
         </ul>
@@ -115,7 +122,7 @@ export class EmailService {
         <h2>Daily Property Violation Report</h2>
         <p>We completed today's check and <strong>no new violations</strong> were found.</p>
         
-        <h3>Check Summary - Number of cases in each state:</h3>
+        <h3>Check Summary - Number of cases in each state (click to filter):</h3>
         <ul>
           ${statusSummary}
         </ul>
