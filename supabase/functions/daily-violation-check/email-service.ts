@@ -27,7 +27,7 @@ export class EmailService {
       
       <p>If you received this email, your notification system is working properly!</p>
       
-      <p><a href="https://preview--pittsburgh-address-finder.lovable.app" style="background-color: #2754C5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">View Dashboard</a></p>
+      <p><a href="https://pittsburgh-address-finder.lovable.app" style="background-color: #2754C5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">View Dashboard</a></p>
       
       <p><em>This is a test message from the Property Investigation Dashboard.</em></p>
     `;
@@ -65,7 +65,7 @@ export class EmailService {
       caseCounts[latestStatus] = (caseCounts[latestStatus] || 0) + 1;
     });
 
-    const dashboardUrl = "https://preview--pittsburgh-address-finder.lovable.app";
+    const dashboardUrl = "https://pittsburgh-address-finder.lovable.app";
 
     return Object.entries(caseCounts)
       .map(([status, count]) => {
@@ -77,7 +77,7 @@ export class EmailService {
   }
 
   private formatNewRecordsList(newRecords: ViolationRecord[]): string {
-    const dashboardUrl = "https://preview--pittsburgh-address-finder.lovable.app";
+    const dashboardUrl = "https://pittsburgh-address-finder.lovable.app";
     
     return newRecords.slice(0, 10).map((record: any) => {
       const caseParam = encodeURIComponent(record.casefile_number || '');
@@ -102,7 +102,7 @@ export class EmailService {
     let emailBody: string;
 
     const statusSummary = this.getStatusSummary(allRecords);
-    const dashboardUrl = "https://preview--pittsburgh-address-finder.lovable.app";
+    const dashboardUrl = "https://pittsburgh-address-finder.lovable.app";
 
     if (newRecords.length > 0) {
       // Email for when new violations are found
