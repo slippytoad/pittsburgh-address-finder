@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,9 +23,13 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   // Get the primary address from the first record and extract just the street
   const fullAddress = groupedCase.records[0]?.address || 'Unknown Address';
   const streetAddress = fullAddress.split(',')[0] || fullAddress;
+  // Convert street address to mixed case
+  const formattedStreetAddress = streetAddress.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
 
   // Get the investigation outcome from the latest record
   const latestOutcome = groupedCase.records[0]?.investigation_outcome || 'No outcome recorded';
+  // Convert outcome to mixed case
+  const formattedOutcome = latestOutcome.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
 
   // Get the earliest investigation date (when case was first opened)
   const earliestDate = groupedCase.records.reduce((earliest, record) => {
@@ -96,7 +101,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   <div className="flex items-center gap-2 min-w-0">
                     <MapPin className="h-4 w-4 text-blue-600 flex-shrink-0" />
                     <CardTitle className="text-base lg:text-lg truncate">
-                      {streetAddress}
+                      {formattedStreetAddress}
                     </CardTitle>
                   </div>
                   
@@ -137,7 +142,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   <div className="text-sm text-gray-600 sm:text-right space-y-1">
                     <div>
                       <span className="font-medium">Outcome:</span> 
-                      <span className="ml-1 break-words">{latestOutcome}</span>
+                      <span className="ml-1 break-words">{formattedOutcome}</span>
                     </div>
                     <div className="flex items-center gap-1 text-gray-500">
                       <Calendar className="h-3 w-3 flex-shrink-0" />
