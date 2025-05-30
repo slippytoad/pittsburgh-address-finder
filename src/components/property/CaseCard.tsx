@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -63,6 +62,27 @@ export const CaseCard: React.FC<CaseCardProps> = ({
     return fieldNameMap[fieldName] || fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
+  // Function to format field values to mixed case (except status)
+  const formatFieldValue = (key: string, value: any) => {
+    if (key === 'investigation_date') {
+      return formatDate(value as string);
+    }
+    
+    if (key === 'status') {
+      // Keep status as-is (don't change case)
+      return typeof value === 'object' ? JSON.stringify(value) : String(value);
+    }
+    
+    if (typeof value === 'object') {
+      return JSON.stringify(value);
+    }
+    
+    const stringValue = String(value);
+    
+    // Convert to mixed case for other fields
+    return stringValue.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+  };
+
   return (
     <Card className={`hover:shadow-md transition-shadow duration-200 ${
       isHighlighted ? 'ring-2 ring-blue-500 bg-blue-50' : ''
@@ -70,57 +90,59 @@ export const CaseCard: React.FC<CaseCardProps> = ({
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
-            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 lg:gap-4">
-              <div className="flex flex-col gap-2 min-w-0 flex-1">
-                <div className="flex items-center gap-2 min-w-0">
-                  <MapPin className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                  <CardTitle className="text-base lg:text-lg truncate">
-                    {streetAddress}
-                  </CardTitle>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <FileText className="h-3 w-3 text-gray-500 flex-shrink-0" />
-                  <span className={`text-sm truncate ${
-                    isHighlighted ? 'text-blue-700 font-medium' : 'text-gray-600'
-                  }`}>
-                    Case #{groupedCase.casefileNumber}
-                  </span>
-                </div>
-                
-                {earliestDate && (
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Calendar className="h-3 w-3 flex-shrink-0" />
-                    <span>Opened: {formatDate(earliestDate)}</span>
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                <div className="flex flex-col gap-2 min-w-0 flex-1">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <MapPin className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                    <CardTitle className="text-base lg:text-lg truncate">
+                      {streetAddress}
+                    </CardTitle>
                   </div>
-                )}
-              </div>
-              
-              <div className="flex flex-col gap-2 lg:items-end lg:flex-shrink-0">
-                <div className="flex items-center justify-between lg:justify-end gap-2">
-                  <Badge variant={getStatusColor(groupedCase.currentStatus)} className="w-fit">
-                    {groupedCase.currentStatus}
-                  </Badge>
-                  <div className="flex items-center gap-1 text-sm text-gray-500">
-                    <span>
-                      {groupedCase.records.length} record{groupedCase.records.length !== 1 ? 's' : ''}
+                  
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-3 w-3 text-gray-500 flex-shrink-0" />
+                    <span className={`text-sm truncate ${
+                      isHighlighted ? 'text-blue-700 font-medium' : 'text-gray-600'
+                    }`}>
+                      Case #{groupedCase.casefileNumber}
                     </span>
-                    {isOpen ? (
-                      <ChevronUp className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 text-gray-500 flex-shrink-0" />
-                    )}
                   </div>
+                  
+                  {earliestDate && (
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <Calendar className="h-3 w-3 flex-shrink-0" />
+                      <span>Opened: {formatDate(earliestDate)}</span>
+                    </div>
+                  )}
                 </div>
                 
-                <div className="text-sm text-gray-600 lg:text-right space-y-1">
-                  <div>
-                    <span className="font-medium">Outcome:</span> 
-                    <span className="ml-1 break-words">{latestOutcome}</span>
+                <div className="flex flex-col gap-2 sm:items-end sm:flex-shrink-0">
+                  <div className="flex items-center justify-between sm:justify-end gap-2">
+                    <Badge variant={getStatusColor(groupedCase.currentStatus)} className="w-fit">
+                      {groupedCase.currentStatus}
+                    </Badge>
+                    <div className="flex items-center gap-1 text-sm text-gray-500">
+                      <span>
+                        {groupedCase.records.length} record{groupedCase.records.length !== 1 ? 's' : ''}
+                      </span>
+                      {isOpen ? (
+                        <ChevronUp className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <Calendar className="h-3 w-3 flex-shrink-0" />
-                    <span>Last update: {formatDate(groupedCase.latestDate)}</span>
+                  
+                  <div className="text-sm text-gray-600 sm:text-right space-y-1">
+                    <div>
+                      <span className="font-medium">Outcome:</span> 
+                      <span className="ml-1 break-words">{latestOutcome}</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-500">
+                      <Calendar className="h-3 w-3 flex-shrink-0" />
+                      <span>Last update: {formatDate(groupedCase.latestDate)}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -143,9 +165,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                               {formatFieldName(key)}:
                             </div>
                             <div className="sm:col-span-2 text-gray-600 text-sm lg:text-base break-words">
-                              {key === 'investigation_date' ? formatDate(value as string) : 
-                               typeof value === 'object' ? JSON.stringify(value) : 
-                               String(value)}
+                              {formatFieldValue(key, value)}
                             </div>
                           </div>
                         );
