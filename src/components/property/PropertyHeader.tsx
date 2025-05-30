@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, FileText, Calendar, Clock, Plus } from 'lucide-react';
@@ -7,32 +8,19 @@ interface PropertyHeaderProps {
   onFetchData: () => void;
   isLoading: boolean;
   showResults: boolean;
-  latestDate?: string;
   newRecordsCount?: number;
   lastApiCheckTime?: string;
+  nextApiCheckTime?: string;
 }
 
 const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   onFetchData,
   isLoading,
   showResults,
-  latestDate,
   newRecordsCount,
-  lastApiCheckTime
+  lastApiCheckTime,
+  nextApiCheckTime
 }) => {
-  // Format date
-  const formatDate = (dateString: string) => {
-    try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      });
-    } catch {
-      return dateString;
-    }
-  };
-
   return (
     <>
       <LoadingOverlay isVisible={isLoading} message="Refreshing data..." />
@@ -49,12 +37,6 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
         
         {showResults && (
           <div className="flex items-center justify-center gap-6 text-sm text-gray-600">
-            {latestDate && (
-              <div className="flex items-center gap-1">
-                <Calendar className="h-4 w-4 text-gray-500" />
-                <span>Last Violation Update: {formatDate(latestDate)}</span>
-              </div>
-            )}
             {lastApiCheckTime && (
               <div className="flex items-center gap-1">
                 <Clock className="h-4 w-4 text-gray-500" />
@@ -65,6 +47,12 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
                     <span>{newRecordsCount} new</span>
                   </div>
                 )}
+              </div>
+            )}
+            {nextApiCheckTime && (
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4 text-gray-500" />
+                <span>Next API check: {nextApiCheckTime}</span>
               </div>
             )}
             <Button
