@@ -46,6 +46,23 @@ export const CaseCard: React.FC<CaseCardProps> = ({
     return [...orderedKeys, ...remainingKeys].filter(key => record[key] !== undefined);
   };
 
+  // Function to format field names to mixed case
+  const formatFieldName = (fieldName: string) => {
+    const fieldNameMap: { [key: string]: string } = {
+      'investigation_date': 'Investigation Date',
+      'status': 'Status',
+      'violation_type': 'Violation Type',
+      'investigation_outcome': 'Investigation Outcome',
+      'violation_description': 'Violation Description',
+      'violation_code_section': 'Violation Code Section',
+      'violation_spec_instructions': 'Violation Specific Instructions',
+      'investigation_findings': 'Investigation Findings',
+      'inspector': 'Inspector'
+    };
+
+    return fieldNameMap[fieldName] || fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
+
   return (
     <Card className={`hover:shadow-md transition-shadow duration-200 ${
       isHighlighted ? 'ring-2 ring-blue-500 bg-blue-50' : ''
@@ -122,8 +139,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                         const value = record[key];
                         return (
                           <div key={key} className="flex flex-col sm:grid sm:grid-cols-3 gap-1 sm:gap-4">
-                            <div className="font-medium text-gray-700 capitalize text-sm lg:text-base">
-                              {key.replace(/_/g, ' ')}:
+                            <div className="font-medium text-gray-700 text-sm lg:text-base">
+                              {formatFieldName(key)}:
                             </div>
                             <div className="sm:col-span-2 text-gray-600 text-sm lg:text-base break-words">
                               {key === 'investigation_date' ? formatDate(value as string) : 
