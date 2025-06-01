@@ -34,10 +34,28 @@ export const groupRecordsByCase = (records: PropertyRecord[]): GroupedCase[] => 
   }, {} as Record<string, PropertyRecord[]>);
 
   return Object.entries(grouped).map(([caseNumber, caseRecords]) => {
-    // Sort records by date to get the most recent
-    const sortedRecords = caseRecords.sort((a, b) => 
-      new Date(b.investigation_date).getTime() - new Date(a.investigation_date).getTime()
-    );
+    // Sort records by date (most recent first), then by status (closed first for same date)
+    const sortedRecords = caseRecords.sort((a, b) => {
+      const dateA = new Date(a.investigation_date);
+      const dateB = new Date(b.investigation_date);
+      
+      // First sort by date (most recent first)
+      if (dateA.getTime() !== dateB.getTime()) {
+        return dateB.getTime() - dateA.getTime();
+      }
+      
+      // If dates are the same, prioritize closed records
+      const statusA = (a.status || '').toLowerCase();
+      const statusB = (b.status || '').toLowerCase();
+      
+      const isClosedA = statusA.includes('closed') || statusA.includes('resolved');
+      const isClosedB = statusB.includes('closed') || statusB.includes('resolved');
+      
+      if (isClosedA && !isClosedB) return -1;
+      if (!isClosedA && isClosedB) return 1;
+      
+      return 0;
+    });
     
     const latestRecord = sortedRecords[0];
     
