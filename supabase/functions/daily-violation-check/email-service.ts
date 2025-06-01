@@ -33,7 +33,7 @@ export class EmailService {
     `;
 
     return await this.resend.emails.send({
-      from: "Property Alerts <onboarding@resend.dev>",
+      from: "Property Alerts <noreply@slippytoad.com>",
       to: [emailAddress],
       subject: emailSubject,
       html: emailBody,
@@ -162,7 +162,7 @@ export class EmailService {
     }
 
     return await this.resend.emails.send({
-      from: "Property Alerts <onboarding@resend.dev>",
+      from: "Property Alerts <noreply@slippytoad.com>",
       to: [emailAddress],
       subject: emailSubject,
       html: emailBody,
