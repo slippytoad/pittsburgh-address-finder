@@ -2,8 +2,24 @@
 import { ViolationRecord } from "./types.ts";
 
 export class ViolationProcessor {
-  static filterNewRecords(allRecords: ViolationRecord[], existingIds: Set<number>): ViolationRecord[] {
-    const newRecords = allRecords.filter(record => !existingIds.has(record._id));
+  static filterNewRecords(
+    allRecords: ViolationRecord[], 
+    existingIds: Set<number>, 
+    latestDate: string | null
+  ): ViolationRecord[] {
+    // First filter out records that already exist in the database
+    const nonExistingRecords = allRecords.filter(record => !existingIds.has(record._id));
+    
+    // If we have a latest date, only include records newer than that date
+    let newRecords = nonExistingRecords;
+    if (latestDate) {
+      newRecords = nonExistingRecords.filter(record => {
+        if (!record.investigation_date) return false;
+        return record.investigation_date > latestDate;
+      });
+      console.log('Filtered by date: Found', newRecords.length, 'records newer than', latestDate);
+    }
+    
     console.log('Filtered records: Found', newRecords.length, 'new records out of', allRecords.length, 'total records');
     return newRecords;
   }

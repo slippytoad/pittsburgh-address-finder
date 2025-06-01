@@ -39,6 +39,25 @@ export class DatabaseService {
     return existingIds;
   }
 
+  async getLatestViolationDate(): Promise<string | null> {
+    const { data: latestRecord, error: fetchError } = await this.supabase
+      .from('violations')
+      .select('investigation_date')
+      .not('investigation_date', 'is', null)
+      .order('investigation_date', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (fetchError) {
+      console.error('Error fetching latest violation date:', fetchError);
+      throw new Error(`Failed to fetch latest violation date: ${fetchError.message}`);
+    }
+
+    const latestDate = latestRecord?.investigation_date || null;
+    console.log('Latest violation date in database:', latestDate);
+    return latestDate;
+  }
+
   async saveNewViolations(violationRecords: ViolationRecord[]): Promise<void> {
     if (violationRecords.length === 0) {
       console.log('No new violations to save');

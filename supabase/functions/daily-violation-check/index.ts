@@ -73,9 +73,10 @@ serve(async (req: Request) => {
     // Fetch property data
     const apiData = await apiClient.fetchPropertyData();
 
-    // Get existing violation IDs and filter new ones based on _id only
+    // Get existing violation IDs and latest date to filter truly new records
     const existingIds = await dbService.getExistingViolationIds();
-    const newRecords = ViolationProcessor.filterNewRecords(apiData.result.records, existingIds);
+    const latestDate = await dbService.getLatestViolationDate();
+    const newRecords = ViolationProcessor.filterNewRecords(apiData.result.records, existingIds, latestDate);
 
     // Save new records if any exist
     if (newRecords.length > 0) {
