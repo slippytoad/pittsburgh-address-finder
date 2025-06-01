@@ -73,10 +73,8 @@ serve(async (req: Request) => {
     // Fetch property data
     const apiData = await apiClient.fetchPropertyData();
 
-    // Get existing violations and filter new ones
-    const existingIds = await dbService.getExistingViolations();
-    console.log('Found', existingIds.size, 'existing records in database');
-
+    // Get existing violation IDs and filter new ones based on _id only
+    const existingIds = await dbService.getExistingViolationIds();
     const newRecords = ViolationProcessor.filterNewRecords(apiData.result.records, existingIds);
 
     // Save new records if any exist

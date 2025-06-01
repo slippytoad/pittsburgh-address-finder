@@ -24,21 +24,28 @@ export class DatabaseService {
     return settings;
   }
 
-  async getExistingViolations(): Promise<Set<number>> {
+  async getExistingViolationIds(): Promise<Set<number>> {
     const { data: existingRecords, error: fetchError } = await this.supabase
       .from('violations')
       .select('_id');
 
     if (fetchError) {
-      console.error('Error fetching existing violations:', fetchError);
-      throw new Error(`Failed to fetch existing violations: ${fetchError.message}`);
+      console.error('Error fetching existing violation IDs:', fetchError);
+      throw new Error(`Failed to fetch existing violation IDs: ${fetchError.message}`);
     }
 
-    return new Set(existingRecords?.map(record => record._id) || []);
+    const existingIds = new Set(existingRecords?.map(record => record._id) || []);
+    console.log('Found', existingIds.size, 'existing violation IDs in database');
+    return existingIds;
   }
 
   async saveNewViolations(violationRecords: ViolationRecord[]): Promise<void> {
-    // Use upsert with onConflict to ignore duplicate keys
+    if (violationRecords.length === 0) {
+      console.log('No new violations to save');
+      return;
+    }
+
+    // Use upsert with onConflict to handle duplicates gracefully
     const { error: insertError } = await this.supabase
       .from('violations')
       .upsert(violationRecords, { 

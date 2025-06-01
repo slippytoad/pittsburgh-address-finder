@@ -4,7 +4,7 @@ import { ViolationRecord } from "./types.ts";
 export class ViolationProcessor {
   static filterNewRecords(allRecords: ViolationRecord[], existingIds: Set<number>): ViolationRecord[] {
     const newRecords = allRecords.filter(record => !existingIds.has(record._id));
-    console.log('Found', newRecords.length, 'new records');
+    console.log('Filtered records: Found', newRecords.length, 'new records out of', allRecords.length, 'total records');
     return newRecords;
   }
 
