@@ -38,16 +38,20 @@ export class DatabaseService {
   }
 
   async saveNewViolations(violationRecords: ViolationRecord[]): Promise<void> {
+    // Use upsert with onConflict to ignore duplicate keys
     const { error: insertError } = await this.supabase
       .from('violations')
-      .insert(violationRecords);
+      .upsert(violationRecords, { 
+        onConflict: '_id',
+        ignoreDuplicates: true 
+      });
 
     if (insertError) {
       console.error('Error saving new violations:', insertError);
       throw new Error(`Failed to save new violations: ${insertError.message}`);
     }
 
-    console.log('Successfully saved', violationRecords.length, 'new violations to database');
+    console.log('Successfully processed', violationRecords.length, 'violation records (duplicates ignored)');
   }
 
   async logEmailNotification(newRecordsCount: number, emailAddress: string): Promise<void> {
