@@ -24,8 +24,8 @@ serve(async (req: Request) => {
     console.log("Starting daily violation check...");
 
     // Initialize services
-    const apiClient = new PropertyApiClient();
     const dbService = new DatabaseService(supabaseUrl, supabaseServiceKey);
+    const apiClient = new PropertyApiClient(dbService);
     const emailService = new EmailService(resendApiKey);
 
     // Check if this is a test run

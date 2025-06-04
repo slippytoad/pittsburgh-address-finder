@@ -1,4 +1,3 @@
-
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { ViolationRecord, AppSettings } from "./types.ts";
 
@@ -7,6 +6,21 @@ export class DatabaseService {
 
   constructor(supabaseUrl: string, supabaseServiceKey: string) {
     this.supabase = createClient(supabaseUrl, supabaseServiceKey);
+  }
+
+  async getAddresses(): Promise<string[]> {
+    const { data: addresses, error } = await this.supabase
+      .from('addresses')
+      .select('address');
+
+    if (error) {
+      console.error('Error fetching addresses:', error);
+      throw new Error(`Failed to fetch addresses: ${error.message}`);
+    }
+
+    const addressList = addresses?.map(item => item.address) || [];
+    console.log('Found', addressList.length, 'addresses in database');
+    return addressList;
   }
 
   async getAppSettings(): Promise<AppSettings | null> {
