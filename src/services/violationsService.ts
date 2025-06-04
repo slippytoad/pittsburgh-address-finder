@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { PropertyRecord } from '@/types/propertyTypes';
 
@@ -65,9 +66,38 @@ export const saveViolationsToDatabase = async (records: PropertyRecord[]): Promi
   const existingIds = new Set(existingRecords?.map(record => record._id) || []);
   console.log('Found', existingIds.size, 'existing records in database');
 
-  // Filter out records that already exist
-  const newRecords = records.filter(record => !existingIds.has(record._id));
-  console.log('Found', newRecords.length, 'new records to save');
+  // Get the latest investigation date from the database
+  const { data: latestRecord, error: latestError } = await supabase
+    .from('violations')
+    .select('investigation_date')
+    .not('investigation_date', 'is', null)
+    .order('investigation_date', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (latestError) {
+    console.error('Error fetching latest violation date:', latestError);
+    throw new Error(`Failed to fetch latest violation date: ${latestError.message}`);
+  }
+
+  const latestDate = latestRecord?.investigation_date || null;
+  console.log('Latest violation date in database:', latestDate);
+
+  // Filter records that don't exist in database
+  const nonExistingRecords = records.filter(record => !existingIds.has(record._id));
+  console.log('Found', nonExistingRecords.length, 'records that do not exist in database');
+
+  // If we have a latest date, only include records newer than that date
+  let newRecords = nonExistingRecords;
+  if (latestDate) {
+    newRecords = nonExistingRecords.filter(record => {
+      if (!record.investigation_date) return false;
+      return record.investigation_date > latestDate;
+    });
+    console.log('Filtered by date: Found', newRecords.length, 'records newer than', latestDate);
+  }
+
+  console.log('Final new records count:', newRecords.length);
 
   if (newRecords.length === 0) {
     console.log('No new records to save');
