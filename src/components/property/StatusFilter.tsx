@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Filter, Check } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import { getStatusColor } from '@/utils/propertyUtils';
 
 interface StatusFilterProps {
@@ -39,27 +39,20 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
           {availableStatuses.map((status) => {
             const isSelected = selectedStatuses.includes(status);
             return (
-              <div
+              <Badge
                 key={status}
+                variant={getStatusColor(status)}
                 onClick={() => handleStatusToggle(status)}
                 className={`
-                  cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 relative
+                  cursor-pointer transition-all duration-200 hover:opacity-80
                   ${isSelected 
-                    ? 'bg-blue-500 border-blue-600 shadow-md ring-2 ring-blue-200' 
-                    : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                    ? 'ring-2 ring-blue-300 shadow-md scale-105' 
+                    : 'hover:scale-105'
                   }
                 `}
               >
-                {isSelected && (
-                  <Check className="absolute top-1 right-1 h-4 w-4 text-white" />
-                )}
-                <Badge 
-                  variant={getStatusColor(status)} 
-                  className={`text-xs ${isSelected ? 'bg-white text-blue-900' : ''}`}
-                >
-                  {status}
-                </Badge>
-              </div>
+                {status}
+              </Badge>
             );
           })}
         </div>
