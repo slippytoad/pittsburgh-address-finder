@@ -1,3 +1,4 @@
+
 import { Resend } from "npm:resend@2.0.0";
 import { ViolationRecord } from "./types.ts";
 
@@ -32,7 +33,7 @@ export class EmailService {
     `;
 
     return await this.resend.emails.send({
-      from: "Property Alerts <noreply@slippytoad.com>",
+      from: "JFW Oakland Alerts <noreply@slippytoad.com>",
       to: [emailAddress],
       subject: emailSubject,
       html: emailBody,
@@ -120,7 +121,7 @@ export class EmailService {
 
     if (newRecords.length > 0) {
       // Email for when new violations are found
-      emailSubject = `JFW Oakland Violations Report - ${newRecords.length} new records`;
+      emailSubject = `${newRecords.length} new violations found`;
       emailBody = `
         <h2>Daily Property Violation Report</h2>
         <p>We found <strong>${newRecords.length} new violations</strong> during today's check.</p>
@@ -142,7 +143,7 @@ export class EmailService {
       `;
     } else {
       // Email for when no new violations are found
-      emailSubject = `JFW Oakland Violations Report - No new violations found`;
+      emailSubject = `No new violations found`;
       emailBody = `
         <h2>Daily Property Violation Report</h2>
         <p>We completed today's check and <strong>no new violations</strong> were found.</p>
@@ -161,7 +162,7 @@ export class EmailService {
     }
 
     return await this.resend.emails.send({
-      from: "Property Alerts <noreply@slippytoad.com>",
+      from: "JFW Oakland Alerts <noreply@slippytoad.com>",
       to: [emailAddress],
       subject: emailSubject,
       html: emailBody,

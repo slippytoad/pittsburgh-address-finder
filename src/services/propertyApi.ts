@@ -46,7 +46,7 @@ export const fetchPropertyData = async (): Promise<ApiResponseWithNewCount> => {
     console.log('No addresses found in database');
     return {
       success: true,
-      result: { records: [] },
+      result: { records: [], total: 0 },
       newRecordsCount: 0
     };
   }
