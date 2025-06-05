@@ -1,6 +1,3 @@
-
-
-
 import { Resend } from "npm:resend@2.0.0";
 import { ViolationRecord } from "./types.ts";
 
@@ -35,7 +32,7 @@ export class EmailService {
     `;
 
     return await this.resend.emails.send({
-      from: "Property Reports <noreply@slippytoad.com>",
+      from: "JFW Oakland Property Reports <noreply@slippytoad.com>",
       to: [emailAddress],
       subject: emailSubject,
       html: emailBody,
@@ -164,12 +161,10 @@ export class EmailService {
     }
 
     return await this.resend.emails.send({
-      from: "Property Reports <noreply@slippytoad.com>",
+      from: "JFW Oakland Property Reports <noreply@slippytoad.com>",
       to: [emailAddress],
       subject: emailSubject,
       html: emailBody,
     });
   }
 }
-
-
