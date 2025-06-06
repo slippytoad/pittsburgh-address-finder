@@ -1,3 +1,4 @@
+
 import { Resend } from "npm:resend@2.0.0";
 import { ViolationRecord } from "./types.ts";
 
@@ -117,12 +118,18 @@ export class EmailService {
 
     const statusSummary = this.getStatusSummary(allRecords);
     const dashboardUrl = "https://pittsburgh-address-finder.lovable.app";
+    const currentDate = new Date().toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
 
     if (newRecords.length > 0) {
       // Email for when new violations are found
       emailSubject = `JFW Oakland Violations Report - ${newRecords.length} new violations found`;
       emailBody = `
-        <h2>Daily Property Violation Report</h2>
+        <h2>Daily Property Violation Report - ${currentDate}</h2>
         <p>We found <strong>${newRecords.length} new violations</strong> during today's check.</p>
         
         <h3>New Records (click case numbers for direct access):</h3>
@@ -144,7 +151,7 @@ export class EmailService {
       // Email for when no new violations are found
       emailSubject = `JFW Oakland Violations Report - No new violations found`;
       emailBody = `
-        <h2>Daily Property Violation Report</h2>
+        <h2>Daily Property Violation Report - ${currentDate}</h2>
         <p>We completed today's check and <strong>no new violations</strong> were found.</p>
         
         <h3>Check Summary - Number of cases in each state (click to filter):</h3>
