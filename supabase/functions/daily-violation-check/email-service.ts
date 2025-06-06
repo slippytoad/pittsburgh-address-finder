@@ -150,7 +150,7 @@ export class EmailService {
           ${newRecords.length > 10 ? `<li><em>... and ${newRecords.length - 10} more records</em></li>` : ''}
         </ul>
         
-        <h3>Check Summary - Number of cases in each state (click to filter):</h3>
+        <h3>Check Summary - Number of cases in each state:</h3>
         <ul>
           ${statusSummary}
         </ul>
@@ -166,7 +166,7 @@ export class EmailService {
         <h2>Daily Property Violation Report - ${currentDate}</h2>
         <p>We completed today's check and <strong>no new violations</strong> were found.</p>
         
-        <h3>Check Summary - Number of cases in each state (click to filter):</h3>
+        <h3>Check Summary - Number of cases in each state:</h3>
         <ul>
           ${statusSummary}
         </ul>
