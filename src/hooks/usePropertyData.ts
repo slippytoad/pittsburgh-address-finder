@@ -60,24 +60,28 @@ export const usePropertyData = (selectedStatuses: string[]) => {
   // Get available statuses and filtered data
   const { availableStatuses, filteredRecords } = useMemo(() => {
     if (!data?.result?.records) {
+      console.log('usePropertyData - no data available');
       return { availableStatuses: [], filteredRecords: [] };
     }
 
     const groupedCases = groupRecordsByCase(data.result.records);
     const statuses = Array.from(new Set(groupedCases.map(c => c.currentStatus)));
     
-    console.log('Available statuses:', statuses);
-    console.log('Selected statuses:', selectedStatuses);
+    console.log('usePropertyData - Available statuses:', statuses);
+    console.log('usePropertyData - Selected statuses:', selectedStatuses);
+    console.log('usePropertyData - Total grouped cases:', groupedCases.length);
 
     // Filter cases based on selected statuses
     let filteredCases = groupedCases;
     if (selectedStatuses.length > 0) {
-      filteredCases = groupedCases.filter(caseGroup => 
-        selectedStatuses.includes(caseGroup.currentStatus)
-      );
+      filteredCases = groupedCases.filter(caseGroup => {
+        const matches = selectedStatuses.includes(caseGroup.currentStatus);
+        console.log(`usePropertyData - Case ${caseGroup.casefileNumber} with status "${caseGroup.currentStatus}" matches filter: ${matches}`);
+        return matches;
+      });
     }
 
-    console.log('Filtered cases count:', filteredCases.length);
+    console.log('usePropertyData - Filtered cases count:', filteredCases.length);
 
     return { 
       availableStatuses: statuses,
