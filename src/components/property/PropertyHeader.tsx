@@ -32,7 +32,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
           </h1>
         </div>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          View property investigation records from Pittsburgh's open data portal for specific addresses.
+          View property investigation records from Pittsburgh's open data portal.
         </p>
         
         {showResults && (
