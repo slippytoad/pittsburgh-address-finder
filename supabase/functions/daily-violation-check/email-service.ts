@@ -27,7 +27,7 @@ export class EmailService {
       
       <p>If you received this email, your notification system is working properly!</p>
       
-      <p><a href="https://pittsburgh-address-finder.lovable.app" style="background-color: #2754C5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">View Dashboard</a></p>
+      <p><a href="https://jfw-oakland-property-violations-tracker.lovable.app" style="background-color: #2754C5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">View Dashboard</a></p>
       
       <p><em>This is a test message from the Property Investigation Dashboard.</em></p>
     `;
@@ -73,26 +73,38 @@ export class EmailService {
     // Use the same grouping logic as the dashboard
     const groupedCases = this.groupRecordsByCase(allRecords);
     
-    // Count cases by their current status
+    // Count cases by their current status, consolidating closed statuses
     const caseCounts: Record<string, number> = {};
     groupedCases.forEach(groupedCase => {
       const status = groupedCase.currentStatus;
-      caseCounts[status] = (caseCounts[status] || 0) + 1;
+      const statusLower = status.toLowerCase();
+      
+      // Consolidate closed and ready to close statuses
+      if (statusLower.includes('closed') || statusLower.includes('ready to close')) {
+        caseCounts['Closed/Ready to Close'] = (caseCounts['Closed/Ready to Close'] || 0) + 1;
+      } else {
+        caseCounts[status] = (caseCounts[status] || 0) + 1;
+      }
     });
 
-    const dashboardUrl = "https://pittsburgh-address-finder.lovable.app";
+    const dashboardUrl = "https://jfw-oakland-property-violations-tracker.lovable.app";
 
     return Object.entries(caseCounts)
       .map(([status, count]) => {
-        const statusParam = encodeURIComponent(status);
-        const statusLink = `${dashboardUrl}?status=${statusParam}`;
-        return `<li><strong><a href="${statusLink}" style="color: #2754C5; text-decoration: none;">${status}</a>:</strong> ${count}</li>`;
+        // For consolidated status, don't add a filter link since it represents multiple statuses
+        if (status === 'Closed/Ready to Close') {
+          return `<li><strong><a href="${dashboardUrl}" style="color: #2754C5; text-decoration: none;">${status}</a>:</strong> ${count}</li>`;
+        } else {
+          const statusParam = encodeURIComponent(status);
+          const statusLink = `${dashboardUrl}?status=${statusParam}`;
+          return `<li><strong><a href="${statusLink}" style="color: #2754C5; text-decoration: none;">${status}</a>:</strong> ${count}</li>`;
+        }
       })
       .join('');
   }
 
   private formatNewRecordsList(newRecords: ViolationRecord[]): string {
-    const dashboardUrl = "https://pittsburgh-address-finder.lovable.app";
+    const dashboardUrl = "https://jfw-oakland-property-violations-tracker.lovable.app";
     
     return newRecords.slice(0, 10).map((record: any) => {
       const caseParam = encodeURIComponent(record.casefile_number || '');
@@ -117,7 +129,7 @@ export class EmailService {
     let emailBody: string;
 
     const statusSummary = this.getStatusSummary(allRecords);
-    const dashboardUrl = "https://pittsburgh-address-finder.lovable.app";
+    const dashboardUrl = "https://jfw-oakland-property-violations-tracker.lovable.app";
     const currentDate = new Date().toLocaleDateString('en-US', { 
       weekday: 'long', 
       year: 'numeric', 
