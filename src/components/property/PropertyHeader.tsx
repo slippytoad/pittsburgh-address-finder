@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, FileText, Calendar, Clock, Plus } from 'lucide-react';
+import { RefreshCw, FileText, Clock, Plus } from 'lucide-react';
 import LoadingOverlay from '@/components/ui/loading-overlay';
 
 interface PropertyHeaderProps {
@@ -10,7 +10,6 @@ interface PropertyHeaderProps {
   showResults: boolean;
   newRecordsCount?: number;
   lastApiCheckTime?: string;
-  nextApiCheckTime?: string;
 }
 
 const PropertyHeader: React.FC<PropertyHeaderProps> = ({
@@ -18,8 +17,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   isLoading,
   showResults,
   newRecordsCount,
-  lastApiCheckTime,
-  nextApiCheckTime
+  lastApiCheckTime
 }) => {
   return (
     <>
@@ -47,12 +45,6 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
                     <span>{newRecordsCount} new</span>
                   </div>
                 )}
-              </div>
-            )}
-            {nextApiCheckTime && (
-              <div className="flex items-center gap-1">
-                <Calendar className="h-4 w-4 text-gray-500" />
-                <span>Next API check: {nextApiCheckTime}</span>
               </div>
             )}
             <Button
