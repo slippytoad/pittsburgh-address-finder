@@ -24,6 +24,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
     availableStatuses,
     filteredRecords,
     lastNewRecordsCount,
+    lastApiNewRecordsCount,
     appSettings,
     handleFetchData,
     getLatestDate,
@@ -38,6 +39,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
         showResults={showResults}
         newRecordsCount={lastNewRecordsCount}
         lastApiCheckTime={formatLastApiCheckTime(appSettings?.last_api_check_time || null)}
+        lastApiNewRecordsCount={lastApiNewRecordsCount}
       />
 
       <EmailSettingsSection />
