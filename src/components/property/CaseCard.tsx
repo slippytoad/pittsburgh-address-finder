@@ -146,7 +146,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                     </div>
                     <div className="flex items-center gap-1 text-gray-500">
                       <Calendar className="h-3 w-3 flex-shrink-0" />
-                      <span>Latest violation date: {formatDate(groupedCase.latestDate)}</span>
+                      <span>Last update: {formatDate(groupedCase.latestDate)}</span>
                     </div>
                   </div>
                 </div>
