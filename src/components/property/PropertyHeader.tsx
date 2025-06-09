@@ -41,12 +41,10 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
               <div className="flex items-center gap-1">
                 <Clock className="h-4 w-4 text-gray-500" />
                 <span>Last API check: {lastApiCheckTime}</span>
-                {lastApiNewRecordsCount !== undefined && (
-                  <div className="flex items-center gap-1 ml-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                    <Plus className="h-3 w-3" />
-                    <span>{lastApiNewRecordsCount} found</span>
-                  </div>
-                )}
+                <div className="flex items-center gap-1 ml-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                  <Plus className="h-3 w-3" />
+                  <span>{lastApiNewRecordsCount || 0} found</span>
+                </div>
                 {newRecordsCount !== undefined && (
                   <div className="flex items-center gap-1 ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
                     <Plus className="h-3 w-3" />
