@@ -7,6 +7,7 @@ export interface AppSettings {
   email_report_address: string;
   violation_checks_enabled: boolean;
   last_api_check_time: string | null;
+  last_api_new_records_count: number | null;
   created_at: string;
   updated_at: string;
 }
