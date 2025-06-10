@@ -61,7 +61,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
               className="text-gray-600 hover:text-gray-800"
             >
               <RefreshCw className="mr-2 h-3 w-3" />
-              Refresh Data
+              Check Now
             </Button>
           </div>
         )}
