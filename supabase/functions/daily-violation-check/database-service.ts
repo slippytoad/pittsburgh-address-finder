@@ -6,7 +6,15 @@ export class DatabaseService {
   private supabase;
 
   constructor(supabaseUrl: string, supabaseServiceKey: string) {
-    this.supabase = createClient(supabaseUrl, supabaseServiceKey);
+    this.supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      },
+      db: {
+        schema: 'public'
+      }
+    });
     console.log('DatabaseService initialized with service role');
   }
 
@@ -82,38 +90,43 @@ export class DatabaseService {
 
     console.log('Attempting to save', violationRecords.length, 'violation records using service role');
 
-    // Try with upsert first, then fallback to individual inserts if needed
     try {
+      // Use insert with onConflict to handle duplicates
       const { error: insertError } = await this.supabase
         .from('violations')
-        .upsert(violationRecords, { 
-          onConflict: '_id',
-          ignoreDuplicates: true 
-        });
+        .insert(violationRecords)
+        .select();
 
       if (insertError) {
-        console.error('Upsert failed, error details:', insertError);
+        console.error('Insert failed, error details:', insertError);
         
-        // If upsert fails, try individual inserts to see which records are problematic
+        // If insert fails, try individual inserts to see which records are problematic
         console.log('Trying individual inserts to identify problematic records...');
         
+        let successCount = 0;
         for (let i = 0; i < violationRecords.length; i++) {
           const record = violationRecords[i];
           const { error: singleError } = await this.supabase
             .from('violations')
-            .insert([record]);
+            .insert([record])
+            .select();
           
           if (singleError) {
             console.error(`Failed to insert record ${i} with _id ${record._id}:`, singleError);
           } else {
             console.log(`Successfully inserted record ${i} with _id ${record._id}`);
+            successCount++;
           }
         }
         
-        throw new Error(`Failed to save new violations: ${insertError.message}`);
+        if (successCount === 0) {
+          throw new Error(`Failed to save any violations: ${insertError.message}`);
+        } else {
+          console.log(`Successfully saved ${successCount} out of ${violationRecords.length} violations`);
+        }
+      } else {
+        console.log('Successfully processed', violationRecords.length, 'violation records');
       }
-
-      console.log('Successfully processed', violationRecords.length, 'violation records (duplicates ignored)');
     } catch (error) {
       console.error('Error in saveNewViolations:', error);
       throw error;
