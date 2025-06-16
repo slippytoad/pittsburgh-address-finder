@@ -7,6 +7,7 @@ export class DatabaseService {
 
   constructor(supabaseUrl: string, supabaseServiceKey: string) {
     this.supabase = createClient(supabaseUrl, supabaseServiceKey);
+    console.log('DatabaseService initialized with service role');
   }
 
   async getAddresses(): Promise<string[]> {
@@ -79,20 +80,44 @@ export class DatabaseService {
       return;
     }
 
-    // Use upsert with onConflict to handle duplicates gracefully
-    const { error: insertError } = await this.supabase
-      .from('violations')
-      .upsert(violationRecords, { 
-        onConflict: '_id',
-        ignoreDuplicates: true 
-      });
+    console.log('Attempting to save', violationRecords.length, 'violation records using service role');
 
-    if (insertError) {
-      console.error('Error saving new violations:', insertError);
-      throw new Error(`Failed to save new violations: ${insertError.message}`);
+    // Try with upsert first, then fallback to individual inserts if needed
+    try {
+      const { error: insertError } = await this.supabase
+        .from('violations')
+        .upsert(violationRecords, { 
+          onConflict: '_id',
+          ignoreDuplicates: true 
+        });
+
+      if (insertError) {
+        console.error('Upsert failed, error details:', insertError);
+        
+        // If upsert fails, try individual inserts to see which records are problematic
+        console.log('Trying individual inserts to identify problematic records...');
+        
+        for (let i = 0; i < violationRecords.length; i++) {
+          const record = violationRecords[i];
+          const { error: singleError } = await this.supabase
+            .from('violations')
+            .insert([record]);
+          
+          if (singleError) {
+            console.error(`Failed to insert record ${i} with _id ${record._id}:`, singleError);
+          } else {
+            console.log(`Successfully inserted record ${i} with _id ${record._id}`);
+          }
+        }
+        
+        throw new Error(`Failed to save new violations: ${insertError.message}`);
+      }
+
+      console.log('Successfully processed', violationRecords.length, 'violation records (duplicates ignored)');
+    } catch (error) {
+      console.error('Error in saveNewViolations:', error);
+      throw error;
     }
-
-    console.log('Successfully processed', violationRecords.length, 'violation records (duplicates ignored)');
   }
 
   async logEmailNotification(newRecordsCount: number, emailAddress: string): Promise<void> {

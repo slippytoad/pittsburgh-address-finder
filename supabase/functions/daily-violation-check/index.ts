@@ -22,6 +22,8 @@ serve(async (req: Request) => {
 
   try {
     console.log("Starting daily violation check...");
+    console.log("Using Supabase URL:", supabaseUrl);
+    console.log("Service key available:", !!supabaseServiceKey);
 
     // Initialize services
     const dbService = new DatabaseService(supabaseUrl, supabaseServiceKey);
@@ -46,6 +48,7 @@ serve(async (req: Request) => {
     }
 
     // Get app settings
+    console.log("Fetching app settings...");
     const settings = await dbService.getAppSettings();
 
     if (!settings?.email_reports_enabled || !settings?.email_report_address) {
@@ -71,20 +74,38 @@ serve(async (req: Request) => {
     }
 
     // Fetch property data
+    console.log("Fetching property data from API...");
     const apiData = await apiClient.fetchPropertyData();
+    console.log("API returned", apiData.result.records.length, "total records");
 
     // Get existing violation IDs and latest date to filter truly new records
+    console.log("Getting existing violations and latest date...");
     const existingIds = await dbService.getExistingViolationIds();
     const latestDate = await dbService.getLatestViolationDate();
+    
+    console.log("Filtering new records...");
     const newRecords = ViolationProcessor.filterNewRecords(apiData.result.records, existingIds, latestDate);
+    console.log("Found", newRecords.length, "new records to save");
 
     // Save new records if any exist
     if (newRecords.length > 0) {
+      console.log("Formatting", newRecords.length, "records for database...");
       const violationRecords = ViolationProcessor.formatForDatabase(newRecords);
-      await dbService.saveNewViolations(violationRecords);
+      
+      console.log("Saving new violations to database...");
+      try {
+        await dbService.saveNewViolations(violationRecords);
+        console.log("Successfully saved", newRecords.length, "new violations");
+      } catch (saveError) {
+        console.error("Failed to save violations:", saveError);
+        // Continue with the rest of the process even if saving fails
+      }
+    } else {
+      console.log("No new violations to save");
     }
 
     // Send daily email notification with all records for status summary
+    console.log("Sending daily email report...");
     const emailResponse = await emailService.sendDailyReport(
       settings.email_report_address, 
       newRecords, 
@@ -94,25 +115,38 @@ serve(async (req: Request) => {
     console.log("Email sent successfully:", emailResponse);
 
     // Log the email notification
-    await dbService.logEmailNotification(newRecords.length, settings.email_report_address);
+    try {
+      await dbService.logEmailNotification(newRecords.length, settings.email_report_address);
+      console.log("Email notification logged successfully");
+    } catch (logError) {
+      console.error("Failed to log email notification:", logError);
+      // Don't fail the whole process for logging errors
+    }
 
     // Update the last API check timestamp with the new records count
-    await dbService.updateLastApiCheckTime(newRecords.length);
-    console.log("Last API check timestamp updated with new records count:", newRecords.length);
+    try {
+      await dbService.updateLastApiCheckTime(newRecords.length);
+      console.log("Last API check timestamp updated with new records count:", newRecords.length);
+    } catch (updateError) {
+      console.error("Failed to update last API check time:", updateError);
+      // Don't fail the whole process for timestamp update errors
+    }
 
     return new Response(
       JSON.stringify({ 
         message: "Daily check completed successfully",
         newRecordsCount: newRecords.length,
-        emailSent: true
+        emailSent: true,
+        savedSuccessfully: newRecords.length > 0
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
   } catch (error: any) {
     console.error("Error in daily-violation-check function:", error);
+    console.error("Error stack:", error.stack);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message, stack: error.stack }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
