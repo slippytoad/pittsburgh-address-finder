@@ -96,9 +96,9 @@ serve(async (req: Request) => {
     // Log the email notification
     await dbService.logEmailNotification(newRecords.length, settings.email_report_address);
 
-    // Update the last API check timestamp
-    await dbService.updateLastApiCheckTime();
-    console.log("Last API check timestamp updated");
+    // Update the last API check timestamp with the new records count
+    await dbService.updateLastApiCheckTime(newRecords.length);
+    console.log("Last API check timestamp updated with new records count:", newRecords.length);
 
     return new Response(
       JSON.stringify({ 

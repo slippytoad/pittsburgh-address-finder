@@ -1,3 +1,4 @@
+
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { ViolationRecord, AppSettings } from "./types.ts";
 
@@ -109,15 +110,22 @@ export class DatabaseService {
     }
   }
 
-  async updateLastApiCheckTime(): Promise<void> {
+  async updateLastApiCheckTime(newRecordsCount?: number): Promise<void> {
     const now = new Date().toISOString();
+    
+    const updateData: any = {
+      id: 1,
+      last_api_check_time: now
+    };
+
+    // Only update the count if provided
+    if (newRecordsCount !== undefined) {
+      updateData.last_api_new_records_count = newRecordsCount;
+    }
     
     const { error } = await this.supabase
       .from('app_settings')
-      .upsert({
-        id: 1,
-        last_api_check_time: now
-      }, {
+      .upsert(updateData, {
         onConflict: 'id'
       });
 
@@ -126,6 +134,6 @@ export class DatabaseService {
       throw new Error(`Failed to update last API check time: ${error.message}`);
     }
 
-    console.log('Last API check time updated to:', now);
+    console.log('Last API check time updated to:', now, 'with new records count:', newRecordsCount);
   }
 }

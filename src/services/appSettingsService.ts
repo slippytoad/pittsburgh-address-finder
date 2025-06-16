@@ -27,15 +27,22 @@ export const getAppSettings = async (): Promise<AppSettings | null> => {
   return data;
 };
 
-export const updateLastApiCheckTime = async (): Promise<void> => {
+export const updateLastApiCheckTime = async (newRecordsCount?: number): Promise<void> => {
   const now = new Date().toISOString();
+  
+  const updateData: any = {
+    id: 1,
+    last_api_check_time: now
+  };
+
+  // Only update the count if provided
+  if (newRecordsCount !== undefined) {
+    updateData.last_api_new_records_count = newRecordsCount;
+  }
   
   const { error } = await supabase
     .from('app_settings')
-    .upsert({
-      id: 1,
-      last_api_check_time: now
-    }, {
+    .upsert(updateData, {
       onConflict: 'id'
     });
 
@@ -44,5 +51,5 @@ export const updateLastApiCheckTime = async (): Promise<void> => {
     throw new Error(`Failed to update last API check time: ${error.message}`);
   }
 
-  console.log('Last API check time updated to:', now);
+  console.log('Last API check time updated to:', now, 'with new records count:', newRecordsCount);
 };
