@@ -1,8 +1,8 @@
+
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Building2, RefreshCw, Loader2, Settings } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Building2, RefreshCw, Loader2 } from 'lucide-react';
 
 interface PropertyHeaderProps {
   onFetchData: () => void;
@@ -35,12 +35,6 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
             </CardDescription>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
-            <Link to="/admin">
-              <Button variant="outline" size="sm" className="w-full sm:w-auto">
-                <Settings className="h-4 w-4 mr-2" />
-                Admin Settings
-              </Button>
-            </Link>
             <Button 
               onClick={onFetchData}
               disabled={isLoading}

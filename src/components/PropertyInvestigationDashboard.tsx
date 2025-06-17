@@ -1,5 +1,8 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { Settings } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import PropertyHeader from '@/components/property/PropertyHeader';
 import PropertyList from '@/components/property/PropertyList';
 import StatusFilter from '@/components/property/StatusFilter';
@@ -59,6 +62,15 @@ const PropertyInvestigationDashboard: React.FC = () => {
           />
         </div>
       )}
+
+      <div className="mt-8 pt-6 border-t border-gray-200 flex justify-center">
+        <Link to="/admin">
+          <Button variant="outline" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Admin Settings
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };
