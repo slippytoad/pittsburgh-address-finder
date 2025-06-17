@@ -31,7 +31,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
               JFW Oakland Property Investigation Dashboard
             </CardTitle>
             <CardDescription className="text-sm sm:text-base">
-              Monitor property violations and investigation records from Oakland's official database
+              Monitor property violations and investigation records from Pittsburgh's official database
             </CardDescription>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
