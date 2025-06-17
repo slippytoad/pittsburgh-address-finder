@@ -26,7 +26,7 @@ const AddressManager: React.FC = () => {
       const { data, error } = await supabase
         .from('addresses')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('address', { ascending: true }); // Sort by address alphabetically
 
       if (error) {
         throw error;
@@ -67,7 +67,8 @@ const AddressManager: React.FC = () => {
         throw error;
       }
 
-      setAddresses(prev => [data, ...prev]);
+      // Insert the new address in the correct alphabetical position
+      setAddresses(prev => [...prev, data].sort((a, b) => a.address.localeCompare(b.address)));
       setNewAddress('');
       toast({
         title: 'Success',
