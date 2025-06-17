@@ -30,14 +30,16 @@ serve(async (req: Request) => {
     const apiClient = new PropertyApiClient(dbService);
     const emailService = new EmailService(resendApiKey);
 
-    // Check if this is a test run
+    // Check if this is a test run or full sync
     const body = await req.text();
     let isTestRun = false;
+    let isFullSync = false;
     
     if (body) {
       try {
         const requestData = JSON.parse(body);
         isTestRun = requestData.test_run === true;
+        isFullSync = requestData.full_sync === true;
       } catch (e) {
         console.log("Body parsing failed, continuing with normal flow");
       }
@@ -45,6 +47,10 @@ serve(async (req: Request) => {
 
     if (isTestRun) {
       console.log("Test run detected - sending test email");
+    }
+
+    if (isFullSync) {
+      console.log("Full sync detected - will fetch data from 2024");
     }
 
     // Get app settings
@@ -73,15 +79,15 @@ serve(async (req: Request) => {
       );
     }
 
-    // Fetch property data
+    // Fetch property data (with full sync parameter if needed)
     console.log("Fetching property data from API...");
-    const apiData = await apiClient.fetchPropertyData();
+    const apiData = await apiClient.fetchPropertyData(isFullSync);
     console.log("API returned", apiData.result.records.length, "total records");
 
     // Get existing violation IDs and latest date to filter truly new records
     console.log("Getting existing violations and latest date...");
     const existingIds = await dbService.getExistingViolationIds();
-    const latestDate = await dbService.getLatestViolationDate();
+    const latestDate = isFullSync ? null : await dbService.getLatestViolationDate(); // Don't filter by date for full sync
     
     console.log("Filtering new records...");
     const newRecords = ViolationProcessor.filterNewRecords(apiData.result.records, existingIds, latestDate);
@@ -134,7 +140,7 @@ serve(async (req: Request) => {
 
     return new Response(
       JSON.stringify({ 
-        message: "Daily check completed successfully",
+        message: isFullSync ? "Full sync completed successfully" : "Daily check completed successfully",
         newRecordsCount: newRecords.length,
         emailSent: true,
         savedSuccessfully: newRecords.length > 0

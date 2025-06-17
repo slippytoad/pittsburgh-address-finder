@@ -15,7 +15,7 @@ export class PropertyApiClient {
     return addresses;
   }
 
-  private buildApiUrl(addresses: string[]): string {
+  private buildApiUrl(addresses: string[], fullSync: boolean = false): string {
     const baseUrl = 'https://data.wprdc.org/api/3/action/datastore_search_sql?sql=SELECT%20%2A%20FROM%20%2270c06278-92c5-4040-ab28-17671866f81c%22%20WHERE%20';
     
     // Build the address conditions dynamically
@@ -23,14 +23,16 @@ export class PropertyApiClient {
       `address%20ILIKE%20%27${encodeURIComponent(address)}%25%27`
     ).join('%20OR%20');
     
-    // Updated date filter to get all records from 2025 onwards
-    const dateFilter = '%20AND%20investigation_date%20%3E%3D%20%272025-01-01%27';
+    // Use different date filter based on fullSync parameter
+    const dateFilter = fullSync 
+      ? '%20AND%20investigation_date%20%3E%3D%20%272024-01-01%27'
+      : '%20AND%20investigation_date%20%3E%3D%20%272025-01-01%27';
     const orderBy = '%20ORDER%20BY%20investigation_date%20DESC';
     
     return baseUrl + '(' + addressConditions + ')' + dateFilter + orderBy;
   }
 
-  async fetchPropertyData(): Promise<ApiResponse> {
+  async fetchPropertyData(fullSync: boolean = false): Promise<ApiResponse> {
     console.log("Fetching addresses from database...");
     const addresses = await this.getAddressesFromDatabase();
     
@@ -42,8 +44,9 @@ export class PropertyApiClient {
       };
     }
     
-    const apiUrl = this.buildApiUrl(addresses);
-    console.log("Fetching property data from API with", addresses.length, "addresses from 2025 onwards...");
+    const apiUrl = this.buildApiUrl(addresses, fullSync);
+    const yearText = fullSync ? '2024' : '2025';
+    console.log(`Fetching property data from API with ${addresses.length} addresses from ${yearText} onwards...`);
     
     const apiResponse = await fetch(apiUrl);
     

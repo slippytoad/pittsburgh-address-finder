@@ -120,21 +120,25 @@ const EmailTestButtons: React.FC = () => {
 
     setRunningFullSync(true);
     try {
-      // First, delete all violations
+      console.log('Starting full sync - deleting all violations...');
+      
+      // Delete all violations using a more reliable method
       const { error: deleteError } = await supabase
         .from('violations')
         .delete()
-        .neq('_id', 0); // Delete all records
+        .gte('_id', 0); // This will match all records since _id is always >= 0
 
       if (deleteError) {
         console.error('Error deleting violations:', deleteError);
         toast({
           title: "Full Sync Failed",
-          description: "Failed to delete existing violations",
+          description: `Failed to delete existing violations: ${deleteError.message}`,
           variant: "destructive"
         });
         return;
       }
+
+      console.log('All violations deleted successfully');
 
       // Then run the daily check to fetch everything from 2024
       const { data, error } = await supabase.functions.invoke('daily-violation-check', {
