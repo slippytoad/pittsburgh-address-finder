@@ -30,16 +30,18 @@ serve(async (req: Request) => {
     const apiClient = new PropertyApiClient(dbService);
     const emailService = new EmailService(resendApiKey);
 
-    // Check if this is a test run or full sync
+    // Check if this is a test run, full sync, or skip email
     const body = await req.text();
     let isTestRun = false;
     let isFullSync = false;
+    let skipEmail = false;
     
     if (body) {
       try {
         const requestData = JSON.parse(body);
         isTestRun = requestData.test_run === true;
         isFullSync = requestData.full_sync === true;
+        skipEmail = requestData.skip_email === true;
       } catch (e) {
         console.log("Body parsing failed, continuing with normal flow");
       }
@@ -53,11 +55,15 @@ serve(async (req: Request) => {
       console.log("Full sync detected - will fetch data from 2024");
     }
 
+    if (skipEmail) {
+      console.log("Skip email detected - no email will be sent");
+    }
+
     // Get app settings
     console.log("Fetching app settings...");
     const settings = await dbService.getAppSettings();
 
-    if (!settings?.email_reports_enabled || !settings?.email_report_address) {
+    if (!skipEmail && (!settings?.email_reports_enabled || !settings?.email_report_address)) {
       console.log("Email reports are disabled or no email address configured");
       return new Response(
         JSON.stringify({ message: "Email reports are disabled or not configured" }),
@@ -110,23 +116,27 @@ serve(async (req: Request) => {
       console.log("No new violations to save");
     }
 
-    // Send daily email notification with all records for status summary
-    console.log("Sending daily email report...");
-    const emailResponse = await emailService.sendDailyReport(
-      settings.email_report_address, 
-      newRecords, 
-      apiData.result.records
-    );
+    // Send daily email notification with all records for status summary (only if not skipping email)
+    if (!skipEmail && settings?.email_reports_enabled && settings?.email_report_address) {
+      console.log("Sending daily email report...");
+      const emailResponse = await emailService.sendDailyReport(
+        settings.email_report_address, 
+        newRecords, 
+        apiData.result.records
+      );
 
-    console.log("Email sent successfully:", emailResponse);
+      console.log("Email sent successfully:", emailResponse);
 
-    // Log the email notification
-    try {
-      await dbService.logEmailNotification(newRecords.length, settings.email_report_address);
-      console.log("Email notification logged successfully");
-    } catch (logError) {
-      console.error("Failed to log email notification:", logError);
-      // Don't fail the whole process for logging errors
+      // Log the email notification
+      try {
+        await dbService.logEmailNotification(newRecords.length, settings.email_report_address);
+        console.log("Email notification logged successfully");
+      } catch (logError) {
+        console.error("Failed to log email notification:", logError);
+        // Don't fail the whole process for logging errors
+      }
+    } else {
+      console.log("Skipping email notification");
     }
 
     // Update the last API check timestamp with the new records count
@@ -142,7 +152,7 @@ serve(async (req: Request) => {
       JSON.stringify({ 
         message: isFullSync ? "Full sync completed successfully" : "Daily check completed successfully",
         newRecordsCount: newRecords.length,
-        emailSent: true,
+        emailSent: !skipEmail && !!settings?.email_reports_enabled,
         savedSuccessfully: newRecords.length > 0
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
