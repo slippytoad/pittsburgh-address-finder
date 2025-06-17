@@ -37,8 +37,9 @@ const buildApiUrl = (addresses: string[], fullSync: boolean = false): string => 
     ? '%20AND%20investigation_date%20%3E%3D%20%272024-01-01%27'
     : '%20AND%20investigation_date%20%3E%3D%20%272025-01-01%27';
   const orderBy = '%20ORDER%20BY%20investigation_date%20DESC';
+  const limit = '%20LIMIT%201000'; // Add limit to fetch more records
   
-  const fullUrl = baseUrl + '(' + addressConditions + ')' + dateFilter + orderBy;
+  const fullUrl = baseUrl + '(' + addressConditions + ')' + dateFilter + orderBy + limit;
   
   // Log the constructed URL
   console.log('=== API URL CONSTRUCTION ===');
@@ -46,6 +47,7 @@ const buildApiUrl = (addresses: string[], fullSync: boolean = false): string => 
   console.log('Address conditions:', addressConditions);
   console.log('Date filter:', dateFilter);
   console.log('Order by:', orderBy);
+  console.log('Limit:', limit);
   console.log('FULL API URL:', fullUrl);
   console.log('=== END API URL CONSTRUCTION ===');
   
