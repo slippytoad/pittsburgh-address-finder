@@ -57,17 +57,9 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
         </div>
 
         <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          {showResults && (
+          {showResults && newRecordsCount !== null && newRecordsCount > 0 && (
             <div className="text-sm text-muted-foreground">
-              {newRecordsCount !== null ? (
-                <>
-                  Found <span className="font-medium">{newRecordsCount}</span> new records.
-                </>
-              ) : (
-                <>
-                  Fetching latest data...
-                </>
-              )}
+              Found <span className="font-medium">{newRecordsCount}</span> new records.
             </div>
           )}
           {lastApiCheckTime && (
