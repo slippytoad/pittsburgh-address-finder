@@ -133,10 +133,10 @@ const EmailTestButtons: React.FC = () => {
         console.log(`Found ${initialCount} violation records to delete`);
       }
 
-      // Use direct SQL to delete all records, bypassing potential RLS issues
-      console.log('Attempting to delete all violation records using SQL...');
+      // Use the SQL function to delete all records, bypassing RLS
+      console.log('Attempting to delete all violation records using SQL function...');
       const { error: sqlDeleteError } = await supabase
-        .rpc('delete_all_violations');
+        .rpc('delete_all_violations' as any); // Type assertion to bypass TypeScript error
 
       if (sqlDeleteError) {
         console.error('SQL delete failed, trying alternative method:', sqlDeleteError);
@@ -161,7 +161,7 @@ const EmailTestButtons: React.FC = () => {
           console.log(`Found ${allViolations.length} records to delete in batches`);
           
           // Delete in smaller batches
-          const batchSize = 100; // Smaller batches for better reliability
+          const batchSize = 100;
           let deletedCount = 0;
           
           for (let i = 0; i < allViolations.length; i += batchSize) {

@@ -155,6 +155,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_all_violations: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _user_id: string
