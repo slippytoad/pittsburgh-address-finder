@@ -91,41 +91,49 @@ export class DatabaseService {
     console.log('Attempting to save', violationRecords.length, 'violation records using service role');
 
     try {
-      // Use insert with onConflict to handle duplicates
-      const { error: insertError } = await this.supabase
+      // First, try a batch insert with proper RLS bypass
+      const { data, error: insertError } = await this.supabase
         .from('violations')
         .insert(violationRecords)
         .select();
 
       if (insertError) {
-        console.error('Insert failed, error details:', insertError);
+        console.error('Batch insert failed:', insertError);
         
-        // If insert fails, try individual inserts to see which records are problematic
-        console.log('Trying individual inserts to identify problematic records...');
+        // If batch insert fails due to RLS or other issues, try individual inserts
+        console.log('Attempting individual record inserts...');
         
         let successCount = 0;
+        let lastError = null;
+        
         for (let i = 0; i < violationRecords.length; i++) {
           const record = violationRecords[i];
-          const { error: singleError } = await this.supabase
-            .from('violations')
-            .insert([record])
-            .select();
-          
-          if (singleError) {
-            console.error(`Failed to insert record ${i} with _id ${record._id}:`, singleError);
-          } else {
-            console.log(`Successfully inserted record ${i} with _id ${record._id}`);
-            successCount++;
+          try {
+            const { data: singleData, error: singleError } = await this.supabase
+              .from('violations')
+              .insert([record])
+              .select();
+            
+            if (singleError) {
+              console.error(`Failed to insert record ${i} with _id ${record._id}:`, singleError);
+              lastError = singleError;
+            } else {
+              console.log(`Successfully inserted record ${i} with _id ${record._id}`);
+              successCount++;
+            }
+          } catch (singleException) {
+            console.error(`Exception inserting record ${i}:`, singleException);
+            lastError = singleException;
           }
         }
         
         if (successCount === 0) {
-          throw new Error(`Failed to save any violations: ${insertError.message}`);
+          throw new Error(`Failed to save any violations. Last error: ${lastError?.message || 'Unknown error'}`);
         } else {
           console.log(`Successfully saved ${successCount} out of ${violationRecords.length} violations`);
         }
       } else {
-        console.log('Successfully processed', violationRecords.length, 'violation records');
+        console.log('Successfully saved all', violationRecords.length, 'violation records');
       }
     } catch (error) {
       console.error('Error in saveNewViolations:', error);
