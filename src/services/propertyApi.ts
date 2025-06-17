@@ -32,7 +32,8 @@ const buildApiUrl = (addresses: string[]): string => {
     `address%20ILIKE%20%27${encodeURIComponent(address)}%25%27`
   ).join('%20OR%20');
   
-  const dateFilter = '%20AND%20investigation_date%20%3E%3D%20%272024-01-01%27';
+  // Updated date filter to get all records from 2025 onwards
+  const dateFilter = '%20AND%20investigation_date%20%3E%3D%20%272025-01-01%27';
   const orderBy = '%20ORDER%20BY%20investigation_date%20DESC';
   
   return baseUrl + '(' + addressConditions + ')' + dateFilter + orderBy;
@@ -52,7 +53,7 @@ export const fetchPropertyData = async (): Promise<ApiResponseWithNewCount> => {
   }
   
   const apiUrl = buildApiUrl(addresses);
-  console.log('Fetching property investigation data with', addresses.length, 'addresses...');
+  console.log('Fetching property investigation data with', addresses.length, 'addresses from 2025 onwards...');
   
   const response = await fetch(apiUrl);
   

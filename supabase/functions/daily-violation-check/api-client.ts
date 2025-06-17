@@ -23,9 +23,11 @@ export class PropertyApiClient {
       `address%20ILIKE%20%27${encodeURIComponent(address)}%25%27`
     ).join('%20OR%20');
     
+    // Updated date filter to get all records from 2025 onwards
+    const dateFilter = '%20AND%20investigation_date%20%3E%3D%20%272025-01-01%27';
     const orderBy = '%20ORDER%20BY%20investigation_date%20DESC';
     
-    return baseUrl + '(' + addressConditions + ')' + orderBy;
+    return baseUrl + '(' + addressConditions + ')' + dateFilter + orderBy;
   }
 
   async fetchPropertyData(): Promise<ApiResponse> {
@@ -41,7 +43,7 @@ export class PropertyApiClient {
     }
     
     const apiUrl = this.buildApiUrl(addresses);
-    console.log("Fetching property data from API with", addresses.length, "addresses...");
+    console.log("Fetching property data from API with", addresses.length, "addresses from 2025 onwards...");
     
     const apiResponse = await fetch(apiUrl);
     
