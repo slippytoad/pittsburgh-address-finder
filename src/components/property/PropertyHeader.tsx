@@ -49,7 +49,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
               ) : (
                 <>
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  Fetch Latest Data
+                  Check for New
                 </>
               )}
             </Button>

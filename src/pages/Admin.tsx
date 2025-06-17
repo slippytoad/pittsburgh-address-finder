@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import EmailSettingsSection from '@/components/property/EmailSettingsSection';
 import AddressManager from '@/components/AddressManager';
+import EmailTestButtons from '@/components/EmailTestButtons';
 
 const Admin = () => {
   return (
@@ -22,6 +23,7 @@ const Admin = () => {
         
         <AddressManager />
         <EmailSettingsSection />
+        <EmailTestButtons />
       </div>
     </div>
   );

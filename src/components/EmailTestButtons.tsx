@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Mail, Send, Play } from 'lucide-react';
+import { Mail, Send, Play, Trash2 } from 'lucide-react';
 
 const EmailTestButtons: React.FC = () => {
   const [sendingTest, setSendingTest] = useState(false);
   const [sendingDaily, setSendingDaily] = useState(false);
   const [runningCheck, setRunningCheck] = useState(false);
+  const [runningFullSync, setRunningFullSync] = useState(false);
   const { toast } = useToast();
 
   const sendTestEmail = async () => {
@@ -112,16 +113,71 @@ const EmailTestButtons: React.FC = () => {
     }
   };
 
+  const runFullSync = async () => {
+    if (!confirm('This will delete ALL violation records and re-sync everything from 2024. Are you sure?')) {
+      return;
+    }
+
+    setRunningFullSync(true);
+    try {
+      // First, delete all violations
+      const { error: deleteError } = await supabase
+        .from('violations')
+        .delete()
+        .neq('_id', 0); // Delete all records
+
+      if (deleteError) {
+        console.error('Error deleting violations:', deleteError);
+        toast({
+          title: "Full Sync Failed",
+          description: "Failed to delete existing violations",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Then run the daily check to fetch everything from 2024
+      const { data, error } = await supabase.functions.invoke('daily-violation-check', {
+        body: { test_run: false, full_sync: true }
+      });
+
+      if (error) {
+        console.error('Error running full sync:', error);
+        toast({
+          title: "Full Sync Failed",
+          description: `Failed to run full sync: ${error.message}`,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      console.log('Full sync response:', data);
+      toast({
+        title: "Full Sync Completed",
+        description: `Full sync completed successfully. All violations have been refreshed from 2024.`
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Full Sync Failed",
+        description: "Failed to run full sync",
+        variant: "destructive"
+      });
+    } finally {
+      setRunningFullSync(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Send className="h-5 w-5" />
-          Email Testing & Daily Check
+          Email Testing & Data Management
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Button 
             onClick={sendTestEmail} 
             disabled={sendingTest}
@@ -150,12 +206,23 @@ const EmailTestButtons: React.FC = () => {
             <Play className="h-4 w-4" />
             {runningCheck ? 'Running...' : 'Run Daily Check'}
           </Button>
+
+          <Button 
+            onClick={runFullSync} 
+            disabled={runningFullSync}
+            className="flex items-center gap-2"
+            variant="destructive"
+          >
+            <Trash2 className="h-4 w-4" />
+            {runningFullSync ? 'Syncing...' : 'Full Sync'}
+          </Button>
         </div>
         
         <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-md">
           <strong>Test Email:</strong> Sends a simple test message to verify email functionality.<br/>
           <strong>Daily Report:</strong> Sends the actual daily violation report with current data.<br/>
-          <strong>Run Daily Check:</strong> Executes the full daily violation check process including data fetching and database updates.
+          <strong>Run Daily Check:</strong> Executes the full daily violation check process including data fetching and database updates.<br/>
+          <strong>Full Sync:</strong> <span className="text-red-600 font-medium">Deletes ALL violation records and re-syncs everything from 2024. Use with caution!</span>
         </div>
       </CardContent>
     </Card>
