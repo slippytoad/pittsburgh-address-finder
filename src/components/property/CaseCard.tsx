@@ -38,12 +38,12 @@ export const CaseCard: React.FC<CaseCardProps> = ({
     return new Date(record.investigation_date) < new Date(earliest) ? record.investigation_date : earliest;
   }, '');
 
-  // Fields to exclude from the expanded view
-  const excludedFields = ['_id', 'full_text', '_full_text', 'casefile_number', 'address', 'parcel_id'];
+  // Fields to exclude from the expanded view - added violation_type
+  const excludedFields = ['_id', 'full_text', '_full_text', 'casefile_number', 'address', 'parcel_id', 'violation_type'];
 
-  // Field order for better presentation - moved investigation_outcome to the top
+  // Field order for better presentation - removed violation_type from the ordered fields
   const getOrderedFields = (record: any) => {
-    const orderedKeys = ['investigation_date', 'status', 'violation_type', 'investigation_outcome'];
+    const orderedKeys = ['investigation_date', 'status', 'investigation_outcome'];
     const remainingKeys = Object.keys(record).filter(
       key => !excludedFields.includes(key) && !orderedKeys.includes(key)
     );
