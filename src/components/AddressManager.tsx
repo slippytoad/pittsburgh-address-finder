@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 interface Address {
   id: number;
   address: string;
+  parcel_id: string | null;
   created_at: string | null;
 }
 
@@ -211,9 +212,16 @@ const AddressManager: React.FC = () => {
                   key={address.id}
                   className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
                 >
-                  <span className="text-sm font-medium flex-1">
-                    {address.address}
-                  </span>
+                  <div className="flex-1">
+                    <div className="text-sm font-medium">
+                      {address.address}
+                    </div>
+                    {address.parcel_id && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        Parcel ID: {address.parcel_id}
+                      </div>
+                    )}
+                  </div>
                   <Button
                     variant="ghost"
                     size="sm"
