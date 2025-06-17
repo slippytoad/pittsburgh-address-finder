@@ -104,42 +104,43 @@ export class DatabaseService {
       if (rpcError) {
         console.error('RPC insert failed:', rpcError);
         
-        // Fallback to individual inserts with detailed logging
-        console.log('Falling back to individual inserts with detailed debugging...');
+        // Fallback to batch inserts with detailed logging
+        console.log('Falling back to batch inserts...');
         
-        let successCount = 0;
+        const batchSize = 50; // Process in batches of 50
+        let totalInserted = 0;
         
-        for (let i = 0; i < Math.min(3, violationRecords.length); i++) { // Try only first 3 records for debugging
-          const record = violationRecords[i];
-          console.log(`Attempting to insert record ${i}:`, JSON.stringify(record, null, 2));
+        for (let i = 0; i < violationRecords.length; i += batchSize) {
+          const batch = violationRecords.slice(i, i + batchSize);
+          console.log(`Processing batch ${Math.floor(i/batchSize) + 1}: ${batch.length} records (${i + 1}-${Math.min(i + batchSize, violationRecords.length)} of ${violationRecords.length})`);
           
           try {
-            const { data: singleData, error: singleError } = await this.supabase
+            const { data: batchData, error: batchError } = await this.supabase
               .from('violations')
-              .insert([record]);
+              .insert(batch);
             
-            if (singleError) {
-              console.error(`Failed to insert record ${i}:`, {
-                error: singleError,
-                record: record,
-                errorCode: singleError.code,
-                errorDetails: singleError.details,
-                errorHint: singleError.hint,
-                errorMessage: singleError.message
+            if (batchError) {
+              console.error(`Failed to insert batch ${Math.floor(i/batchSize) + 1}:`, {
+                error: batchError,
+                batchSize: batch.length,
+                errorCode: batchError.code,
+                errorDetails: batchError.details,
+                errorHint: batchError.hint,
+                errorMessage: batchError.message
               });
             } else {
-              console.log(`Successfully inserted record ${i} with _id ${record._id}`);
-              successCount++;
+              totalInserted += batch.length;
+              console.log(`Successfully inserted batch ${Math.floor(i/batchSize) + 1} with ${batch.length} records. Total inserted so far: ${totalInserted}`);
             }
-          } catch (singleException) {
-            console.error(`Exception inserting record ${i}:`, singleException);
+          } catch (batchException) {
+            console.error(`Exception inserting batch ${Math.floor(i/batchSize) + 1}:`, batchException);
           }
         }
         
-        if (successCount === 0) {
+        if (totalInserted === 0) {
           throw new Error(`Failed to save any violations. RPC error: ${rpcError.message}`);
         } else {
-          console.log(`Successfully saved ${successCount} out of ${Math.min(3, violationRecords.length)} test records`);
+          console.log(`Successfully saved ${totalInserted} out of ${violationRecords.length} violations via batch insert`);
         }
       } else {
         console.log('Successfully saved all', violationRecords.length, 'violation records via RPC');
