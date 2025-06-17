@@ -133,18 +133,16 @@ const EmailTestButtons: React.FC = () => {
         console.log(`Found ${initialCount} violation records to delete`);
       }
 
-      // Use a more aggressive deletion approach - delete all records without any conditions
-      console.log('Attempting to delete all violation records...');
-      const { error: deleteError } = await supabase
-        .from('violations')
-        .delete()
-        .gte('_id', 0); // Delete all records where _id >= 0 (should be all records)
+      // Use direct SQL to delete all records, bypassing potential RLS issues
+      console.log('Attempting to delete all violation records using SQL...');
+      const { error: sqlDeleteError } = await supabase
+        .rpc('delete_all_violations');
 
-      if (deleteError) {
-        console.error('Primary deletion failed:', deleteError);
+      if (sqlDeleteError) {
+        console.error('SQL delete failed, trying alternative method:', sqlDeleteError);
         
-        // Try alternative approach - get all IDs and delete them specifically
-        console.log('Trying alternative deletion method - fetching all IDs...');
+        // Fallback: Try to get all IDs and delete them in batches
+        console.log('Trying batch deletion method...');
         const { data: allViolations, error: fetchError } = await supabase
           .from('violations')
           .select('_id');
@@ -160,10 +158,10 @@ const EmailTestButtons: React.FC = () => {
         }
 
         if (allViolations && allViolations.length > 0) {
-          console.log(`Found ${allViolations.length} records to delete individually`);
+          console.log(`Found ${allViolations.length} records to delete in batches`);
           
-          // Delete in smaller batches to avoid timeout
-          const batchSize = 500;
+          // Delete in smaller batches
+          const batchSize = 100; // Smaller batches for better reliability
           let deletedCount = 0;
           
           for (let i = 0; i < allViolations.length; i += batchSize) {
@@ -190,7 +188,7 @@ const EmailTestButtons: React.FC = () => {
           console.log('No violation records found to delete');
         }
       } else {
-        console.log('Primary deletion completed successfully');
+        console.log('SQL deletion completed successfully');
       }
 
       // Verify deletion worked
@@ -204,9 +202,9 @@ const EmailTestButtons: React.FC = () => {
         console.log(`Final violation count after deletion: ${finalCount}`);
       }
 
-      console.log('All violations deleted successfully, starting full sync...');
+      console.log('Starting full sync to pull all records from 2024...');
 
-      // Then run the daily check to fetch everything from 2024 without sending email
+      // Run the daily check to fetch everything from 2024 without sending email
       const { data, error } = await supabase.functions.invoke('daily-violation-check', {
         body: { test_run: false, full_sync: true, skip_email: true }
       });
@@ -222,9 +220,11 @@ const EmailTestButtons: React.FC = () => {
       }
 
       console.log('Full sync response:', data);
+      const retrievedCount = data?.newRecordsCount || 0;
+      
       toast({
         title: "Full Sync Completed",
-        description: `Full sync completed successfully. All violations have been refreshed from 2024.`
+        description: `Full sync completed successfully. Retrieved ${retrievedCount} records from API (2024 onwards).`
       });
     } catch (error) {
       console.error('Error:', error);
@@ -292,7 +292,7 @@ const EmailTestButtons: React.FC = () => {
           <strong>Test Email:</strong> Sends a simple test message to verify email functionality.<br/>
           <strong>Daily Report:</strong> Sends the actual daily violation report with current data.<br/>
           <strong>Run Daily Check:</strong> Executes the full daily violation check process including data fetching and database updates.<br/>
-          <strong>Full Sync:</strong> <span className="text-red-600 font-medium">Deletes ALL violation records and re-syncs everything from 2024. No email is sent. Use with caution!</span>
+          <strong>Full Sync:</strong> <span className="text-red-600 font-medium">Deletes ALL violation records and re-syncs everything from 2024. Reports count of retrieved records. No email is sent. Use with caution!</span>
         </div>
       </CardContent>
     </Card>
