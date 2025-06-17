@@ -64,7 +64,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
           )}
           {lastApiCheckTime && (
             <div className="text-sm text-muted-foreground">
-              Last API Check: <span className="font-medium">{lastApiCheckTime}</span>
+              Last API Check: <span className="font-medium">{lastApiCheckTime} </span>
               {lastApiNewRecordsCount !== null && (
                 <>
                    (<span className="font-medium">{lastApiNewRecordsCount}</span> new)
