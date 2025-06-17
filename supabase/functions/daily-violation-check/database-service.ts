@@ -89,51 +89,60 @@ export class DatabaseService {
     }
 
     console.log('Attempting to save', violationRecords.length, 'violation records using service role');
+    console.log('Sample record structure:', JSON.stringify(violationRecords[0], null, 2));
 
     try {
-      // First, try a batch insert with proper RLS bypass
-      const { data, error: insertError } = await this.supabase
-        .from('violations')
-        .insert(violationRecords)
-        .select();
+      // Try direct SQL insert using RPC to bypass RLS completely
+      console.log('Attempting direct RPC insert to bypass RLS...');
+      
+      // Create a simple RPC function call that should work with service role
+      const { data: rpcResult, error: rpcError } = await this.supabase
+        .rpc('insert_violations_bulk', { 
+          violation_data: violationRecords 
+        });
 
-      if (insertError) {
-        console.error('Batch insert failed:', insertError);
+      if (rpcError) {
+        console.error('RPC insert failed:', rpcError);
         
-        // If batch insert fails due to RLS or other issues, try individual inserts
-        console.log('Attempting individual record inserts...');
+        // Fallback to individual inserts with detailed logging
+        console.log('Falling back to individual inserts with detailed debugging...');
         
         let successCount = 0;
-        let lastError = null;
         
-        for (let i = 0; i < violationRecords.length; i++) {
+        for (let i = 0; i < Math.min(3, violationRecords.length); i++) { // Try only first 3 records for debugging
           const record = violationRecords[i];
+          console.log(`Attempting to insert record ${i}:`, JSON.stringify(record, null, 2));
+          
           try {
             const { data: singleData, error: singleError } = await this.supabase
               .from('violations')
-              .insert([record])
-              .select();
+              .insert([record]);
             
             if (singleError) {
-              console.error(`Failed to insert record ${i} with _id ${record._id}:`, singleError);
-              lastError = singleError;
+              console.error(`Failed to insert record ${i}:`, {
+                error: singleError,
+                record: record,
+                errorCode: singleError.code,
+                errorDetails: singleError.details,
+                errorHint: singleError.hint,
+                errorMessage: singleError.message
+              });
             } else {
               console.log(`Successfully inserted record ${i} with _id ${record._id}`);
               successCount++;
             }
           } catch (singleException) {
             console.error(`Exception inserting record ${i}:`, singleException);
-            lastError = singleException;
           }
         }
         
         if (successCount === 0) {
-          throw new Error(`Failed to save any violations. Last error: ${lastError?.message || 'Unknown error'}`);
+          throw new Error(`Failed to save any violations. RPC error: ${rpcError.message}`);
         } else {
-          console.log(`Successfully saved ${successCount} out of ${violationRecords.length} violations`);
+          console.log(`Successfully saved ${successCount} out of ${Math.min(3, violationRecords.length)} test records`);
         }
       } else {
-        console.log('Successfully saved all', violationRecords.length, 'violation records');
+        console.log('Successfully saved all', violationRecords.length, 'violation records via RPC');
       }
     } catch (error) {
       console.error('Error in saveNewViolations:', error);
