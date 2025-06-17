@@ -23,6 +23,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
     showResults,
     availableStatuses,
     filteredRecords,
+    statusCounts,
     lastNewRecordsCount,
     lastApiNewRecordsCount,
     appSettings,
@@ -52,6 +53,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
             availableStatuses={availableStatuses}
             selectedStatuses={selectedStatuses}
             onStatusChange={setSelectedStatuses}
+            statusCounts={statusCounts}
           />
           <PropertyList 
             records={filteredRecords} 

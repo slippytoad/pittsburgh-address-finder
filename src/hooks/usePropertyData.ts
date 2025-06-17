@@ -57,17 +57,25 @@ export const usePropertyData = (selectedStatuses: string[]) => {
     }
   };
 
-  // Get available statuses and filtered data
-  const { availableStatuses, filteredRecords } = useMemo(() => {
+  // Get available statuses, status counts, and filtered data
+  const { availableStatuses, statusCounts, filteredRecords } = useMemo(() => {
     if (!data?.result?.records) {
       console.log('usePropertyData - no data available');
-      return { availableStatuses: [], filteredRecords: [] };
+      return { availableStatuses: [], statusCounts: {}, filteredRecords: [] };
     }
 
     const groupedCases = groupRecordsByCase(data.result.records);
     const statuses = Array.from(new Set(groupedCases.map(c => c.currentStatus)));
     
+    // Calculate status counts
+    const counts: Record<string, number> = {};
+    groupedCases.forEach(caseGroup => {
+      const status = caseGroup.currentStatus;
+      counts[status] = (counts[status] || 0) + 1;
+    });
+    
     console.log('usePropertyData - Available statuses:', statuses);
+    console.log('usePropertyData - Status counts:', counts);
     console.log('usePropertyData - Selected statuses:', selectedStatuses);
     console.log('usePropertyData - Total grouped cases:', groupedCases.length);
 
@@ -85,6 +93,7 @@ export const usePropertyData = (selectedStatuses: string[]) => {
 
     return { 
       availableStatuses: statuses,
+      statusCounts: counts,
       filteredRecords: filteredCases.flatMap(c => c.records)
     };
   }, [data, selectedStatuses]);
@@ -121,6 +130,7 @@ export const usePropertyData = (selectedStatuses: string[]) => {
     error,
     showResults,
     availableStatuses,
+    statusCounts,
     filteredRecords,
     lastNewRecordsCount,
     lastApiNewRecordsCount: appSettings?.last_api_new_records_count,

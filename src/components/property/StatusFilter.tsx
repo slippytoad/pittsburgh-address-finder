@@ -9,18 +9,21 @@ interface StatusFilterProps {
   availableStatuses: string[];
   selectedStatuses: string[];
   onStatusChange: (statuses: string[]) => void;
+  statusCounts: Record<string, number>;
 }
 
 const StatusFilter: React.FC<StatusFilterProps> = ({
   availableStatuses,
   selectedStatuses,
   onStatusChange,
+  statusCounts,
 }) => {
   // Debug logging to track props
   useEffect(() => {
     console.log('StatusFilter - availableStatuses:', availableStatuses);
     console.log('StatusFilter - selectedStatuses:', selectedStatuses);
-  }, [availableStatuses, selectedStatuses]);
+    console.log('StatusFilter - statusCounts:', statusCounts);
+  }, [availableStatuses, selectedStatuses, statusCounts]);
 
   const handleStatusToggle = (status: string) => {
     console.log('StatusFilter - handleStatusToggle called with:', status);
@@ -46,7 +49,8 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
       <div className="flex flex-wrap gap-2">
         {availableStatuses.map((status) => {
           const isSelected = selectedStatuses.includes(status);
-          console.log(`StatusFilter - rendering ${status}, isSelected: ${isSelected}`);
+          const count = statusCounts[status] || 0;
+          console.log(`StatusFilter - rendering ${status}, isSelected: ${isSelected}, count: ${count}`);
           return (
             <Badge
               key={status}
@@ -60,7 +64,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
                 }
               `}
             >
-              {status}
+              {status} ({count})
             </Badge>
           );
         })}
