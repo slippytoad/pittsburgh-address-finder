@@ -1,16 +1,16 @@
-
 import React from 'react';
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, FileText, Clock, Plus } from 'lucide-react';
-import LoadingOverlay from '@/components/ui/loading-overlay';
+import { Building2, RefreshCw, Loader2, Settings } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface PropertyHeaderProps {
   onFetchData: () => void;
   isLoading: boolean;
   showResults: boolean;
-  newRecordsCount?: number;
-  lastApiCheckTime?: string;
-  lastApiNewRecordsCount?: number;
+  newRecordsCount: number | null;
+  lastApiCheckTime: string | null;
+  lastApiNewRecordsCount: number | null;
 }
 
 const PropertyHeader: React.FC<PropertyHeaderProps> = ({
@@ -22,51 +22,73 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   lastApiNewRecordsCount
 }) => {
   return (
-    <>
-      <LoadingOverlay isVisible={isLoading} message="Refreshing data..." />
-      <div className="text-center space-y-4">
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <FileText className="h-8 w-8 text-blue-600" />
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            JFW Oakland Violations Dashboard
-          </h1>
-        </div>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          View property investigation records from Pittsburgh's open data portal.
-        </p>
-        
-        {showResults && (
-          <div className="flex items-center justify-center gap-6 text-sm text-gray-600">
-            {lastApiCheckTime && (
-              <div className="flex items-center gap-1">
-                <Clock className="h-4 w-4 text-gray-500" />
-                <span>Last API check: {lastApiCheckTime}</span>
-                <div className="flex items-center gap-1 ml-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                  <Plus className="h-3 w-3" />
-                  <span>{lastApiNewRecordsCount || 0} found</span>
-                </div>
-                {newRecordsCount !== undefined && (
-                  <div className="flex items-center gap-1 ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                    <Plus className="h-3 w-3" />
-                    <span>{newRecordsCount} new</span>
-                  </div>
-                )}
-              </div>
-            )}
-            <Button
+    <Card className="border-t-4 border-t-blue-500">
+      <CardHeader>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+              <Building2 className="h-6 w-6 text-blue-600" />
+              JFW Oakland Property Investigation Dashboard
+            </CardTitle>
+            <CardDescription className="text-sm sm:text-base">
+              Monitor property violations and investigation records from Oakland's official database
+            </CardDescription>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Link to="/admin">
+              <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                <Settings className="h-4 w-4 mr-2" />
+                Admin Settings
+              </Button>
+            </Link>
+            <Button 
               onClick={onFetchData}
               disabled={isLoading}
-              variant="outline"
+              className="w-full sm:w-auto"
               size="sm"
-              className="text-gray-600 hover:text-gray-800"
             >
-              <RefreshCw className="mr-2 h-3 w-3" />
-              Check Now
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Fetching...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Fetch Latest Data
+                </>
+              )}
             </Button>
           </div>
-        )}
-      </div>
-    </>
+        </div>
+
+        <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          {showResults && (
+            <div className="text-sm text-muted-foreground">
+              {newRecordsCount !== null ? (
+                <>
+                  Found <span className="font-medium">{newRecordsCount}</span> new records.
+                </>
+              ) : (
+                <>
+                  Fetching latest data...
+                </>
+              )}
+            </div>
+          )}
+          {lastApiCheckTime && (
+            <div className="text-sm text-muted-foreground">
+              Last API Check: <span className="font-medium">{lastApiCheckTime}</span>
+              {lastApiNewRecordsCount !== null && (
+                <>
+                   (<span className="font-medium">{lastApiNewRecordsCount}</span> new)
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </CardHeader>
+    </Card>
   );
 };
 
