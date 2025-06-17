@@ -4,6 +4,7 @@ import PropertyHeader from '@/components/property/PropertyHeader';
 import PropertyList from '@/components/property/PropertyList';
 import StatusFilter from '@/components/property/StatusFilter';
 import EmailSettingsSection from '@/components/property/EmailSettingsSection';
+import AddressManager from '@/components/AddressManager';
 import ErrorDisplay from '@/components/property/ErrorDisplay';
 import { useUrlParameters } from '@/hooks/useUrlParameters';
 import { usePropertyData } from '@/hooks/usePropertyData';
@@ -44,6 +45,8 @@ const PropertyInvestigationDashboard: React.FC = () => {
       />
 
       <EmailSettingsSection />
+
+      <AddressManager />
 
       {error && <ErrorDisplay error={error} />}
 
