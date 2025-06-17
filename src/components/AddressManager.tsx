@@ -20,19 +20,50 @@ const AddressManager: React.FC = () => {
   const [isAddingAddress, setIsAddingAddress] = useState(false);
   const { toast } = useToast();
 
+  // Function to sort addresses by street name and then by street number
+  const sortAddresses = (addresses: Address[]) => {
+    return addresses.sort((a, b) => {
+      const parseAddress = (address: string) => {
+        const match = address.match(/^(\d+)\s+(.+)$/);
+        if (match) {
+          return {
+            number: parseInt(match[1]),
+            street: match[2].toLowerCase()
+          };
+        }
+        return {
+          number: 0,
+          street: address.toLowerCase()
+        };
+      };
+
+      const aData = parseAddress(a.address);
+      const bData = parseAddress(b.address);
+
+      // First sort by street name
+      const streetComparison = aData.street.localeCompare(bData.street);
+      if (streetComparison !== 0) {
+        return streetComparison;
+      }
+
+      // If street names are the same, sort by number
+      return aData.number - bData.number;
+    });
+  };
+
   const fetchAddresses = async () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('addresses')
-        .select('*')
-        .order('address', { ascending: true }); // Sort by address alphabetically
+        .select('*');
 
       if (error) {
         throw error;
       }
 
-      setAddresses(data || []);
+      const sortedAddresses = sortAddresses(data || []);
+      setAddresses(sortedAddresses);
     } catch (error) {
       console.error('Error fetching addresses:', error);
       toast({
@@ -67,8 +98,9 @@ const AddressManager: React.FC = () => {
         throw error;
       }
 
-      // Insert the new address in the correct alphabetical position
-      setAddresses(prev => [...prev, data].sort((a, b) => a.address.localeCompare(b.address)));
+      // Add the new address and re-sort the entire list
+      const updatedAddresses = sortAddresses([...addresses, data]);
+      setAddresses(updatedAddresses);
       setNewAddress('');
       toast({
         title: 'Success',
