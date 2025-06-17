@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import EmailSettingsSection from '@/components/property/EmailSettingsSection';
+import AddressManager from '@/components/AddressManager';
 
 const Admin = () => {
   return (
@@ -19,6 +20,7 @@ const Admin = () => {
           <h1 className="text-2xl font-bold text-gray-800">Admin Settings</h1>
         </div>
         
+        <AddressManager />
         <EmailSettingsSection />
       </div>
     </div>

@@ -3,7 +3,6 @@ import React from 'react';
 import PropertyHeader from '@/components/property/PropertyHeader';
 import PropertyList from '@/components/property/PropertyList';
 import StatusFilter from '@/components/property/StatusFilter';
-import AddressManager from '@/components/AddressManager';
 import ErrorDisplay from '@/components/property/ErrorDisplay';
 import { useUrlParameters } from '@/hooks/useUrlParameters';
 import { usePropertyData } from '@/hooks/usePropertyData';
@@ -42,8 +41,6 @@ const PropertyInvestigationDashboard: React.FC = () => {
         lastApiCheckTime={formatLastApiCheckTime(appSettings?.last_api_check_time || null)}
         lastApiNewRecordsCount={lastApiNewRecordsCount}
       />
-
-      <AddressManager />
 
       {error && <ErrorDisplay error={error} />}
 
