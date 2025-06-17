@@ -38,7 +38,18 @@ const buildApiUrl = (addresses: string[], fullSync: boolean = false): string => 
     : '%20AND%20investigation_date%20%3E%3D%20%272025-01-01%27';
   const orderBy = '%20ORDER%20BY%20investigation_date%20DESC';
   
-  return baseUrl + '(' + addressConditions + ')' + dateFilter + orderBy;
+  const fullUrl = baseUrl + '(' + addressConditions + ')' + dateFilter + orderBy;
+  
+  // Log the constructed URL
+  console.log('=== API URL CONSTRUCTION ===');
+  console.log('Base URL:', baseUrl);
+  console.log('Address conditions:', addressConditions);
+  console.log('Date filter:', dateFilter);
+  console.log('Order by:', orderBy);
+  console.log('FULL API URL:', fullUrl);
+  console.log('=== END API URL CONSTRUCTION ===');
+  
+  return fullUrl;
 };
 
 export const fetchPropertyData = async (fullSync: boolean = false): Promise<ApiResponseWithNewCount> => {
@@ -57,15 +68,25 @@ export const fetchPropertyData = async (fullSync: boolean = false): Promise<ApiR
   const apiUrl = buildApiUrl(addresses, fullSync);
   const yearText = fullSync ? '2024' : '2025';
   console.log(`Fetching property investigation data with ${addresses.length} addresses from ${yearText} onwards...`);
+  console.log('Making API call to URL:', apiUrl);
   
   const response = await fetch(apiUrl);
   
   if (!response.ok) {
+    console.error('API request failed:', {
+      status: response.status,
+      statusText: response.statusText,
+      url: apiUrl
+    });
     throw new Error(`HTTP error! status: ${response.status}`);
   }
   
   const data = await response.json();
-  console.log('API Response:', data);
+  console.log('API Response received:', {
+    success: data.success,
+    recordCount: data?.result?.records?.length || 0,
+    totalRecords: data?.result?.total || 'unknown'
+  });
   
   let newRecordsCount = 0;
   

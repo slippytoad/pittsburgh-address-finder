@@ -29,7 +29,21 @@ export class PropertyApiClient {
       : '%20AND%20investigation_date%20%3E%3D%20%272025-01-01%27';
     const orderBy = '%20ORDER%20BY%20investigation_date%20DESC';
     
-    return baseUrl + '(' + addressConditions + ')' + dateFilter + orderBy;
+    const fullUrl = baseUrl + '(' + addressConditions + ')' + dateFilter + orderBy;
+    
+    // Log the constructed URL in detail
+    console.log('=== EDGE FUNCTION API URL CONSTRUCTION ===');
+    console.log('Base URL:', baseUrl);
+    console.log('Number of addresses:', addresses.length);
+    console.log('First few addresses:', addresses.slice(0, 3));
+    console.log('Address conditions:', addressConditions);
+    console.log('Date filter (fullSync=' + fullSync + '):', dateFilter);
+    console.log('Order by:', orderBy);
+    console.log('FULL API URL:', fullUrl);
+    console.log('URL Length:', fullUrl.length);
+    console.log('=== END EDGE FUNCTION API URL CONSTRUCTION ===');
+    
+    return fullUrl;
   }
 
   async fetchPropertyData(fullSync: boolean = false): Promise<ApiResponse> {
@@ -47,17 +61,34 @@ export class PropertyApiClient {
     const apiUrl = this.buildApiUrl(addresses, fullSync);
     const yearText = fullSync ? '2024' : '2025';
     console.log(`Fetching property data from API with ${addresses.length} addresses from ${yearText} onwards...`);
+    console.log('About to make API call to:', apiUrl);
     
+    const startTime = Date.now();
     const apiResponse = await fetch(apiUrl);
+    const endTime = Date.now();
+    
+    console.log('API call completed in', (endTime - startTime), 'ms');
+    console.log('Response status:', apiResponse.status, apiResponse.statusText);
     
     if (!apiResponse.ok) {
+      console.error('API request failed:', {
+        status: apiResponse.status,
+        statusText: apiResponse.statusText,
+        url: apiUrl
+      });
       throw new Error(`API request failed with status: ${apiResponse.status}`);
     }
     
     const apiData = await apiResponse.json();
-    console.log("API Response received:", apiData?.result?.records?.length || 0, "records");
+    console.log("API Response received:", {
+      success: apiData.success,
+      recordCount: apiData?.result?.records?.length || 0,
+      hasResult: !!apiData.result,
+      hasRecords: !!apiData.result?.records
+    });
 
     if (!apiData.success || !apiData.result?.records) {
+      console.error("Invalid API response format:", apiData);
       throw new Error("Invalid API response format");
     }
 
