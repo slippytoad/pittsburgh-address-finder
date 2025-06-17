@@ -122,22 +122,35 @@ const EmailTestButtons: React.FC = () => {
     try {
       console.log('Starting full sync - deleting all violations...');
       
-      // Use a simpler delete all approach
+      // First, let's check how many records we have
+      const { count: initialCount, error: countError } = await supabase
+        .from('violations')
+        .select('*', { count: 'exact', head: true });
+
+      if (countError) {
+        console.error('Error counting violations:', countError);
+      } else {
+        console.log(`Found ${initialCount} violation records to delete`);
+      }
+
+      // Use a more aggressive deletion approach - delete all records without any conditions
+      console.log('Attempting to delete all violation records...');
       const { error: deleteError } = await supabase
         .from('violations')
         .delete()
-        .neq('_id', 0); // Delete where _id is not equal to 0 (which should be all records)
+        .gte('_id', 0); // Delete all records where _id >= 0 (should be all records)
 
       if (deleteError) {
-        console.error('Error deleting violations:', deleteError);
+        console.error('Primary deletion failed:', deleteError);
         
-        // Try alternative deletion method if the first one fails
-        console.log('Trying alternative deletion method...');
+        // Try alternative approach - get all IDs and delete them specifically
+        console.log('Trying alternative deletion method - fetching all IDs...');
         const { data: allViolations, error: fetchError } = await supabase
           .from('violations')
           .select('_id');
         
         if (fetchError) {
+          console.error('Failed to fetch violation IDs:', fetchError);
           toast({
             title: "Full Sync Failed",
             description: `Failed to fetch violations for deletion: ${fetchError.message}`,
@@ -146,12 +159,18 @@ const EmailTestButtons: React.FC = () => {
           return;
         }
 
-        // Delete in batches
         if (allViolations && allViolations.length > 0) {
-          const batchSize = 1000;
+          console.log(`Found ${allViolations.length} records to delete individually`);
+          
+          // Delete in smaller batches to avoid timeout
+          const batchSize = 500;
+          let deletedCount = 0;
+          
           for (let i = 0; i < allViolations.length; i += batchSize) {
             const batch = allViolations.slice(i, i + batchSize);
             const ids = batch.map(v => v._id);
+            
+            console.log(`Deleting batch ${Math.floor(i/batchSize) + 1}: ${ids.length} records`);
             
             const { error: batchDeleteError } = await supabase
               .from('violations')
@@ -159,13 +178,33 @@ const EmailTestButtons: React.FC = () => {
               .in('_id', ids);
             
             if (batchDeleteError) {
-              console.error('Batch delete error:', batchDeleteError);
+              console.error(`Batch delete error for batch ${Math.floor(i/batchSize) + 1}:`, batchDeleteError);
+            } else {
+              deletedCount += ids.length;
+              console.log(`Successfully deleted batch ${Math.floor(i/batchSize) + 1}, total deleted: ${deletedCount}`);
             }
           }
+          
+          console.log(`Finished deletion process. Attempted to delete ${deletedCount} records.`);
+        } else {
+          console.log('No violation records found to delete');
         }
+      } else {
+        console.log('Primary deletion completed successfully');
       }
 
-      console.log('All violations deleted successfully');
+      // Verify deletion worked
+      const { count: finalCount, error: finalCountError } = await supabase
+        .from('violations')
+        .select('*', { count: 'exact', head: true });
+
+      if (finalCountError) {
+        console.error('Error counting final violations:', finalCountError);
+      } else {
+        console.log(`Final violation count after deletion: ${finalCount}`);
+      }
+
+      console.log('All violations deleted successfully, starting full sync...');
 
       // Then run the daily check to fetch everything from 2024 without sending email
       const { data, error } = await supabase.functions.invoke('daily-violation-check', {
