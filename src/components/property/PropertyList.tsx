@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, FileText } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { FileText } from 'lucide-react';
 import { PropertyRecord } from '@/types/propertyTypes';
 import { groupRecordsByCase } from '@/utils/propertyUtils';
 import CaseCard from './CaseCard';
@@ -21,16 +21,7 @@ export const PropertyList: React.FC<PropertyListProps> = ({
 
   return (
     <Card className="shadow-lg">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MapPin className="h-5 w-5 text-blue-600" />
-          Investigation Cases
-        </CardTitle>
-        <CardDescription>
-          Found {groupedCases.length} case{groupedCases.length !== 1 ? 's' : ''} with {records.length} total record{records.length !== 1 ? 's' : ''}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         {groupedCases.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
