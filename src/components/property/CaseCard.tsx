@@ -40,10 +40,10 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   // Check if this is an IN COURT case for showing court filing link
   const isInCourt = groupedCase.currentStatus === 'IN COURT';
 
-  // Generate court filing URL based on case number
+  // Generate court filing URL based on case number for Pennsylvania/Pittsburgh court
   const getCourtFilingUrl = (caseNumber: string) => {
-    // This is a placeholder URL structure - adjust based on actual court system
-    return `https://www.courts.ca.gov/case-search?case=${encodeURIComponent(caseNumber)}`;
+    // Pennsylvania Unified Judicial System web portal
+    return `https://ujsportal.pacourts.us/CaseSearch?caseNumber=${encodeURIComponent(caseNumber)}`;
   };
 
   // Get the earliest investigation date (when case was first opened)
