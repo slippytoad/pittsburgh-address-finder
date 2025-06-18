@@ -31,6 +31,13 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   // Convert outcome to mixed case
   const formattedOutcome = latestOutcome.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
 
+  // Get violation specific instructions for IN VIOLATION and IN COURT statuses
+  const shouldShowInstructions = groupedCase.currentStatus === 'IN VIOLATION' || groupedCase.currentStatus === 'IN COURT';
+  const violationInstructions = shouldShowInstructions ? 
+    groupedCase.records[0]?.violation_spec_instructions || null : null;
+  const formattedInstructions = violationInstructions ? 
+    violationInstructions.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) : null;
+
   // Get the earliest investigation date (when case was first opened)
   const earliestDate = groupedCase.records.reduce((earliest, record) => {
     if (!record.investigation_date) return earliest;
@@ -151,6 +158,16 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   </div>
                 </div>
               </div>
+
+              {/* Add violation instructions for IN VIOLATION and IN COURT statuses */}
+              {formattedInstructions && (
+                <div className="pt-2 border-t border-gray-200">
+                  <div className="text-sm text-gray-700">
+                    <span className="font-medium">Instructions:</span>
+                    <span className="ml-1 break-words">{formattedInstructions}</span>
+                  </div>
+                </div>
+              )}
             </div>
           </CardHeader>
         </CollapsibleTrigger>
