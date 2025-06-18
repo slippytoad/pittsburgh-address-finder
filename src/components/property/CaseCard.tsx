@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -40,10 +41,10 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   // Check if this is an IN COURT case for showing court filing link
   const isInCourt = groupedCase.currentStatus === 'IN COURT';
 
-  // Generate court filing URL based on casefile number for Pennsylvania/Pittsburgh court
-  const getCourtFilingUrl = (casefileNumber: string) => {
+  // Generate court filing URL based on parcel_id for Pennsylvania/Pittsburgh court
+  const getCourtFilingUrl = (parcelId: string) => {
     // Pennsylvania Unified Judicial System web portal
-    return `https://ujsportal.pacourts.us/CaseSearch?casefileNumber=${encodeURIComponent(casefileNumber)}`;
+    return `https://ujsportal.pacourts.us/CaseSearch?parcel_id=${encodeURIComponent(parcelId)}`;
   };
 
   // Get the earliest investigation date (when case was first opened)
@@ -178,11 +179,11 @@ export const CaseCard: React.FC<CaseCardProps> = ({
               )}
 
               {/* Add court filing link for IN COURT status */}
-              {isInCourt && (
+              {isInCourt && groupedCase.records[0]?.parcel_id && (
                 <div className={`${formattedInstructions ? 'pt-2' : 'pt-2 border-t border-gray-200'}`}>
                   <div className="text-sm">
                     <a 
-                      href={getCourtFilingUrl(groupedCase.casefileNumber)}
+                      href={getCourtFilingUrl(groupedCase.records[0].parcel_id)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium"
