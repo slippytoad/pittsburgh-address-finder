@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +24,9 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   const streetAddress = fullAddress.split(',')[0] || fullAddress;
   // Convert street address to mixed case
   const formattedStreetAddress = streetAddress.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+
+  // Get the parcel ID from the first record
+  const parcelId = groupedCase.records[0]?.parcel_id || null;
 
   // Get the investigation outcome from the latest record
   const latestOutcome = groupedCase.records[0]?.investigation_outcome || 'No outcome recorded';
@@ -120,6 +122,14 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                       {formattedStreetAddress}
                     </CardTitle>
                   </div>
+                  
+                  {/* Add parcel ID below the address */}
+                  {parcelId && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600 ml-6">
+                      <span className="font-medium">Parcel ID:</span>
+                      <span>{parcelId}</span>
+                    </div>
+                  )}
                   
                   <div className="flex items-center gap-2">
                     <FileText className="h-3 w-3 text-gray-500 flex-shrink-0" />
