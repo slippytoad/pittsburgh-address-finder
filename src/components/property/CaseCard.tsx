@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronUp, FileText, MapPin, Calendar } from 'lucide-react';
+import { ChevronDown, ChevronUp, FileText, MapPin, Calendar, ExternalLink } from 'lucide-react';
 import { GroupedCase } from '@/types/propertyTypes';
 import { formatDate, getStatusColor } from '@/utils/propertyUtils';
 
@@ -37,6 +36,15 @@ export const CaseCard: React.FC<CaseCardProps> = ({
     groupedCase.records[0]?.violation_spec_instructions || null : null;
   const formattedInstructions = violationInstructions ? 
     violationInstructions.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) : null;
+
+  // Check if this is an IN COURT case for showing court filing link
+  const isInCourt = groupedCase.currentStatus === 'IN COURT';
+
+  // Generate court filing URL based on case number
+  const getCourtFilingUrl = (caseNumber: string) => {
+    // This is a placeholder URL structure - adjust based on actual court system
+    return `https://www.courts.ca.gov/case-search?case=${encodeURIComponent(caseNumber)}`;
+  };
 
   // Get the earliest investigation date (when case was first opened)
   const earliestDate = groupedCase.records.reduce((earliest, record) => {
@@ -165,6 +173,24 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   <div className="text-sm text-gray-700">
                     <span className="font-medium">Instructions:</span>
                     <span className="ml-1 break-words">{formattedInstructions}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Add court filing link for IN COURT status */}
+              {isInCourt && (
+                <div className={`${formattedInstructions ? 'pt-2' : 'pt-2 border-t border-gray-200'}`}>
+                  <div className="text-sm">
+                    <a 
+                      href={getCourtFilingUrl(groupedCase.casefileNumber)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      View Court Filing
+                    </a>
                   </div>
                 </div>
               )}
