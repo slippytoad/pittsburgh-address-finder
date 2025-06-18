@@ -9,6 +9,8 @@ interface PropertyHeaderProps {
   isLoading: boolean;
   showResults: boolean;
   newRecordsCount: number | null;
+  newCasefilesCount: number | null;
+  newRecordsForExistingCasesCount: number | null;
   lastApiCheckTime: string | null;
   lastApiNewRecordsCount: number | null;
 }
@@ -18,6 +20,8 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   isLoading,
   showResults,
   newRecordsCount,
+  newCasefilesCount,
+  newRecordsForExistingCasesCount,
   lastApiCheckTime,
   lastApiNewRecordsCount
 }) => {
@@ -58,8 +62,20 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
 
         <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           {showResults && newRecordsCount !== null && newRecordsCount > 0 && (
-            <div className="text-sm text-muted-foreground">
-              Found <span className="font-medium">{newRecordsCount}</span> new records.
+            <div className="text-sm text-muted-foreground space-y-1">
+              <div>
+                Found <span className="font-medium">{newRecordsCount}</span> new records total.
+              </div>
+              {(newCasefilesCount !== null && newCasefilesCount > 0) && (
+                <div className="text-xs">
+                  • <span className="font-medium">{newCasefilesCount}</span> new casefiles
+                </div>
+              )}
+              {(newRecordsForExistingCasesCount !== null && newRecordsForExistingCasesCount > 0) && (
+                <div className="text-xs">
+                  • <span className="font-medium">{newRecordsForExistingCasesCount}</span> new records for existing cases
+                </div>
+              )}
             </div>
           )}
           {lastApiCheckTime && (
