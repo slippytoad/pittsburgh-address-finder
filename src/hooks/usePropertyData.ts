@@ -9,6 +9,8 @@ import { groupRecordsByCase } from '@/utils/propertyUtils';
 export const usePropertyData = (selectedStatuses: string[]) => {
   const [showResults, setShowResults] = useState(true);
   const [lastNewRecordsCount, setLastNewRecordsCount] = useState<number | undefined>(undefined);
+  const [lastNewCasefilesCount, setLastNewCasefilesCount] = useState<number | undefined>(undefined);
+  const [lastNewRecordsForExistingCasesCount, setLastNewRecordsForExistingCasesCount] = useState<number | undefined>(undefined);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Query for app settings to get the last API check time
@@ -40,9 +42,15 @@ export const usePropertyData = (selectedStatuses: string[]) => {
       // Update the last API check time in the database with the new records count
       await updateLastApiCheckTime(apiData?.newRecordsCount);
       
-      // Set the new records count if available
+      // Set the detailed new records counts if available
       if (apiData?.newRecordsCount !== undefined) {
         setLastNewRecordsCount(apiData.newRecordsCount);
+      }
+      if (apiData?.newCasefilesCount !== undefined) {
+        setLastNewCasefilesCount(apiData.newCasefilesCount);
+      }
+      if (apiData?.newRecordsForExistingCasesCount !== undefined) {
+        setLastNewRecordsForExistingCasesCount(apiData.newRecordsForExistingCasesCount);
       }
       
       // Refetch app settings to get the updated timestamp
@@ -133,6 +141,8 @@ export const usePropertyData = (selectedStatuses: string[]) => {
     statusCounts,
     filteredRecords,
     lastNewRecordsCount,
+    lastNewCasefilesCount,
+    lastNewRecordsForExistingCasesCount,
     lastApiNewRecordsCount: appSettings?.last_api_new_records_count,
     appSettings,
     handleFetchData,

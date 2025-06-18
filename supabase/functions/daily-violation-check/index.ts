@@ -90,24 +90,33 @@ serve(async (req: Request) => {
     const apiData = await apiClient.fetchPropertyData(isFullSync);
     console.log("API returned", apiData.result.records.length, "total records");
 
-    // Get existing violation IDs and latest date to filter truly new records
-    console.log("Getting existing violations and latest date...");
+    // Get existing violation IDs, case numbers, and latest date to filter truly new records
+    console.log("Getting existing violations, case numbers, and latest date...");
     const existingIds = await dbService.getExistingViolationIds();
+    const existingCaseNumbers = await dbService.getExistingCaseNumbers();
     const latestDate = isFullSync ? null : await dbService.getLatestViolationDate(); // Don't filter by date for full sync
     
     console.log("Filtering new records...");
-    const newRecords = ViolationProcessor.filterNewRecords(apiData.result.records, existingIds, latestDate);
-    console.log("Found", newRecords.length, "new records to save");
+    const filterResult = ViolationProcessor.filterNewRecords(
+      apiData.result.records, 
+      existingIds, 
+      existingCaseNumbers,
+      latestDate
+    );
+    
+    console.log("Found", filterResult.newRecords.length, "total new records to save");
+    console.log("- New records for existing cases:", filterResult.newRecordsForExistingCases.length);
+    console.log("- New casefiles:", filterResult.newCasefiles.length);
 
     // Save new records if any exist
-    if (newRecords.length > 0) {
-      console.log("Formatting", newRecords.length, "records for database...");
-      const violationRecords = ViolationProcessor.formatForDatabase(newRecords);
+    if (filterResult.newRecords.length > 0) {
+      console.log("Formatting", filterResult.newRecords.length, "records for database...");
+      const violationRecords = ViolationProcessor.formatForDatabase(filterResult.newRecords);
       
       console.log("Saving new violations to database...");
       try {
         await dbService.saveNewViolations(violationRecords);
-        console.log("Successfully saved", newRecords.length, "new violations");
+        console.log("Successfully saved", filterResult.newRecords.length, "new violations");
       } catch (saveError) {
         console.error("Failed to save violations:", saveError);
         // Continue with the rest of the process even if saving fails
@@ -116,20 +125,26 @@ serve(async (req: Request) => {
       console.log("No new violations to save");
     }
 
-    // Send daily email notification with all records for status summary (only if not skipping email)
+    // Send daily email notification with detailed breakdown (only if not skipping email)
     if (!skipEmail && settings?.email_reports_enabled && settings?.email_report_address) {
       console.log("Sending daily email report...");
       const emailResponse = await emailService.sendDailyReport(
         settings.email_report_address, 
-        newRecords, 
-        apiData.result.records
+        filterResult.newRecords, 
+        apiData.result.records,
+        filterResult.newCasefiles.length,
+        filterResult.newRecordsForExistingCases.length
       );
 
       console.log("Email sent successfully:", emailResponse);
 
-      // Log the email notification
+      // Log the email notification with case breakdown
       try {
-        await dbService.logEmailNotification(newRecords.length, settings.email_report_address);
+        await dbService.logEmailNotification(
+          filterResult.newRecords.length, 
+          filterResult.newCasefiles.length,
+          settings.email_report_address
+        );
         console.log("Email notification logged successfully");
       } catch (logError) {
         console.error("Failed to log email notification:", logError);
@@ -141,8 +156,8 @@ serve(async (req: Request) => {
 
     // Update the last API check timestamp with the new records count
     try {
-      await dbService.updateLastApiCheckTime(newRecords.length);
-      console.log("Last API check timestamp updated with new records count:", newRecords.length);
+      await dbService.updateLastApiCheckTime(filterResult.newRecords.length);
+      console.log("Last API check timestamp updated with new records count:", filterResult.newRecords.length);
     } catch (updateError) {
       console.error("Failed to update last API check time:", updateError);
       // Don't fail the whole process for timestamp update errors
@@ -151,9 +166,11 @@ serve(async (req: Request) => {
     return new Response(
       JSON.stringify({ 
         message: isFullSync ? "Full sync completed successfully" : "Daily check completed successfully",
-        newRecordsCount: newRecords.length,
+        newRecordsCount: filterResult.newRecords.length,
+        newCasefilesCount: filterResult.newCasefiles.length,
+        newRecordsForExistingCasesCount: filterResult.newRecordsForExistingCases.length,
         emailSent: !skipEmail && !!settings?.email_reports_enabled,
-        savedSuccessfully: newRecords.length > 0
+        savedSuccessfully: filterResult.newRecords.length > 0
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

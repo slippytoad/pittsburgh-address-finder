@@ -1,12 +1,19 @@
 
 import { ViolationRecord } from "./types.ts";
 
+export interface FilterResult {
+  newRecords: ViolationRecord[];
+  newRecordsForExistingCases: ViolationRecord[];
+  newCasefiles: ViolationRecord[];
+}
+
 export class ViolationProcessor {
   static filterNewRecords(
     allRecords: ViolationRecord[], 
     existingIds: Set<number>, 
+    existingCaseNumbers: Set<string>,
     latestDate: string | null
-  ): ViolationRecord[] {
+  ): FilterResult {
     // First filter out records that already exist in the database
     const nonExistingRecords = allRecords.filter(record => !existingIds.has(record._id));
     
@@ -20,8 +27,27 @@ export class ViolationProcessor {
       console.log('Filtered by date: Found', newRecords.length, 'records newer than', latestDate);
     }
     
+    // Separate new records into two categories
+    const newRecordsForExistingCases: ViolationRecord[] = [];
+    const newCasefiles: ViolationRecord[] = [];
+    
+    newRecords.forEach(record => {
+      if (record.casefile_number && existingCaseNumbers.has(record.casefile_number)) {
+        newRecordsForExistingCases.push(record);
+      } else {
+        newCasefiles.push(record);
+      }
+    });
+    
     console.log('Filtered records: Found', newRecords.length, 'new records out of', allRecords.length, 'total records');
-    return newRecords;
+    console.log('New records for existing cases:', newRecordsForExistingCases.length);
+    console.log('New casefiles:', newCasefiles.length);
+    
+    return {
+      newRecords,
+      newRecordsForExistingCases,
+      newCasefiles
+    };
   }
 
   static formatForDatabase(records: ViolationRecord[]): ViolationRecord[] {

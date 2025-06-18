@@ -16,6 +16,12 @@ export interface ViolationRecord {
   investigation_findings?: string;
 }
 
+export interface FilterResult {
+  newRecords: PropertyRecord[];
+  newRecordsForExistingCases: PropertyRecord[];
+  newCasefiles: PropertyRecord[];
+}
+
 export const fetchViolationsFromDatabase = async (): Promise<PropertyRecord[]> => {
   console.log('Fetching violations from database...');
   
@@ -50,7 +56,49 @@ export const fetchViolationsFromDatabase = async (): Promise<PropertyRecord[]> =
   return propertyRecords;
 };
 
-export const saveViolationsToDatabase = async (records: PropertyRecord[]): Promise<number> => {
+const filterNewRecords = (
+  allRecords: PropertyRecord[], 
+  existingIds: Set<number>, 
+  existingCaseNumbers: Set<string>,
+  latestDate: string | null
+): FilterResult => {
+  // First filter out records that already exist in the database
+  const nonExistingRecords = allRecords.filter(record => !existingIds.has(record._id));
+  
+  // If we have a latest date, only include records newer than that date
+  let newRecords = nonExistingRecords;
+  if (latestDate) {
+    newRecords = nonExistingRecords.filter(record => {
+      if (!record.investigation_date) return false;
+      return record.investigation_date > latestDate;
+    });
+    console.log('Filtered by date: Found', newRecords.length, 'records newer than', latestDate);
+  }
+  
+  // Separate new records into two categories
+  const newRecordsForExistingCases: PropertyRecord[] = [];
+  const newCasefiles: PropertyRecord[] = [];
+  
+  newRecords.forEach(record => {
+    if (record.casefile_number && existingCaseNumbers.has(record.casefile_number)) {
+      newRecordsForExistingCases.push(record);
+    } else {
+      newCasefiles.push(record);
+    }
+  });
+  
+  console.log('Filtered records: Found', newRecords.length, 'new records out of', allRecords.length, 'total records');
+  console.log('New records for existing cases:', newRecordsForExistingCases.length);
+  console.log('New casefiles:', newCasefiles.length);
+  
+  return {
+    newRecords,
+    newRecordsForExistingCases,
+    newCasefiles
+  };
+};
+
+export const saveViolationsToDatabase = async (records: PropertyRecord[]): Promise<{ newRecordsCount: number; newCasefilesCount: number; newRecordsForExistingCasesCount: number }> => {
   console.log('Checking for new violations...', records.length, 'records from API');
   
   // Get existing record IDs from database
@@ -65,6 +113,20 @@ export const saveViolationsToDatabase = async (records: PropertyRecord[]): Promi
 
   const existingIds = new Set(existingRecords?.map(record => record._id) || []);
   console.log('Found', existingIds.size, 'existing records in database');
+
+  // Get existing case numbers from database
+  const { data: existingCaseRecords, error: caseError } = await supabase
+    .from('violations')
+    .select('casefile_number')
+    .not('casefile_number', 'is', null);
+
+  if (caseError) {
+    console.error('Error fetching existing case numbers:', caseError);
+    throw new Error(`Failed to fetch existing case numbers: ${caseError.message}`);
+  }
+
+  const existingCaseNumbers = new Set(existingCaseRecords?.map(record => record.casefile_number).filter(Boolean) || []);
+  console.log('Found', existingCaseNumbers.size, 'existing case numbers in database');
 
   // Get the latest investigation date from the database
   const { data: latestRecord, error: latestError } = await supabase
@@ -83,29 +145,25 @@ export const saveViolationsToDatabase = async (records: PropertyRecord[]): Promi
   const latestDate = latestRecord?.investigation_date || null;
   console.log('Latest violation date in database:', latestDate);
 
-  // Filter records that don't exist in database
-  const nonExistingRecords = records.filter(record => !existingIds.has(record._id));
-  console.log('Found', nonExistingRecords.length, 'records that do not exist in database');
+  // Filter and categorize new records
+  const filterResult = filterNewRecords(records, existingIds, existingCaseNumbers, latestDate);
 
-  // If we have a latest date, only include records newer than that date
-  let newRecords = nonExistingRecords;
-  if (latestDate) {
-    newRecords = nonExistingRecords.filter(record => {
-      if (!record.investigation_date) return false;
-      return record.investigation_date > latestDate;
-    });
-    console.log('Filtered by date: Found', newRecords.length, 'records newer than', latestDate);
-  }
+  console.log('Final breakdown:');
+  console.log('- Total new records:', filterResult.newRecords.length);
+  console.log('- New records for existing cases:', filterResult.newRecordsForExistingCases.length);
+  console.log('- New casefiles:', filterResult.newCasefiles.length);
 
-  console.log('Final new records count:', newRecords.length);
-
-  if (newRecords.length === 0) {
+  if (filterResult.newRecords.length === 0) {
     console.log('No new records to save');
-    return 0;
+    return {
+      newRecordsCount: 0,
+      newCasefilesCount: 0,
+      newRecordsForExistingCasesCount: 0
+    };
   }
 
   // Map new records to database format
-  const violationRecords: ViolationRecord[] = newRecords.map(record => ({
+  const violationRecords: ViolationRecord[] = filterResult.newRecords.map(record => ({
     _id: record._id,
     casefile_number: record.casefile_number || null,
     address: record.address || null,
@@ -129,6 +187,13 @@ export const saveViolationsToDatabase = async (records: PropertyRecord[]): Promi
     throw new Error(`Failed to save new violations: ${error.message}`);
   }
 
-  console.log('Successfully saved', newRecords.length, 'new violations to database');
-  return newRecords.length;
+  console.log('Successfully saved', filterResult.newRecords.length, 'new violations to database');
+  console.log('- New casefiles:', filterResult.newCasefiles.length);
+  console.log('- New records for existing cases:', filterResult.newRecordsForExistingCases.length);
+  
+  return {
+    newRecordsCount: filterResult.newRecords.length,
+    newCasefilesCount: filterResult.newCasefiles.length,
+    newRecordsForExistingCasesCount: filterResult.newRecordsForExistingCases.length
+  };
 };

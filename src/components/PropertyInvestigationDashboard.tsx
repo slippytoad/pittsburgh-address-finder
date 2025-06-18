@@ -27,6 +27,8 @@ const PropertyInvestigationDashboard: React.FC = () => {
     filteredRecords,
     statusCounts,
     lastNewRecordsCount,
+    lastNewCasefilesCount,
+    lastNewRecordsForExistingCasesCount,
     lastApiNewRecordsCount,
     appSettings,
     handleFetchData,
@@ -41,6 +43,8 @@ const PropertyInvestigationDashboard: React.FC = () => {
         isLoading={isLoading}
         showResults={showResults}
         newRecordsCount={lastNewRecordsCount}
+        newCasefilesCount={lastNewCasefilesCount}
+        newRecordsForExistingCasesCount={lastNewRecordsForExistingCasesCount}
         lastApiCheckTime={formatLastApiCheckTime(appSettings?.last_api_check_time || null)}
         lastApiNewRecordsCount={lastApiNewRecordsCount}
       />

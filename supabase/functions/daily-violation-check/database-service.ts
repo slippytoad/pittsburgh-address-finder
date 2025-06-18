@@ -63,6 +63,22 @@ export class DatabaseService {
     return existingIds;
   }
 
+  async getExistingCaseNumbers(): Promise<Set<string>> {
+    const { data: existingRecords, error: fetchError } = await this.supabase
+      .from('violations')
+      .select('casefile_number')
+      .not('casefile_number', 'is', null);
+
+    if (fetchError) {
+      console.error('Error fetching existing case numbers:', fetchError);
+      throw new Error(`Failed to fetch existing case numbers: ${fetchError.message}`);
+    }
+
+    const existingCaseNumbers = new Set(existingRecords?.map(record => record.casefile_number).filter(Boolean) || []);
+    console.log('Found', existingCaseNumbers.size, 'existing case numbers in database');
+    return existingCaseNumbers;
+  }
+
   async getLatestViolationDate(): Promise<string | null> {
     const { data: latestRecord, error: fetchError } = await this.supabase
       .from('violations')
@@ -151,7 +167,7 @@ export class DatabaseService {
     }
   }
 
-  async logEmailNotification(newRecordsCount: number, emailAddress: string): Promise<void> {
+  async logEmailNotification(newRecordsCount: number, newCasefilesCount: number, emailAddress: string): Promise<void> {
     const { error: logError } = await this.supabase
       .from('email_notifications')
       .insert({
@@ -164,6 +180,8 @@ export class DatabaseService {
       console.error('Error logging email notification:', logError);
       // Don't throw here - the email was sent successfully
     }
+    
+    console.log(`Logged email notification: ${newRecordsCount} total new records, ${newCasefilesCount} new casefiles`);
   }
 
   async updateLastApiCheckTime(newRecordsCount?: number): Promise<void> {

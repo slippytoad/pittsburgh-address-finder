@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 export interface ApiResponseWithNewCount extends ApiResponse {
   newRecordsCount?: number;
+  newCasefilesCount?: number;
+  newRecordsForExistingCasesCount?: number;
 }
 
 const getAddressesFromDatabase = async (): Promise<string[]> => {
@@ -63,7 +65,9 @@ export const fetchPropertyData = async (fullSync: boolean = false): Promise<ApiR
     return {
       success: true,
       result: { records: [], total: 0 },
-      newRecordsCount: 0
+      newRecordsCount: 0,
+      newCasefilesCount: 0,
+      newRecordsForExistingCasesCount: 0
     };
   }
   
@@ -90,13 +94,17 @@ export const fetchPropertyData = async (fullSync: boolean = false): Promise<ApiR
     totalRecords: data?.result?.total || 'unknown'
   });
   
-  let newRecordsCount = 0;
+  let saveResult = {
+    newRecordsCount: 0,
+    newCasefilesCount: 0,
+    newRecordsForExistingCasesCount: 0
+  };
   
-  // Save the violations to the database and get count of new records
+  // Save the violations to the database and get detailed count breakdown
   if (data.success && data.result?.records) {
     try {
-      newRecordsCount = await saveViolationsToDatabase(data.result.records);
-      console.log('New violations saved:', newRecordsCount);
+      saveResult = await saveViolationsToDatabase(data.result.records);
+      console.log('New violations breakdown:', saveResult);
     } catch (error) {
       console.error('Failed to save violations to database:', error);
       // Don't throw here - we still want to return the API data even if saving fails
@@ -105,6 +113,8 @@ export const fetchPropertyData = async (fullSync: boolean = false): Promise<ApiR
   
   return {
     ...data,
-    newRecordsCount
+    newRecordsCount: saveResult.newRecordsCount,
+    newCasefilesCount: saveResult.newCasefilesCount,
+    newRecordsForExistingCasesCount: saveResult.newRecordsForExistingCasesCount
   };
 };
