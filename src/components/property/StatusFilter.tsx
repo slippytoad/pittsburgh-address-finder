@@ -59,6 +59,12 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
   const totalCases = Object.values(statusCounts).reduce((sum, count) => sum + count, 0);
   const isShowingAll = selectedStatuses.length === 0;
 
+  // Define the desired order of statuses
+  const statusOrder = ['IN VIOLATION', 'IN COURT', 'READY TO CLOSE', 'CLOSED'];
+  
+  // Sort available statuses according to the desired order
+  const orderedStatuses = statusOrder.filter(status => availableStatuses.includes(status));
+
   return (
     <div className="mb-4">
       <div className="flex items-center gap-2 mb-4">
@@ -82,8 +88,8 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
           All ({totalCases})
         </Badge>
         
-        {/* Individual status options */}
-        {availableStatuses.map((status) => {
+        {/* Individual status options in specified order */}
+        {orderedStatuses.map((status) => {
           const isSelected = selectedStatuses.includes(status);
           const count = statusCounts[status] || 0;
           console.log(`StatusFilter - rendering ${status}, isSelected: ${isSelected}, count: ${count}`);
