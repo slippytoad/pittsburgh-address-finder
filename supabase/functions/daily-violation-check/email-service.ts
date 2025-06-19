@@ -73,32 +73,20 @@ export class EmailService {
     // Use the same grouping logic as the dashboard
     const groupedCases = this.groupRecordsByCase(allRecords);
     
-    // Count cases by their current status, consolidating closed statuses
+    // Count cases by their current status - no grouping
     const caseCounts: Record<string, number> = {};
     groupedCases.forEach(groupedCase => {
       const status = groupedCase.currentStatus;
-      const statusLower = status.toLowerCase();
-      
-      // Consolidate closed and ready to close statuses
-      if (statusLower.includes('closed') || statusLower.includes('ready to close')) {
-        caseCounts['Closed/Ready to Close'] = (caseCounts['Closed/Ready to Close'] || 0) + 1;
-      } else {
-        caseCounts[status] = (caseCounts[status] || 0) + 1;
-      }
+      caseCounts[status] = (caseCounts[status] || 0) + 1;
     });
 
     const dashboardUrl = "https://jfw-oakland-property-violations-tracker.lovable.app";
 
     return Object.entries(caseCounts)
       .map(([status, count]) => {
-        // For consolidated status, don't add a filter link since it represents multiple statuses
-        if (status === 'Closed/Ready to Close') {
-          return `<li><strong><a href="${dashboardUrl}" style="color: #2754C5; text-decoration: none;">${status}</a>:</strong> ${count}</li>`;
-        } else {
-          const statusParam = encodeURIComponent(status);
-          const statusLink = `${dashboardUrl}?status=${statusParam}`;
-          return `<li><strong><a href="${statusLink}" style="color: #2754C5; text-decoration: none;">${status}</a>:</strong> ${count}</li>`;
-        }
+        const statusParam = encodeURIComponent(status);
+        const statusLink = `${dashboardUrl}?status=${statusParam}`;
+        return `<li><strong><a href="${statusLink}" style="color: #2754C5; text-decoration: none;">${status}</a>:</strong> ${count}</li>`;
       })
       .join('');
   }
@@ -150,7 +138,7 @@ export class EmailService {
           ${newRecords.length > 10 ? `<li><em>... and ${newRecords.length - 10} more records</em></li>` : ''}
         </ul>
         
-        <h3>Check Summary - Number of cases in each state:</h3>
+        <h3>Number of cases in each state:</h3>
         <ul>
           ${statusSummary}
         </ul>
@@ -166,7 +154,7 @@ export class EmailService {
         <h2>Daily Property Violation Report - ${currentDate}</h2>
         <p>We completed today's check and <strong>no new violations</strong> were found.</p>
         
-        <h3>Check Summary - Number of cases in each state:</h3>
+        <h3>Number of cases in each state:</h3>
         <ul>
           ${statusSummary}
         </ul>
