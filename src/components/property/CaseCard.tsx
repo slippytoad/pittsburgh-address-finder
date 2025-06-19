@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -70,18 +71,18 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                     earliestDate={earliestDate}
                     isHighlighted={isHighlighted}
                   />
-                  
-                  <CaseCardOutcome
-                    formattedOutcome={formattedOutcome}
-                    latestDate={groupedCase.latestDate}
-                  />
                 </div>
                 
-                <div className="flex justify-end sm:flex-shrink-0 sm:min-w-[300px]">
+                <div className="flex flex-col gap-3 justify-end sm:flex-shrink-0 sm:min-w-[300px] sm:items-end">
                   <CaseCardStatus
                     currentStatus={groupedCase.currentStatus}
                     recordCount={groupedCase.records.length}
                     isOpen={isOpen}
+                  />
+                  
+                  <CaseCardOutcome
+                    formattedOutcome={formattedOutcome}
+                    latestDate={groupedCase.latestDate}
                   />
                 </div>
               </div>
