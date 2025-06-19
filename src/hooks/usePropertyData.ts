@@ -6,7 +6,7 @@ import { fetchViolationsFromDatabase } from '@/services/violationsService';
 import { getAppSettings, updateLastApiCheckTime } from '@/services/appSettingsService';
 import { groupRecordsByCase } from '@/utils/propertyUtils';
 
-export const usePropertyData = (selectedStatuses: string[]) => {
+export const usePropertyData = (selectedStatuses: string[], addressSearch?: string) => {
   const [showResults, setShowResults] = useState(true);
   const [lastNewRecordsCount, setLastNewRecordsCount] = useState<number | undefined>(undefined);
   const [lastNewCasefilesCount, setLastNewCasefilesCount] = useState<number | undefined>(undefined);
@@ -97,6 +97,16 @@ export const usePropertyData = (selectedStatuses: string[]) => {
       });
     }
 
+    // Filter by address search if provided
+    if (addressSearch && addressSearch.trim()) {
+      const searchTerm = addressSearch.toLowerCase().trim();
+      filteredCases = filteredCases.filter(caseGroup => {
+        return caseGroup.records.some(record => 
+          record.address?.toLowerCase().includes(searchTerm)
+        );
+      });
+    }
+
     console.log('usePropertyData - Filtered cases count:', filteredCases.length);
 
     return { 
@@ -104,7 +114,7 @@ export const usePropertyData = (selectedStatuses: string[]) => {
       statusCounts: counts,
       filteredRecords: filteredCases.flatMap(c => c.records)
     };
-  }, [data, selectedStatuses]);
+  }, [data, selectedStatuses, addressSearch]);
 
   // Get the latest date from the grouped cases
   const getLatestDate = () => {

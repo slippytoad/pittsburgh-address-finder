@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,8 @@ const PropertyInvestigationDashboard: React.FC = () => {
     highlightedCaseNumber
   } = useUrlParameters();
 
+  const [addressSearch, setAddressSearch] = useState('');
+
   const {
     data,
     isLoading,
@@ -34,7 +36,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
     handleFetchData,
     getLatestDate,
     formatLastApiCheckTime
-  } = usePropertyData(selectedStatuses);
+  } = usePropertyData(selectedStatuses, addressSearch);
 
   return (
     <div className="w-full max-w-7xl mx-auto p-2 sm:p-6 space-y-4 sm:space-y-6">
@@ -58,6 +60,8 @@ const PropertyInvestigationDashboard: React.FC = () => {
             selectedStatuses={selectedStatuses}
             onStatusChange={setSelectedStatuses}
             statusCounts={statusCounts}
+            onAddressSearch={setAddressSearch}
+            addressSearch={addressSearch}
           />
           <PropertyList 
             records={filteredRecords} 

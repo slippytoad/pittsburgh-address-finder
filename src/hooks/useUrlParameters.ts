@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 
 export const useUrlParameters = () => {
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(['IN VIOLATION']);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [expandAllCards, setExpandAllCards] = useState(false);
   const [highlightedCaseNumber, setHighlightedCaseNumber] = useState<string | null>(null);
 
