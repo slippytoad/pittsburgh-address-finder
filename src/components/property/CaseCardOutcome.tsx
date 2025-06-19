@@ -16,7 +16,7 @@ export const CaseCardOutcome: React.FC<CaseCardOutcomeProps> = ({
     <div className="flex gap-2 text-sm text-gray-600 lg:text-right">
       <div className="flex flex-col items-start gap-1">
         <Scale className="h-4 w-4 text-gray-500 flex-shrink-0" />
-        <Calendar className="h-3 w-3 text-gray-500 flex-shrink-0" />
+        <Calendar className="h-3 w-3 text-gray-500 flex-shrink-0 ml-0.5" />
       </div>
       <div className="flex flex-col gap-1">
         <div>
