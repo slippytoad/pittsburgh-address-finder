@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -179,8 +178,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                         <span className="font-medium">Outcome:</span> 
                         <span className="ml-1 break-words">{formattedOutcome}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-gray-500">
-                        <Calendar className="h-3 w-3 flex-shrink-0" />
+                      <div className="flex items-start gap-1 text-gray-500">
+                        <Calendar className="h-3 w-3 flex-shrink-0 mt-0.5" />
                         <span>Last update: {formatDate(groupedCase.latestDate)}</span>
                       </div>
                     </div>
