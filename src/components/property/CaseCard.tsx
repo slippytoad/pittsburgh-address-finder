@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -62,22 +61,26 @@ export const CaseCard: React.FC<CaseCardProps> = ({
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-                <CaseCardHeader
-                  formattedStreetAddress={formattedStreetAddress}
-                  parcelId={parcelId}
-                  casefileNumber={groupedCase.casefileNumber}
-                  earliestDate={earliestDate}
-                  isHighlighted={isHighlighted}
-                />
-                
-                <div className="flex flex-col gap-3 lg:items-end lg:flex-shrink-0 lg:min-w-[300px]">
-                  <CaseCardStatus
-                    currentStatus={groupedCase.currentStatus}
-                    recordCount={groupedCase.records.length}
-                    isOpen={isOpen}
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <CaseCardHeader
+                    formattedStreetAddress={formattedStreetAddress}
+                    parcelId={parcelId}
+                    casefileNumber={groupedCase.casefileNumber}
+                    earliestDate={earliestDate}
+                    isHighlighted={isHighlighted}
                   />
                   
+                  <div className="flex justify-end sm:flex-shrink-0 sm:min-w-[300px]">
+                    <CaseCardStatus
+                      currentStatus={groupedCase.currentStatus}
+                      recordCount={groupedCase.records.length}
+                      isOpen={isOpen}
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex justify-end">
                   <CaseCardOutcome
                     formattedOutcome={formattedOutcome}
                     latestDate={groupedCase.latestDate}
