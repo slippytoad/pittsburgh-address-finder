@@ -7,7 +7,6 @@ import { CaseCardHeader } from './CaseCardHeader';
 import { CaseCardStatus } from './CaseCardStatus';
 import { CaseCardOutcome } from './CaseCardOutcome';
 import { CaseCardInstructions } from './CaseCardInstructions';
-import { CaseCardCourtLink } from './CaseCardCourtLink';
 import { CaseCardRecord } from './CaseCardRecord';
 
 interface CaseCardProps {
@@ -43,9 +42,6 @@ export const CaseCard: React.FC<CaseCardProps> = ({
     groupedCase.records[0]?.violation_spec_instructions || null : null;
   const formattedInstructions = violationInstructions ? 
     violationInstructions.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) : null;
-
-  // Check if this is an IN COURT case for showing court filing link
-  const isInCourt = groupedCase.currentStatus === 'IN COURT';
 
   // Get the earliest investigation date (when case was first opened)
   const earliestDate = groupedCase.records.reduce((earliest, record) => {
@@ -88,13 +84,6 @@ export const CaseCard: React.FC<CaseCardProps> = ({
               </div>
 
               <CaseCardInstructions formattedInstructions={formattedInstructions} />
-
-              {isInCourt && parcelId && (
-                <CaseCardCourtLink 
-                  parcelId={parcelId} 
-                  hasInstructions={!!formattedInstructions} 
-                />
-              )}
             </div>
           </CardHeader>
         </CollapsibleTrigger>
