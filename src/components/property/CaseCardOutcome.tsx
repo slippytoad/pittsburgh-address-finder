@@ -21,7 +21,7 @@ export const CaseCardOutcome: React.FC<CaseCardOutcomeProps> = ({
           <span className="ml-1 break-words">{formattedOutcome}</span>
         </div>
         <div className="flex items-start gap-2 text-gray-500">
-          <Calendar className="h-3 w-3 flex-shrink-0 mt-0.5 ml-0.5" />
+          <Calendar className="h-3 w-3 flex-shrink-0 mt-0.5" />
           <span>Last update: {formatDate(latestDate)}</span>
         </div>
       </div>
