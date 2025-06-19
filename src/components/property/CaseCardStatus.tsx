@@ -16,7 +16,7 @@ export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
   isOpen
 }) => {
   return (
-    <div className="flex items-center justify-end gap-3">
+    <div className="flex items-center justify-end gap-3 w-full">
       <Badge variant={getStatusColor(currentStatus)} className="w-fit">
         {currentStatus}
       </Badge>
