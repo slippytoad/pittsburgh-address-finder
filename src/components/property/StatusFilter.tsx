@@ -112,8 +112,8 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         })}
       </div>
 
-      {/* Address search - only show when All is selected */}
-      {isShowingAll && onAddressSearch && (
+      {/* Address search - now always visible */}
+      {onAddressSearch && (
         <div className="flex items-center gap-2">
           <Search className="h-4 w-4 text-gray-500" />
           <Input
