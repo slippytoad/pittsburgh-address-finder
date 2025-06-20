@@ -58,7 +58,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors">
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              {/* Desktop Layout - side by side */}
+              <div className="hidden sm:flex sm:items-start sm:justify-between gap-4">
                 <div className="flex flex-col gap-3 min-w-0 flex-1">
                   <CaseCardHeader
                     formattedStreetAddress={formattedStreetAddress}
@@ -70,6 +71,32 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                 </div>
                 
                 <div className="flex flex-col gap-3 justify-end sm:flex-shrink-0 sm:min-w-[300px] sm:items-end">
+                  <CaseCardStatus
+                    currentStatus={groupedCase.currentStatus}
+                    recordCount={groupedCase.records.length}
+                    isOpen={isOpen}
+                  />
+                  
+                  <CaseCardOutcome
+                    formattedOutcome={formattedOutcome}
+                    latestDate={groupedCase.latestDate}
+                  />
+                </div>
+              </div>
+
+              {/* Mobile Layout - stacked */}
+              <div className="flex flex-col gap-4 sm:hidden">
+                <div className="flex flex-col gap-3 min-w-0 flex-1">
+                  <CaseCardHeader
+                    formattedStreetAddress={formattedStreetAddress}
+                    parcelId={parcelId}
+                    casefileNumber={groupedCase.casefileNumber}
+                    earliestDate={earliestDate}
+                    isHighlighted={isHighlighted}
+                  />
+                </div>
+                
+                <div className="flex flex-col gap-3">
                   <CaseCardStatus
                     currentStatus={groupedCase.currentStatus}
                     recordCount={groupedCase.records.length}
