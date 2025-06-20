@@ -9,7 +9,7 @@ export class PropertyApiClient {
     this.dbService = dbService;
   }
 
-  private async getParcelIdsFromDatabase(): Promise<string[]> => {
+  private async getParcelIdsFromDatabase(): Promise<string[]> {
     const parcelIds = await this.dbService.getParcelIds();
     console.log('Fetched parcel IDs from database:', parcelIds.length);
     return parcelIds;
