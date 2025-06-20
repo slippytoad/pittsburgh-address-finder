@@ -42,6 +42,68 @@ export class DatabaseService {
     return data?.map(item => item.parcel_id).filter(Boolean) || [];
   }
 
+  async getLatestViolationDate(): Promise<string | null> {
+    const { data, error } = await this.supabase
+      .from('violations')
+      .select('investigation_date')
+      .not('investigation_date', 'is', null)
+      .order('investigation_date', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error fetching latest violation date:', error);
+      throw new Error(`Failed to fetch latest violation date: ${error.message}`);
+    }
+
+    return data?.investigation_date || null;
+  }
+
+  async getExistingViolationIds(): Promise<Set<number>> {
+    const { data, error } = await this.supabase
+      .from('violations')
+      .select('_id');
+
+    if (error) {
+      console.error('Error fetching existing violation IDs:', error);
+      throw new Error(`Failed to fetch existing violation IDs: ${error.message}`);
+    }
+
+    return new Set(data?.map(item => item._id) || []);
+  }
+
+  async getExistingCaseNumbers(): Promise<Set<string>> {
+    const { data, error } = await this.supabase
+      .from('violations')
+      .select('casefile_number')
+      .not('casefile_number', 'is', null);
+
+    if (error) {
+      console.error('Error fetching existing case numbers:', error);
+      throw new Error(`Failed to fetch existing case numbers: ${error.message}`);
+    }
+
+    return new Set(data?.map(item => item.casefile_number).filter(Boolean) || []);
+  }
+
+  async saveNewViolations(violations: ViolationRecord[]): Promise<void> {
+    if (violations.length === 0) {
+      console.log('No violations to save');
+      return;
+    }
+
+    const { error } = await this.supabase
+      .from('violations')
+      .insert(violations);
+
+    if (error) {
+      console.error('Error saving violations:', error);
+      throw new Error(`Failed to save violations: ${error.message}`);
+    }
+
+    console.log(`Successfully saved ${violations.length} new violation records`);
+  }
+
   async saveViolations(violations: ViolationRecord[]): Promise<SaveResult> {
     console.log(`Attempting to save ${violations.length} violation records...`);
     
@@ -123,6 +185,21 @@ export class DatabaseService {
     if (error) {
       console.error('Error updating last API check time:', error);
       throw new Error(`Failed to update last API check time: ${error.message}`);
+    }
+  }
+
+  async logEmailNotification(newRecordsCount: number, newCasefilesCount: number, emailAddress: string): Promise<void> {
+    const { error } = await this.supabase
+      .from('email_notifications')
+      .insert({
+        new_records_count: newRecordsCount,
+        email_address: emailAddress,
+        status: 'sent'
+      });
+
+    if (error) {
+      console.error('Error logging email notification:', error);
+      throw new Error(`Failed to log email notification: ${error.message}`);
     }
   }
 
