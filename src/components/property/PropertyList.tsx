@@ -20,15 +20,15 @@ export const PropertyList: React.FC<PropertyListProps> = ({
   const groupedCases = groupRecordsByCase(records);
 
   return (
-    <Card className="shadow-lg">
-      <CardContent className="pt-6">
+    <Card className="shadow-lg border-2 border-gray-200">
+      <CardContent className="pt-6 p-6">
         {groupedCases.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>No investigation records found for the specified criteria.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {groupedCases.map((groupedCase, index) => (
               <CaseCard 
                 key={groupedCase.casefileNumber || index} 
