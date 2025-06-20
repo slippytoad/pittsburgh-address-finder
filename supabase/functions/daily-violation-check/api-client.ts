@@ -9,19 +9,18 @@ export class PropertyApiClient {
     this.dbService = dbService;
   }
 
-  private async getAddressesFromDatabase(): Promise<string[]> {
-    const addresses = await this.dbService.getAddresses();
-    console.log('Fetched addresses from database:', addresses.length);
-    return addresses;
+  private async getParcelIdsFromDatabase(): Promise<string[]> => {
+    const parcelIds = await this.dbService.getParcelIds();
+    console.log('Fetched parcel IDs from database:', parcelIds.length);
+    return parcelIds;
   }
 
-  private buildApiUrl(addresses: string[], fullSync: boolean = false): string {
+  private buildApiUrl(parcelIds: string[], fullSync: boolean = false): string {
     const baseUrl = 'https://data.wprdc.org/api/3/action/datastore_search_sql?sql=SELECT%20%2A%20FROM%20%2270c06278-92c5-4040-ab28-17671866f81c%22%20WHERE%20';
     
-    // Build the address conditions dynamically
-    const addressConditions = addresses.map(address => 
-      `address%20ILIKE%20%27${encodeURIComponent(address)}%25%27`
-    ).join('%20OR%20');
+    // Build the parcel_id IN clause
+    const parcelIdList = parcelIds.map(id => `%27${encodeURIComponent(id)}%27`).join('%2C');
+    const parcelIdCondition = `parcel_id%20IN%20%28${parcelIdList}%29`;
     
     // Use different date filter based on fullSync parameter
     const dateFilter = fullSync 
@@ -30,14 +29,14 @@ export class PropertyApiClient {
     const orderBy = '%20ORDER%20BY%20investigation_date%20DESC';
     const limit = '%20LIMIT%201000'; // Add limit to fetch more records
     
-    const fullUrl = baseUrl + '(' + addressConditions + ')' + dateFilter + orderBy + limit;
+    const fullUrl = baseUrl + parcelIdCondition + dateFilter + orderBy + limit;
     
     // Log the constructed URL in detail
     console.log('=== EDGE FUNCTION API URL CONSTRUCTION ===');
     console.log('Base URL:', baseUrl);
-    console.log('Number of addresses:', addresses.length);
-    console.log('First few addresses:', addresses.slice(0, 3));
-    console.log('Address conditions:', addressConditions);
+    console.log('Number of parcel IDs:', parcelIds.length);
+    console.log('First few parcel IDs:', parcelIds.slice(0, 3));
+    console.log('Parcel ID condition:', parcelIdCondition);
     console.log('Date filter (fullSync=' + fullSync + '):', dateFilter);
     console.log('Order by:', orderBy);
     console.log('Limit:', limit);
@@ -49,20 +48,20 @@ export class PropertyApiClient {
   }
 
   async fetchPropertyData(fullSync: boolean = false): Promise<ApiResponse> {
-    console.log("Fetching addresses from database...");
-    const addresses = await this.getAddressesFromDatabase();
+    console.log("Fetching parcel IDs from database...");
+    const parcelIds = await this.getParcelIdsFromDatabase();
     
-    if (addresses.length === 0) {
-      console.log("No addresses found in database");
+    if (parcelIds.length === 0) {
+      console.log("No parcel IDs found in database");
       return {
         success: true,
         result: { records: [] }
       };
     }
     
-    const apiUrl = this.buildApiUrl(addresses, fullSync);
+    const apiUrl = this.buildApiUrl(parcelIds, fullSync);
     const yearText = fullSync ? '2024' : '2025';
-    console.log(`Fetching property data from API with ${addresses.length} addresses from ${yearText} onwards...`);
+    console.log(`Fetching property data from API with ${parcelIds.length} parcel IDs from ${yearText} onwards...`);
     console.log('About to make API call to:', apiUrl);
     
     const startTime = Date.now();

@@ -1,25 +1,22 @@
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { ViolationRecord, AppSettings } from "./types.ts";
+import { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { ViolationRecord } from "./types.ts";
+
+interface SaveResult {
+  newRecordsCount: number;
+  newCasefilesCount: number;
+  newRecordsForExistingCasesCount: number;
+}
 
 export class DatabaseService {
-  private supabase;
+  private supabase: SupabaseClient;
 
-  constructor(supabaseUrl: string, supabaseServiceKey: string) {
-    this.supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      },
-      db: {
-        schema: 'public'
-      }
-    });
-    console.log('DatabaseService initialized with service role');
+  constructor(supabase: SupabaseClient) {
+    this.supabase = supabase;
   }
 
   async getAddresses(): Promise<string[]> {
-    const { data: addresses, error } = await this.supabase
+    const { data, error } = await this.supabase
       .from('addresses')
       .select('address');
 
@@ -28,186 +25,119 @@ export class DatabaseService {
       throw new Error(`Failed to fetch addresses: ${error.message}`);
     }
 
-    const addressList = addresses?.map(item => item.address) || [];
-    console.log('Found', addressList.length, 'addresses in database');
-    return addressList;
+    return data?.map(item => item.address) || [];
   }
 
-  async getAppSettings(): Promise<AppSettings | null> {
-    const { data: settings, error: settingsError } = await this.supabase
-      .from("app_settings")
-      .select("*")
-      .eq("id", 1)
-      .maybeSingle();
+  async getParcelIds(): Promise<string[]> {
+    const { data, error } = await this.supabase
+      .from('addresses')
+      .select('parcel_id')
+      .not('parcel_id', 'is', null);
 
-    if (settingsError) {
-      console.error("Error fetching app settings:", settingsError);
-      throw new Error(`Failed to fetch app settings: ${settingsError.message}`);
+    if (error) {
+      console.error('Error fetching parcel IDs:', error);
+      throw new Error(`Failed to fetch parcel IDs: ${error.message}`);
     }
 
-    return settings;
+    return data?.map(item => item.parcel_id).filter(Boolean) || [];
   }
 
-  async getExistingViolationIds(): Promise<Set<number>> {
-    const { data: existingRecords, error: fetchError } = await this.supabase
-      .from('violations')
-      .select('_id');
-
-    if (fetchError) {
-      console.error('Error fetching existing violation IDs:', fetchError);
-      throw new Error(`Failed to fetch existing violation IDs: ${fetchError.message}`);
-    }
-
-    const existingIds = new Set(existingRecords?.map(record => record._id) || []);
-    console.log('Found', existingIds.size, 'existing violation IDs in database');
-    return existingIds;
-  }
-
-  async getExistingCaseNumbers(): Promise<Set<string>> {
-    const { data: existingRecords, error: fetchError } = await this.supabase
-      .from('violations')
-      .select('casefile_number')
-      .not('casefile_number', 'is', null);
-
-    if (fetchError) {
-      console.error('Error fetching existing case numbers:', fetchError);
-      throw new Error(`Failed to fetch existing case numbers: ${fetchError.message}`);
-    }
-
-    const existingCaseNumbers = new Set(existingRecords?.map(record => record.casefile_number).filter(Boolean) || []);
-    console.log('Found', existingCaseNumbers.size, 'existing case numbers in database');
-    return existingCaseNumbers;
-  }
-
-  async getLatestViolationDate(): Promise<string | null> {
-    const { data: latestRecord, error: fetchError } = await this.supabase
-      .from('violations')
-      .select('investigation_date')
-      .not('investigation_date', 'is', null)
-      .order('investigation_date', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (fetchError) {
-      console.error('Error fetching latest violation date:', fetchError);
-      throw new Error(`Failed to fetch latest violation date: ${fetchError.message}`);
-    }
-
-    const latestDate = latestRecord?.investigation_date || null;
-    console.log('Latest violation date in database:', latestDate);
-    return latestDate;
-  }
-
-  async saveNewViolations(violationRecords: ViolationRecord[]): Promise<void> {
-    if (violationRecords.length === 0) {
-      console.log('No new violations to save');
-      return;
-    }
-
-    console.log('Attempting to save', violationRecords.length, 'violation records using service role');
-    console.log('Sample record structure:', JSON.stringify(violationRecords[0], null, 2));
-
-    try {
-      // Try direct SQL insert using RPC to bypass RLS completely
-      console.log('Attempting direct RPC insert to bypass RLS...');
-      
-      // Create a simple RPC function call that should work with service role
-      const { data: rpcResult, error: rpcError } = await this.supabase
-        .rpc('insert_violations_bulk', { 
-          violation_data: violationRecords 
-        });
-
-      if (rpcError) {
-        console.error('RPC insert failed:', rpcError);
-        
-        // Fallback to batch inserts with detailed logging
-        console.log('Falling back to batch inserts...');
-        
-        const batchSize = 50; // Process in batches of 50
-        let totalInserted = 0;
-        
-        for (let i = 0; i < violationRecords.length; i += batchSize) {
-          const batch = violationRecords.slice(i, i + batchSize);
-          console.log(`Processing batch ${Math.floor(i/batchSize) + 1}: ${batch.length} records (${i + 1}-${Math.min(i + batchSize, violationRecords.length)} of ${violationRecords.length})`);
-          
-          try {
-            const { data: batchData, error: batchError } = await this.supabase
-              .from('violations')
-              .insert(batch);
-            
-            if (batchError) {
-              console.error(`Failed to insert batch ${Math.floor(i/batchSize) + 1}:`, {
-                error: batchError,
-                batchSize: batch.length,
-                errorCode: batchError.code,
-                errorDetails: batchError.details,
-                errorHint: batchError.hint,
-                errorMessage: batchError.message
-              });
-            } else {
-              totalInserted += batch.length;
-              console.log(`Successfully inserted batch ${Math.floor(i/batchSize) + 1} with ${batch.length} records. Total inserted so far: ${totalInserted}`);
-            }
-          } catch (batchException) {
-            console.error(`Exception inserting batch ${Math.floor(i/batchSize) + 1}:`, batchException);
-          }
-        }
-        
-        if (totalInserted === 0) {
-          throw new Error(`Failed to save any violations. RPC error: ${rpcError.message}`);
-        } else {
-          console.log(`Successfully saved ${totalInserted} out of ${violationRecords.length} violations via batch insert`);
-        }
-      } else {
-        console.log('Successfully saved all', violationRecords.length, 'violation records via RPC');
-      }
-    } catch (error) {
-      console.error('Error in saveNewViolations:', error);
-      throw error;
-    }
-  }
-
-  async logEmailNotification(newRecordsCount: number, newCasefilesCount: number, emailAddress: string): Promise<void> {
-    const { error: logError } = await this.supabase
-      .from('email_notifications')
-      .insert({
-        new_records_count: newRecordsCount,
-        email_address: emailAddress,
-        status: 'sent'
-      });
-
-    if (logError) {
-      console.error('Error logging email notification:', logError);
-      // Don't throw here - the email was sent successfully
-    }
+  async saveViolations(violations: ViolationRecord[]): Promise<SaveResult> {
+    console.log(`Attempting to save ${violations.length} violation records...`);
     
-    console.log(`Logged email notification: ${newRecordsCount} total new records, ${newCasefilesCount} new casefiles`);
+    if (violations.length === 0) {
+      console.log('No violations to save');
+      return {
+        newRecordsCount: 0,
+        newCasefilesCount: 0,
+        newRecordsForExistingCasesCount: 0
+      };
+    }
+
+    // Get existing violation IDs to check which ones are new
+    const violationIds = violations.map(v => v._id);
+    const { data: existingViolations, error: fetchError } = await this.supabase
+      .from('violations')
+      .select('_id, casefile_number')
+      .in('_id', violationIds);
+
+    if (fetchError) {
+      console.error('Error fetching existing violations:', fetchError);
+      throw new Error(`Failed to fetch existing violations: ${fetchError.message}`);
+    }
+
+    const existingIds = new Set(existingViolations?.map(v => v._id) || []);
+    const existingCaseNumbers = new Set(existingViolations?.map(v => v.casefile_number) || []);
+    
+    // Filter out violations that already exist
+    const newViolations = violations.filter(v => !existingIds.has(v._id));
+    
+    console.log(`Found ${newViolations.length} new violations out of ${violations.length} total`);
+
+    if (newViolations.length === 0) {
+      console.log('All violations already exist in database');
+      return {
+        newRecordsCount: 0,
+        newCasefilesCount: 0,
+        newRecordsForExistingCasesCount: 0
+      };
+    }
+
+    // Count new casefiles and new records for existing cases
+    const newCaseNumbers = new Set(newViolations.map(v => v.casefile_number));
+    const newCasefilesCount = Array.from(newCaseNumbers).filter(caseNum => !existingCaseNumbers.has(caseNum)).length;
+    const newRecordsForExistingCasesCount = newViolations.length - Array.from(newCaseNumbers).filter(caseNum => !existingCaseNumbers.has(caseNum)).reduce((count, caseNum) => {
+      return count + newViolations.filter(v => v.casefile_number === caseNum).length;
+    }, 0);
+
+    // Save new violations
+    const { error: insertError } = await this.supabase
+      .from('violations')
+      .insert(newViolations);
+
+    if (insertError) {
+      console.error('Error saving violations:', insertError);
+      throw new Error(`Failed to save violations: ${insertError.message}`);
+    }
+
+    console.log(`Successfully saved ${newViolations.length} new violation records`);
+    console.log(`New casefiles: ${newCasefilesCount}`);
+    console.log(`New records for existing cases: ${newRecordsForExistingCasesCount}`);
+    
+    return {
+      newRecordsCount: newViolations.length,
+      newCasefilesCount,
+      newRecordsForExistingCasesCount
+    };
   }
 
   async updateLastApiCheckTime(newRecordsCount?: number): Promise<void> {
-    const now = new Date().toISOString();
-    
-    const updateData: any = {
-      id: 1,
-      last_api_check_time: now
-    };
-
-    // Only update the count if provided
-    if (newRecordsCount !== undefined) {
-      updateData.last_api_new_records_count = newRecordsCount;
-    }
-    
     const { error } = await this.supabase
       .from('app_settings')
-      .upsert(updateData, {
-        onConflict: 'id'
-      });
+      .update({ 
+        last_api_check_time: new Date().toISOString(),
+        last_api_new_records_count: newRecordsCount || 0
+      })
+      .eq('id', 1);
 
     if (error) {
       console.error('Error updating last API check time:', error);
       throw new Error(`Failed to update last API check time: ${error.message}`);
     }
+  }
 
-    console.log('Last API check time updated to:', now, 'with new records count:', newRecordsCount);
+  async getAppSettings() {
+    const { data, error } = await this.supabase
+      .from('app_settings')
+      .select('*')
+      .eq('id', 1)
+      .single();
+
+    if (error) {
+      console.error('Error fetching app settings:', error);
+      throw new Error(`Failed to fetch app settings: ${error.message}`);
+    }
+
+    return data;
   }
 }
