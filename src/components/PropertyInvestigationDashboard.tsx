@@ -39,45 +39,47 @@ const PropertyInvestigationDashboard: React.FC = () => {
   } = usePropertyData(selectedStatuses, addressSearch);
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-2 sm:p-6 space-y-4 sm:space-y-6">
-      <PropertyHeader 
-        onFetchData={handleFetchData}
-        isLoading={isLoading}
-        showResults={showResults}
-        newRecordsCount={lastNewRecordsCount}
-        newCasefilesCount={lastNewCasefilesCount}
-        newRecordsForExistingCasesCount={lastNewRecordsForExistingCasesCount}
-        lastApiCheckTime={formatLastApiCheckTime(appSettings?.last_api_check_time || null)}
-        lastApiNewRecordsCount={lastApiNewRecordsCount}
-      />
+    <div className="min-h-screen bg-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        <PropertyHeader 
+          onFetchData={handleFetchData}
+          isLoading={isLoading}
+          showResults={showResults}
+          newRecordsCount={lastNewRecordsCount}
+          newCasefilesCount={lastNewCasefilesCount}
+          newRecordsForExistingCasesCount={lastNewRecordsForExistingCasesCount}
+          lastApiCheckTime={formatLastApiCheckTime(appSettings?.last_api_check_time || null)}
+          lastApiNewRecordsCount={lastApiNewRecordsCount}
+        />
 
-      {error && <ErrorDisplay error={error} />}
+        {error && <ErrorDisplay error={error} />}
 
-      {data && (
-        <div className="space-y-4 sm:space-y-6">
-          <StatusFilter
-            availableStatuses={availableStatuses}
-            selectedStatuses={selectedStatuses}
-            onStatusChange={setSelectedStatuses}
-            statusCounts={statusCounts}
-            onAddressSearch={setAddressSearch}
-            addressSearch={addressSearch}
-          />
-          <PropertyList 
-            records={filteredRecords} 
-            expandAllCards={expandAllCards}
-            highlightedCaseNumber={highlightedCaseNumber}
-          />
+        {data && (
+          <div className="space-y-8">
+            <StatusFilter
+              availableStatuses={availableStatuses}
+              selectedStatuses={selectedStatuses}
+              onStatusChange={setSelectedStatuses}
+              statusCounts={statusCounts}
+              onAddressSearch={setAddressSearch}
+              addressSearch={addressSearch}
+            />
+            <PropertyList 
+              records={filteredRecords} 
+              expandAllCards={expandAllCards}
+              highlightedCaseNumber={highlightedCaseNumber}
+            />
+          </div>
+        )}
+
+        <div className="pt-12 border-t border-gray-100 flex justify-center">
+          <Link to="/admin">
+            <Button variant="outline" className="flex items-center gap-2 rounded-full px-6 py-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50">
+              <Settings className="h-4 w-4" />
+              Admin Settings
+            </Button>
+          </Link>
         </div>
-      )}
-
-      <div className="mt-8 pt-6 border-t border-gray-200 flex justify-center">
-        <Link to="/admin">
-          <Button variant="outline" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Admin Settings
-          </Button>
-        </Link>
       </div>
     </div>
   );

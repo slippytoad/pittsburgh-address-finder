@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -72,22 +71,22 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
   };
 
   return (
-    <div className="mb-4">      
-      <div className="flex flex-wrap gap-2 mb-4">
+    <div className="space-y-6">      
+      {/* Status Filters */}
+      <div className="flex flex-wrap gap-3">
         {/* All option */}
-        <Badge
-          variant="secondary"
+        <button
           onClick={() => handleStatusToggle('All')}
           className={`
-            cursor-pointer transition-all duration-200 hover:opacity-80
+            px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 border
             ${isShowingAll 
-              ? 'ring-2 ring-blue-400 shadow-lg scale-105 bg-blue-600 text-white' 
-              : 'hover:scale-105 opacity-70'
+              ? 'bg-gray-900 text-white border-gray-900 shadow-sm' 
+              : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400 hover:bg-gray-50'
             }
           `}
         >
           All ({totalCases})
-        </Badge>
+        </button>
         
         {/* Individual status options in specified order */}
         {orderedStatuses.map((status) => {
@@ -95,38 +94,37 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
           const count = statusCounts[status] || 0;
           console.log(`StatusFilter - rendering ${status}, isSelected: ${isSelected}, count: ${count}`);
           return (
-            <Badge
+            <button
               key={status}
-              variant={getStatusColor(status)}
               onClick={() => handleStatusToggle(status)}
               className={`
-                cursor-pointer transition-all duration-200 hover:opacity-80
+                px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 border
                 ${isSelected 
-                  ? 'ring-2 ring-blue-400 shadow-lg scale-105 bg-blue-600 text-white' 
-                  : 'hover:scale-105 opacity-70'
+                  ? 'bg-gray-900 text-white border-gray-900 shadow-sm' 
+                  : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400 hover:bg-gray-50'
                 }
               `}
             >
               {status} ({count})
-            </Badge>
+            </button>
           );
         })}
       </div>
 
       {/* Address search with search icon inside */}
       {onAddressSearch && (
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+        <div className="relative max-w-md">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           <Input
             placeholder="Search by address..."
             value={addressSearch}
             onChange={(e) => onAddressSearch(e.target.value)}
-            className="pl-10 pr-8"
+            className="pl-12 pr-10 py-3 rounded-full border-gray-300 focus:border-gray-900 focus:ring-gray-900 text-base"
           />
           {addressSearch && (
             <button
               onClick={handleClearSearch}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
               type="button"
             >
               <X className="h-4 w-4" />
