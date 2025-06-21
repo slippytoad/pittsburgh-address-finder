@@ -25,15 +25,12 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   lastApiNewRecordsCount
 }) => {
   const [buttonState, setButtonState] = useState<'default' | 'loading' | 'success'>('default');
-  const [wasLoading, setWasLoading] = useState(false);
 
   useEffect(() => {
-    if (isLoading && !wasLoading) {
+    if (isLoading) {
       setButtonState('loading');
-      setWasLoading(true);
-    } else if (!isLoading && wasLoading && newRecordsCount !== null) {
+    } else if (buttonState === 'loading' && newRecordsCount !== null) {
       setButtonState('success');
-      setWasLoading(false);
       
       // Revert to default after 2 seconds
       const timer = setTimeout(() => {
@@ -41,11 +38,8 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
       }, 2000);
       
       return () => clearTimeout(timer);
-    } else if (!isLoading && wasLoading) {
-      setButtonState('default');
-      setWasLoading(false);
     }
-  }, [isLoading, wasLoading, newRecordsCount]);
+  }, [isLoading, newRecordsCount, buttonState]);
 
   const getButtonContent = () => {
     switch (buttonState) {
@@ -97,7 +91,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
             <Button 
               onClick={onFetchData}
               disabled={isLoading}
-              className="rounded-full px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-medium min-w-[160px]"
+              className="rounded-full px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-medium w-[180px]"
               size="sm"
             >
               {getButtonContent()}
