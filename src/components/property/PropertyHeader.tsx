@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Building2, RefreshCw, Loader2, CheckCircle } from 'lucide-react';
@@ -48,7 +47,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
       
       return () => clearTimeout(timer);
     }
-  }, [isLoading, showResults, newRecordsCount, hasBeenClicked, buttonState]);
+  }, [isLoading, showResults, newRecordsCount, hasBeenClicked]);
 
   const getButtonContent = () => {
     switch (buttonState) {
