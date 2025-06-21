@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Filter, Search } from 'lucide-react';
+import { Filter, Search, X } from 'lucide-react';
 import { getStatusColor } from '@/utils/propertyUtils';
 
 interface StatusFilterProps {
@@ -65,6 +65,12 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
   // Sort available statuses according to the desired order
   const orderedStatuses = statusOrder.filter(status => availableStatuses.includes(status));
 
+  const handleClearSearch = () => {
+    if (onAddressSearch) {
+      onAddressSearch('');
+    }
+  };
+
   return (
     <div className="mb-4">
       <div className="flex items-center gap-2 mb-4">
@@ -112,16 +118,27 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         })}
       </div>
 
-      {/* Address search - now always visible */}
+      {/* Address search with clear button */}
       {onAddressSearch && (
         <div className="flex items-center gap-2">
           <Search className="h-4 w-4 text-gray-500" />
-          <Input
-            placeholder="Search by address..."
-            value={addressSearch}
-            onChange={(e) => onAddressSearch(e.target.value)}
-            className="max-w-sm"
-          />
+          <div className="relative max-w-sm">
+            <Input
+              placeholder="Search by address..."
+              value={addressSearch}
+              onChange={(e) => onAddressSearch(e.target.value)}
+              className="pr-8"
+            />
+            {addressSearch && (
+              <button
+                onClick={handleClearSearch}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                type="button"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
