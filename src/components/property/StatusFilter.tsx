@@ -72,12 +72,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
   };
 
   return (
-    <div className="mb-4">
-      <div className="flex items-center gap-2 mb-4">
-        <Filter className="h-4 w-4 text-blue-600" />
-        <h3 className="font-medium text-sm">Filter by Status</h3>
-      </div>
-      
+    <div className="mb-4">      
       <div className="flex flex-wrap gap-2 mb-4">
         {/* All option */}
         <Badge
@@ -118,27 +113,25 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         })}
       </div>
 
-      {/* Address search with clear button */}
+      {/* Address search with search icon inside */}
       {onAddressSearch && (
-        <div className="flex items-center gap-2">
-          <Search className="h-4 w-4 text-gray-500" />
-          <div className="relative max-w-sm">
-            <Input
-              placeholder="Search by address..."
-              value={addressSearch}
-              onChange={(e) => onAddressSearch(e.target.value)}
-              className="pr-8"
-            />
-            {addressSearch && (
-              <button
-                onClick={handleClearSearch}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                type="button"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+          <Input
+            placeholder="Search by address..."
+            value={addressSearch}
+            onChange={(e) => onAddressSearch(e.target.value)}
+            className="pl-10 pr-8"
+          />
+          {addressSearch && (
+            <button
+              onClick={handleClearSearch}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              type="button"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
       )}
     </div>
