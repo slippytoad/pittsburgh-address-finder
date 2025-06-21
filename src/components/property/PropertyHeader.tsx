@@ -39,7 +39,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
       
       return () => clearTimeout(timer);
     }
-  }, [isLoading, newRecordsCount, buttonState]);
+  }, [isLoading, newRecordsCount]);
 
   const getButtonContent = () => {
     switch (buttonState) {
