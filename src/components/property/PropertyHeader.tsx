@@ -28,7 +28,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   useEffect(() => {
     if (isLoading) {
       setButtonState('loading');
-    } else if (buttonState === 'loading' && newRecordsCount !== undefined) {
+    } else if (buttonState === 'loading' && showResults && newRecordsCount !== undefined) {
       setButtonState('success');
       
       // Revert to default after 2 seconds
@@ -38,7 +38,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
       
       return () => clearTimeout(timer);
     }
-  }, [isLoading, newRecordsCount, buttonState]);
+  }, [isLoading, showResults, newRecordsCount, buttonState]);
 
   const getButtonContent = () => {
     switch (buttonState) {
