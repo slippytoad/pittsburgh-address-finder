@@ -1,5 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { PropertyApiClient } from "./api-client.ts";
 import { DatabaseService } from "./database-service.ts";
 import { EmailService } from "./email-service.ts";
@@ -25,8 +26,9 @@ serve(async (req: Request) => {
     console.log("Using Supabase URL:", supabaseUrl);
     console.log("Service key available:", !!supabaseServiceKey);
 
-    // Initialize services
-    const dbService = new DatabaseService(supabaseUrl, supabaseServiceKey);
+    // Initialize Supabase client and services
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const dbService = new DatabaseService(supabase);
     const apiClient = new PropertyApiClient(dbService);
     const emailService = new EmailService(resendApiKey);
 
