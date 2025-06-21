@@ -86,6 +86,49 @@ export class DatabaseService {
     return new Set(data?.map(item => item.casefile_number).filter(Boolean) || []);
   }
 
+  async getOpenCasesCountByStatus(): Promise<Record<string, number>> {
+    try {
+      // Get all violations and group by case, then count by status for non-closed cases
+      const { data: violations, error } = await this.supabase
+        .from('violations')
+        .select('casefile_number, status, investigation_date')
+        .not('casefile_number', 'is', null)
+        .order('investigation_date', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching violations for status count:', error);
+        throw new Error(`Failed to fetch violations for status count: ${error.message}`);
+      }
+
+      // Group by case and get the latest status for each case
+      const caseStatuses: Record<string, string> = {};
+      
+      violations?.forEach(violation => {
+        const caseNumber = violation.casefile_number;
+        if (caseNumber && !caseStatuses[caseNumber]) {
+          // First occurrence is the latest due to ordering
+          caseStatuses[caseNumber] = violation.status || 'Unknown';
+        }
+      });
+
+      // Count cases by status, excluding closed cases
+      const statusCounts: Record<string, number> = {};
+      Object.values(caseStatuses).forEach(status => {
+        const statusUpper = status.toUpperCase();
+        // Only count non-closed cases
+        if (!statusUpper.includes('CLOSED') && !statusUpper.includes('RESOLVED')) {
+          statusCounts[status] = (statusCounts[status] || 0) + 1;
+        }
+      });
+
+      console.log('Open cases count by status:', statusCounts);
+      return statusCounts;
+    } catch (error) {
+      console.error('Error in getOpenCasesCountByStatus:', error);
+      throw error;
+    }
+  }
+
   async saveNewViolations(violations: ViolationRecord[]): Promise<void> {
     if (violations.length === 0) {
       console.log('No violations to save');

@@ -135,7 +135,8 @@ serve(async (req: Request) => {
         filterResult.newRecords, 
         apiData.result.records,
         filterResult.newCasefiles.length,
-        filterResult.newRecordsForExistingCases.length
+        filterResult.newRecordsForExistingCases.length,
+        dbService // Pass the database service for querying open cases
       );
 
       console.log("Email sent successfully:", emailResponse);

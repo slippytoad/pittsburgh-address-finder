@@ -1,6 +1,7 @@
 
 import { Resend } from "npm:resend@2.0.0";
 import { ViolationRecord } from "./types.ts";
+import { DatabaseService } from "./database-service.ts";
 
 export class EmailService {
   private resend: Resend;
@@ -69,26 +70,25 @@ export class EmailService {
     }).sort((a, b) => new Date(b.latestDate).getTime() - new Date(a.latestDate).getTime());
   }
 
-  private getStatusSummary(allRecords: ViolationRecord[]): string {
-    // Use the same grouping logic as the dashboard
-    const groupedCases = this.groupRecordsByCase(allRecords);
-    
-    // Count cases by their current status - no grouping
-    const caseCounts: Record<string, number> = {};
-    groupedCases.forEach(groupedCase => {
-      const status = groupedCase.currentStatus;
-      caseCounts[status] = (caseCounts[status] || 0) + 1;
-    });
+  private async getOpenCasesSummary(dbService: DatabaseService): Promise<string> {
+    try {
+      // Get the status counts for open (non-closed) cases from the database
+      const statusCounts = await dbService.getOpenCasesCountByStatus();
+      
+      const dashboardUrl = "https://jfw-oakland-property-violations-tracker.lovable.app";
 
-    const dashboardUrl = "https://jfw-oakland-property-violations-tracker.lovable.app";
-
-    return Object.entries(caseCounts)
-      .map(([status, count]) => {
-        const statusParam = encodeURIComponent(status);
-        const statusLink = `${dashboardUrl}?status=${statusParam}`;
-        return `<li><strong><a href="${statusLink}" style="color: #2754C5; text-decoration: none;">${status}</a>:</strong> ${count}</li>`;
-      })
-      .join('');
+      return Object.entries(statusCounts)
+        .map(([status, count]) => {
+          const statusParam = encodeURIComponent(status);
+          const statusLink = `${dashboardUrl}?status=${statusParam}`;
+          return `<li><strong><a href="${statusLink}" style="color: #2754C5; text-decoration: none;">${status}</a>:</strong> ${count}</li>`;
+        })
+        .join('');
+    } catch (error) {
+      console.error('Error getting open cases summary:', error);
+      // Fallback to the old method if database query fails
+      return '<li>Unable to retrieve case status counts</li>';
+    }
   }
 
   private formatNewRecordsList(newRecords: ViolationRecord[]): string {
@@ -110,13 +110,13 @@ export class EmailService {
     }).join('');
   }
 
-  async sendDailyReport(emailAddress: string, newRecords: ViolationRecord[], allRecords: ViolationRecord[]): Promise<any> {
+  async sendDailyReport(emailAddress: string, newRecords: ViolationRecord[], allRecords: ViolationRecord[], newCasefilesCount: number, newRecordsForExistingCasesCount: number, dbService: DatabaseService): Promise<any> {
     console.log('Sending daily email notification to:', emailAddress);
     
     let emailSubject: string;
     let emailBody: string;
 
-    const statusSummary = this.getStatusSummary(allRecords);
+    const statusSummary = await this.getOpenCasesSummary(dbService);
     const dashboardUrl = "https://jfw-oakland-property-violations-tracker.lovable.app";
     const currentDate = new Date().toLocaleDateString('en-US', { 
       weekday: 'long', 
@@ -138,7 +138,7 @@ export class EmailService {
           ${newRecords.length > 10 ? `<li><em>... and ${newRecords.length - 10} more records</em></li>` : ''}
         </ul>
         
-        <h3>Number of cases in each state:</h3>
+        <h3>Number of open cases in each state:</h3>
         <ul>
           ${statusSummary}
         </ul>
@@ -154,7 +154,7 @@ export class EmailService {
         <h2>Daily Property Violation Report - ${currentDate}</h2>
         <p>We completed today's check and <strong>no new violations</strong> were found.</p>
         
-        <h3>Number of cases in each state:</h3>
+        <h3>Number of open cases in each state:</h3>
         <ul>
           ${statusSummary}
         </ul>
