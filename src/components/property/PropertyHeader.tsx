@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Building2, RefreshCw, Loader2, CheckCircle } from 'lucide-react';
@@ -24,8 +25,17 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   lastApiNewRecordsCount
 }) => {
   const [buttonState, setButtonState] = useState<'default' | 'loading' | 'success'>('default');
+  const [hasBeenClicked, setHasBeenClicked] = useState(false);
+
+  const handleButtonClick = () => {
+    setHasBeenClicked(true);
+    onFetchData();
+  };
 
   useEffect(() => {
+    // Only update button state if the button has been clicked
+    if (!hasBeenClicked) return;
+
     if (isLoading) {
       setButtonState('loading');
     } else if (buttonState === 'loading' && showResults && newRecordsCount !== undefined) {
@@ -38,7 +48,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
       
       return () => clearTimeout(timer);
     }
-  }, [isLoading, showResults, newRecordsCount, buttonState]);
+  }, [isLoading, showResults, newRecordsCount, hasBeenClicked, buttonState]);
 
   const getButtonContent = () => {
     switch (buttonState) {
@@ -85,7 +95,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
           
           <div className="flex flex-col sm:flex-row gap-3">
             <Button 
-              onClick={onFetchData}
+              onClick={handleButtonClick}
               disabled={isLoading}
               className="rounded-full px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-medium w-[180px]"
               size="sm"
