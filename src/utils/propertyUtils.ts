@@ -15,6 +15,15 @@ export const formatDate = (dateString: string) => {
 
 export const getStatusColor = (status?: string) => {
   if (!status) return 'secondary';
+  const statusUpper = status.toUpperCase();
+  
+  // Specific status color mappings
+  if (statusUpper === 'IN COURT') return 'destructive'; // Red
+  if (statusUpper === 'READY TO CLOSE') return 'outline'; // Gray
+  if (statusUpper === 'IN VIOLATION') return 'secondary'; // Default secondary color
+  if (statusUpper === 'CLOSED') return 'default'; // Default primary color
+  
+  // Fallback logic for other statuses
   const statusLower = status.toLowerCase();
   if (statusLower.includes('open') || statusLower.includes('pending')) return 'destructive';
   if (statusLower.includes('closed') || statusLower.includes('resolved')) return 'default';
