@@ -80,9 +80,6 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
                 <h1 className="text-2xl font-semibold text-gray-900">
                   JFW Oakland Property Investigation Dashboard
                 </h1>
-                <p className="text-base text-gray-600 mt-1">
-                  Monitor property violations and investigation records from Pittsburgh's official database
-                </p>
               </div>
             </div>
           </div>
