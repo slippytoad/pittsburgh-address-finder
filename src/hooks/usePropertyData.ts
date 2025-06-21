@@ -13,7 +13,7 @@ import {
 } from '@/utils/propertyFilters';
 
 export const usePropertyData = (selectedStatuses: string[], addressSearch?: string) => {
-  const [showResults, setShowResults] = useState(true);
+  const [showResults, setShowResults] = useState(false);
   const [lastNewRecordsCount, setLastNewRecordsCount] = useState<number | undefined>(undefined);
   const [lastNewCasefilesCount, setLastNewCasefilesCount] = useState<number | undefined>(undefined);
   const [lastNewRecordsForExistingCasesCount, setLastNewRecordsForExistingCasesCount] = useState<number | undefined>(undefined);
