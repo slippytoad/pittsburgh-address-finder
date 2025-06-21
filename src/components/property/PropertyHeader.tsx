@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Building2, RefreshCw, Loader2 } from 'lucide-react';
+import { Building2, RefreshCw, Loader2, CheckCircle } from 'lucide-react';
 
 interface PropertyHeaderProps {
   onFetchData: () => void;
@@ -24,6 +24,55 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   lastApiCheckTime,
   lastApiNewRecordsCount
 }) => {
+  const [buttonState, setButtonState] = useState<'default' | 'loading' | 'success'>('default');
+  const [wasLoading, setWasLoading] = useState(false);
+
+  useEffect(() => {
+    if (isLoading && !wasLoading) {
+      setButtonState('loading');
+      setWasLoading(true);
+    } else if (!isLoading && wasLoading && newRecordsCount !== null) {
+      setButtonState('success');
+      setWasLoading(false);
+      
+      // Revert to default after 2 seconds
+      const timer = setTimeout(() => {
+        setButtonState('default');
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    } else if (!isLoading && wasLoading) {
+      setButtonState('default');
+      setWasLoading(false);
+    }
+  }, [isLoading, wasLoading, newRecordsCount]);
+
+  const getButtonContent = () => {
+    switch (buttonState) {
+      case 'loading':
+        return (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Checking...
+          </>
+        );
+      case 'success':
+        return (
+          <>
+            <CheckCircle className="mr-2 h-4 w-4" />
+            {newRecordsCount === 0 ? 'No new records' : `Found ${newRecordsCount} new`}
+          </>
+        );
+      default:
+        return (
+          <>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Check for Updates
+          </>
+        );
+    }
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm">
       <div className="p-8">
@@ -48,20 +97,10 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
             <Button 
               onClick={onFetchData}
               disabled={isLoading}
-              className="rounded-full px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-medium"
+              className="rounded-full px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-medium min-w-[160px]"
               size="sm"
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Checking...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Check for Updates
-                </>
-              )}
+              {getButtonContent()}
             </Button>
           </div>
         </div>
