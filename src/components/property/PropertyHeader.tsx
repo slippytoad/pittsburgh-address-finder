@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Building2, RefreshCw, Loader2 } from 'lucide-react';
 
@@ -35,12 +34,12 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
                 <Building2 className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <CardTitle className="text-2xl font-semibold text-gray-900">
+                <h1 className="text-2xl font-semibold text-gray-900">
                   JFW Oakland Property Investigation Dashboard
-                </CardTitle>
-                <CardDescription className="text-base text-gray-600 mt-1">
+                </h1>
+                <p className="text-base text-gray-600 mt-1">
                   Monitor property violations and investigation records from Pittsburgh's official database
-                </CardDescription>
+                </p>
               </div>
             </div>
           </div>
@@ -97,7 +96,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
               </div>
             )}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
