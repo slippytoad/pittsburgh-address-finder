@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import StatusFilter from '@/components/property/StatusFilter';
 import ErrorDisplay from '@/components/property/ErrorDisplay';
 import { useUrlParameters } from '@/hooks/useUrlParameters';
 import { usePropertyData } from '@/hooks/usePropertyData';
+import { useAddressSearch } from '@/hooks/useAddressSearch';
 
 const PropertyInvestigationDashboard: React.FC = () => {
   const {
@@ -18,7 +18,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
     highlightedCaseNumber
   } = useUrlParameters();
 
-  const [addressSearch, setAddressSearch] = useState('');
+  const { addressSearch, setAddressSearch } = useAddressSearch();
 
   const {
     data,
@@ -34,7 +34,6 @@ const PropertyInvestigationDashboard: React.FC = () => {
     lastApiNewRecordsCount,
     appSettings,
     handleFetchData,
-    getLatestDate,
     formatLastApiCheckTime
   } = usePropertyData(selectedStatuses, addressSearch);
 
