@@ -19,7 +19,7 @@ export const getStatusColor = (status?: string) => {
   
   // Specific status color mappings
   if (statusUpper === 'IN COURT') return 'destructive'; // Red
-  if (statusUpper === 'READY TO CLOSE') return 'secondary'; // Orange
+  if (statusUpper === 'READY TO CLOSE') return 'warning'; // Orange
   if (statusUpper === 'IN VIOLATION') return 'outline'; // Gray
   if (statusUpper === 'CLOSED') return 'default'; // Default primary color
   
