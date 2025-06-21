@@ -32,7 +32,6 @@ export const usePropertyData = (selectedStatuses: string[], addressSearch?: stri
 
   // Use database data
   const data = { result: { records: dbData || [] } };
-  const isLoading = dbLoading;
 
   // Get grouped cases
   const groupedCases = usePropertyCases(data?.result?.records);
@@ -92,7 +91,7 @@ export const usePropertyData = (selectedStatuses: string[], addressSearch?: stri
 
   return {
     data,
-    isLoading,
+    isLoading: mutation.isPending, // Only show loading when API mutation is pending
     error: dbError,
     showResults,
     availableStatuses,
