@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -59,7 +58,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
           <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors p-6">
             <div className="flex flex-col gap-4">
               {/* Desktop Layout - side by side */}
-              <div className="hidden sm:flex sm:items-start sm:justify-between gap-4">
+              <div className="hidden sm:flex sm:items-start sm:justify-between gap-6">
                 <div className="flex flex-col gap-3 min-w-0 flex-1">
                   <CaseCardHeader
                     formattedStreetAddress={formattedStreetAddress}
@@ -70,7 +69,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   />
                 </div>
                 
-                <div className="flex flex-col gap-3 justify-end sm:flex-shrink-0 sm:min-w-[300px] sm:items-end">
+                <div className="flex flex-col gap-3 justify-start sm:flex-shrink-0 sm:min-w-[320px] sm:items-end">
                   <CaseCardStatus
                     currentStatus={groupedCase.currentStatus}
                     recordCount={groupedCase.records.length}
