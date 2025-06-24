@@ -3,8 +3,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import NotificationSettingsSection from '@/components/property/NotificationSettingsSection';
+import EmailSettingsSection from '@/components/property/EmailSettingsSection';
 import AddressManager from '@/components/AddressManager';
+import EmailTestButtons from '@/components/EmailTestButtons';
 
 const Admin = () => {
   return (
@@ -21,7 +22,8 @@ const Admin = () => {
         </div>
         
         <AddressManager />
-        <NotificationSettingsSection />
+        <EmailSettingsSection />
+        <EmailTestButtons />
       </div>
     </div>
   );

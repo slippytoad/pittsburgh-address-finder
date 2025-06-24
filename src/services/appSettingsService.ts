@@ -6,8 +6,6 @@ export interface AppSettings {
   email_reports_enabled: boolean;
   email_report_address: string;
   violation_checks_enabled: boolean;
-  sms_reports_enabled: boolean;
-  sms_report_phone: string | null;
   last_api_check_time: string | null;
   last_api_new_records_count?: number | null;
   created_at: string;
