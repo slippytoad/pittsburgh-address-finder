@@ -4,6 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { PropertyApiClient } from "./api-client.ts";
 import { DatabaseService } from "./database-service.ts";
 import { EmailService } from "./email-service.ts";
+import { SmsService } from "./sms-service.ts";
 import { ViolationProcessor } from "./violation-processor.ts";
 
 const corsHeaders = {
@@ -14,6 +15,8 @@ const corsHeaders = {
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const resendApiKey = Deno.env.get("RESEND_API_KEY")!;
+const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN");
 
 serve(async (req: Request) => {
   // Handle CORS preflight requests
@@ -31,10 +34,17 @@ serve(async (req: Request) => {
     const dbService = new DatabaseService(supabase);
     const apiClient = new PropertyApiClient(dbService);
     const emailService = new EmailService(resendApiKey);
+    
+    // Initialize SMS service if credentials are available
+    let smsService: SmsService | null = null;
+    if (twilioAccountSid && twilioAuthToken) {
+      smsService = new SmsService(twilioAccountSid, twilioAuthToken);
+    }
 
     // Check if this is a test run, full sync, or skip email
     const body = await req.text();
     let isTestRun = false;
+    let testType = 'email';
     let isFullSync = false;
     let skipEmail = false;
     
@@ -42,6 +52,7 @@ serve(async (req: Request) => {
       try {
         const requestData = JSON.parse(body);
         isTestRun = requestData.test_run === true;
+        testType = requestData.test_type || 'email';
         isFullSync = requestData.full_sync === true;
         skipEmail = requestData.skip_email === true;
       } catch (e) {
@@ -50,7 +61,7 @@ serve(async (req: Request) => {
     }
 
     if (isTestRun) {
-      console.log("Test run detected - sending test email");
+      console.log(`Test run detected - sending test ${testType}`);
     }
 
     if (isFullSync) {
@@ -65,24 +76,71 @@ serve(async (req: Request) => {
     console.log("Fetching app settings...");
     const settings = await dbService.getAppSettings();
 
+    // Handle test runs
+    if (isTestRun) {
+      if (testType === 'sms') {
+        if (!smsService) {
+          console.error("SMS service not available - missing Twilio credentials");
+          return new Response(
+            JSON.stringify({ error: "SMS service not configured - missing Twilio credentials" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        if (!settings?.sms_reports_enabled || !settings?.sms_report_phone) {
+          console.log("SMS reports are disabled or no phone number configured");
+          return new Response(
+            JSON.stringify({ message: "SMS reports are disabled or not configured" }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        console.log("Sending test SMS to:", settings.sms_report_phone);
+        const smsResponse = await smsService.sendTestSms(settings.sms_report_phone);
+        
+        if (smsResponse.error) {
+          console.error("Test SMS failed:", smsResponse.error);
+          return new Response(
+            JSON.stringify({ error: "Failed to send test SMS", details: smsResponse.error }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        console.log("Test SMS sent successfully:", smsResponse);
+        return new Response(
+          JSON.stringify({ 
+            message: "Test SMS sent successfully",
+            smsResponse: smsResponse
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } else {
+        // Email test
+        if (!settings?.email_reports_enabled || !settings?.email_report_address) {
+          console.log("Email reports are disabled or no email address configured");
+          return new Response(
+            JSON.stringify({ message: "Email reports are disabled or not configured" }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        const emailResponse = await emailService.sendTestEmail(settings.email_report_address, settings);
+        console.log("Test email sent successfully:", emailResponse);
+
+        return new Response(
+          JSON.stringify({ 
+            message: "Test email sent successfully",
+            emailResponse: emailResponse
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     if (!skipEmail && (!settings?.email_reports_enabled || !settings?.email_report_address)) {
       console.log("Email reports are disabled or no email address configured");
       return new Response(
         JSON.stringify({ message: "Email reports are disabled or not configured" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Handle test run
-    if (isTestRun) {
-      const emailResponse = await emailService.sendTestEmail(settings.email_report_address, settings);
-      console.log("Test email sent successfully:", emailResponse);
-
-      return new Response(
-        JSON.stringify({ 
-          message: "Test email sent successfully",
-          emailResponse: emailResponse
-        }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -157,6 +215,32 @@ serve(async (req: Request) => {
       console.log("Skipping email notification");
     }
 
+    // Send SMS notification ONLY if new records are found
+    if (filterResult.newRecords.length > 0 && settings?.sms_reports_enabled && settings?.sms_report_phone && smsService) {
+      console.log("Sending SMS alert for new violations...");
+      try {
+        const smsResponse = await smsService.sendNewViolationsAlert(
+          settings.sms_report_phone,
+          filterResult.newRecords.length,
+          filterResult.newCasefiles.length,
+          filterResult.newRecordsForExistingCases.length
+        );
+
+        if (smsResponse.error) {
+          console.error("SMS alert failed:", smsResponse.error);
+        } else {
+          console.log("SMS alert sent successfully:", smsResponse);
+        }
+      } catch (smsError) {
+        console.error("Failed to send SMS alert:", smsError);
+        // Don't fail the whole process for SMS errors
+      }
+    } else if (settings?.sms_reports_enabled && filterResult.newRecords.length === 0) {
+      console.log("Skipping SMS notification - no new records found");
+    } else if (settings?.sms_reports_enabled && !smsService) {
+      console.log("Skipping SMS notification - SMS service not configured");
+    }
+
     // Update the last API check timestamp with the new records count
     try {
       await dbService.updateLastApiCheckTime(filterResult.newRecords.length);
@@ -173,6 +257,7 @@ serve(async (req: Request) => {
         newCasefilesCount: filterResult.newCasefiles.length,
         newRecordsForExistingCasesCount: filterResult.newRecordsForExistingCases.length,
         emailSent: !skipEmail && !!settings?.email_reports_enabled,
+        smsSent: filterResult.newRecords.length > 0 && !!settings?.sms_reports_enabled && !!smsService,
         savedSuccessfully: filterResult.newRecords.length > 0
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
