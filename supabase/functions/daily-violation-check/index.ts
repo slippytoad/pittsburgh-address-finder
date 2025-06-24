@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { PropertyApiClient } from "./api-client.ts";
@@ -17,6 +16,7 @@ const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const resendApiKey = Deno.env.get("RESEND_API_KEY")!;
 const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
 const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+const twilioFromNumber = Deno.env.get("TWILIO_FROM_NUMBER");
 
 serve(async (req: Request) => {
   // Handle CORS preflight requests
@@ -38,7 +38,8 @@ serve(async (req: Request) => {
     // Initialize SMS service if credentials are available
     let smsService: SmsService | null = null;
     if (twilioAccountSid && twilioAuthToken) {
-      smsService = new SmsService(twilioAccountSid, twilioAuthToken);
+      smsService = new SmsService(twilioAccountSid, twilioAuthToken, twilioFromNumber);
+      console.log("SMS service initialized with from number:", twilioFromNumber || "default");
     }
 
     // Check if this is a test run, full sync, or skip email

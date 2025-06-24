@@ -2,10 +2,13 @@
 export class SmsService {
   private accountSid: string;
   private authToken: string;
+  private fromNumber: string;
 
-  constructor(accountSid: string, authToken: string) {
+  constructor(accountSid: string, authToken: string, fromNumber?: string) {
     this.accountSid = accountSid;
     this.authToken = authToken;
+    // Use provided from number or fall back to a default
+    this.fromNumber = fromNumber || '+18447418618';
   }
 
   async sendNewViolationsAlert(
@@ -60,13 +63,15 @@ export class SmsService {
     
     const body = new URLSearchParams({
       To: phoneNumber,
-      From: '+18447418618', // Default Twilio number - user should replace with their own
+      From: this.fromNumber,
       Body: message
     });
 
     const auth = btoa(`${this.accountSid}:${this.authToken}`);
 
     try {
+      console.log(`Sending SMS from ${this.fromNumber} to ${phoneNumber}`);
+      
       const response = await fetch(url, {
         method: 'POST',
         headers: {
