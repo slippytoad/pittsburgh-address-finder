@@ -21,12 +21,12 @@ export const getStatusColor = (status?: string) => {
   if (statusUpper === 'IN COURT') return 'destructive'; // Red
   if (statusUpper === 'READY TO CLOSE') return 'success'; // Green
   if (statusUpper === 'IN VIOLATION') return 'outline'; // Gray
-  if (statusUpper === 'CLOSED') return 'secondary'; // Gray
+  if (statusUpper === 'CLOSED') return 'closed'; // Black
   
   // Fallback logic for other statuses
   const statusLower = status.toLowerCase();
   if (statusLower.includes('open') || statusLower.includes('pending')) return 'destructive';
-  if (statusLower.includes('closed') || statusLower.includes('resolved')) return 'secondary';
+  if (statusLower.includes('closed') || statusLower.includes('resolved')) return 'closed';
   return 'secondary';
 };
 
