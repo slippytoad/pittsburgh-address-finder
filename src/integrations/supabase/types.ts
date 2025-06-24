@@ -39,6 +39,8 @@ export type Database = {
           last_api_check_time: string | null
           last_api_new_records_count: number | null
           next_violation_check_time: string | null
+          sms_report_phone: string | null
+          sms_reports_enabled: boolean | null
           updated_at: string | null
           violation_checks_enabled: boolean | null
         }
@@ -50,6 +52,8 @@ export type Database = {
           last_api_check_time?: string | null
           last_api_new_records_count?: number | null
           next_violation_check_time?: string | null
+          sms_report_phone?: string | null
+          sms_reports_enabled?: boolean | null
           updated_at?: string | null
           violation_checks_enabled?: boolean | null
         }
@@ -61,6 +65,8 @@ export type Database = {
           last_api_check_time?: string | null
           last_api_new_records_count?: number | null
           next_violation_check_time?: string | null
+          sms_report_phone?: string | null
+          sms_reports_enabled?: boolean | null
           updated_at?: string | null
           violation_checks_enabled?: boolean | null
         }
