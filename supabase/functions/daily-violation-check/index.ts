@@ -127,8 +127,8 @@ serve(async (req: Request) => {
       console.log("No new violations to save");
     }
 
-    // Send daily email notification with detailed breakdown (only if not skipping email)
-    if (!skipEmail && settings?.email_reports_enabled && settings?.email_report_address) {
+    // Send daily email notification with detailed breakdown (only if not skipping email and there are new violations)
+    if (!skipEmail && settings?.email_reports_enabled && settings?.email_report_address && filterResult.newRecords.length > 0) {
       console.log("Sending daily email report...");
       const emailResponse = await emailService.sendDailyReport(
         settings.email_report_address, 
