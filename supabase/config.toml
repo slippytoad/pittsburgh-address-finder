@@ -1,1 +1,4 @@
 project_id = "qdjfzjqhnhrlkpqdtssp"
+
+[functions.check-property-updates]
+verify_jwt = false
