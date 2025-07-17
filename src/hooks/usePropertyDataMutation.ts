@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchPropertyData } from '@/services/propertyApi';
-import { updateLastApiCheckTime } from '@/services/appSettingsService';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface FetchDataResult {
   newRecordsCount?: number;
@@ -13,15 +12,25 @@ export const usePropertyDataMutation = () => {
 
   return useMutation({
     mutationFn: async (): Promise<FetchDataResult> => {
-      const apiData = await fetchPropertyData();
+      console.log('Calling check-property-updates Edge function...');
       
-      // Update the last API check time in the database
-      await updateLastApiCheckTime(apiData?.newRecordsCount);
+      const { data, error } = await supabase.functions.invoke('check-property-updates');
+      
+      if (error) {
+        console.error('Edge function error:', error);
+        throw new Error(`Failed to check for updates: ${error.message}`);
+      }
+      
+      if (!data?.success) {
+        throw new Error(data?.error || 'Update check failed');
+      }
+      
+      console.log('Edge function response:', data);
       
       return {
-        newRecordsCount: apiData?.newRecordsCount,
-        newCasefilesCount: apiData?.newCasefilesCount,
-        newRecordsForExistingCasesCount: apiData?.newRecordsForExistingCasesCount,
+        newRecordsCount: data.newRecordsCount,
+        newCasefilesCount: data.newCasefilesCount,
+        newRecordsForExistingCasesCount: data.newRecordsForExistingCasesCount,
       };
     },
     onSuccess: () => {
