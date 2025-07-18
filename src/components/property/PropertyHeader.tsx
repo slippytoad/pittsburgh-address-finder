@@ -76,7 +76,7 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm">
+    <div className="bg-white border border-gray-200 rounded-2xl">
       <div className="p-8">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
           <div className="space-y-3">

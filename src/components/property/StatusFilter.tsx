@@ -80,7 +80,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
           className={`
             px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 border
             ${isShowingAll 
-              ? 'bg-gray-900 text-white border-gray-900 shadow-sm' 
+              ? 'bg-gray-900 text-white border-gray-900'
               : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400 hover:bg-gray-50'
             }
           `}
@@ -100,7 +100,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
               className={`
                 px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-200 border
                 ${isSelected 
-                  ? 'bg-gray-900 text-white border-gray-900 shadow-sm' 
+                  ? 'bg-gray-900 text-white border-gray-900' 
                   : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400 hover:bg-gray-50'
                 }
               `}
