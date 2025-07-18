@@ -50,7 +50,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   }, '');
 
   return (
-    <Card className={`border-2 hover:border-primary transition-all duration-300 ${
+    <Card className={`hover:bg-muted/50 transition-all duration-300 ${
       isHighlighted ? 'ring-2 ring-blue-500 bg-blue-50 border-blue-200' : 'border-gray-200 hover:border-gray-300'
     }`}>
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>

@@ -20,7 +20,7 @@ export const PropertyList: React.FC<PropertyListProps> = ({
   const groupedCases = groupRecordsByCase(records);
 
   return (
-    <Card className="border-2 border-gray-200">
+    <Card className="">
       <CardContent className="pt-6 p-6">
         {groupedCases.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
