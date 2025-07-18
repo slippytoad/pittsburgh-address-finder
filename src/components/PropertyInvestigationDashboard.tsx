@@ -39,7 +39,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-6xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="pl-4 sm:pl-6 lg:pl-8 py-8 space-y-8">
         <PropertyHeader 
           onFetchData={handleFetchData}
           isLoading={isLoading}
