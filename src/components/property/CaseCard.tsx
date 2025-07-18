@@ -55,8 +55,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
     }`}>
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
-          <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors p-6">
-            <div className="flex flex-col gap-4">
+          <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors p-0">
+            <div className="flex flex-col gap-4 p-6">
               {/* Desktop Layout - side by side */}
               <div className="hidden sm:flex sm:items-start sm:justify-between gap-6">
                 <div className="flex flex-col gap-3 min-w-0 flex-1">
@@ -170,8 +170,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
         </CollapsibleTrigger>
         
         <CollapsibleContent>
-          <CardContent className="pt-0 p-6">
-            <div className="space-y-4">
+          <CardContent className="pt-0 p-0">
+            <div className="space-y-4 px-6 pb-6">
               {groupedCase.records.map((record, index) => (
                 <CaseCardRecord key={record._id || index} record={record} index={index} />
               ))}

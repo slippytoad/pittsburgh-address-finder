@@ -21,7 +21,7 @@ export const PropertyList: React.FC<PropertyListProps> = ({
 
   return (
     <Card className="">
-      <CardContent className="pt-6 p-6">
+      <CardContent className="p-0">
         {groupedCases.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />

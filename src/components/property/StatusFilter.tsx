@@ -71,7 +71,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
   };
 
   return (
-    <div className="space-y-6 pl-6">{/* Match card padding */}
+    <div className="space-y-6">
       {/* Status Filters */}
       <div className="flex flex-wrap gap-3">
         {/* All option */}
