@@ -16,7 +16,7 @@ export const CaseCardCourtLink: React.FC<CaseCardCourtLinkProps> = ({
   };
 
   return (
-    <div className={`${hasInstructions ? 'pt-2' : 'pt-3 border-t border-gray-200'}`}>
+    <div className={`${hasInstructions ? 'pt-2' : 'pt-3'}`}>
       <div className="text-sm">
         <a 
           href={getCourtFilingUrl(parcelId)}
