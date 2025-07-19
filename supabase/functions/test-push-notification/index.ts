@@ -42,43 +42,62 @@ class PushService {
       iat: Math.floor(Date.now() / 1000)
     };
 
-    const headerB64 = btoa(JSON.stringify(header)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-    const payloadB64 = btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    const headerB64 = btoa(JSON.stringify(header)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    const payloadB64 = btoa(JSON.stringify(payload)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
     
     const signingInput = `${headerB64}.${payloadB64}`;
     
-    // Import the private key
-    const keyData = this.privateKey.replace(/-----BEGIN PRIVATE KEY-----/g, '')
-      .replace(/-----END PRIVATE KEY-----/g, '')
-      .replace(/\s/g, '');
-    
-    const binaryKey = Uint8Array.from(atob(keyData), c => c.charCodeAt(0));
-    
-    const cryptoKey = await crypto.subtle.importKey(
-      'pkcs8',
-      binaryKey,
-      {
-        name: 'ECDSA',
-        namedCurve: 'P-256'
-      },
-      false,
-      ['sign']
-    );
+    try {
+      // Clean and format the private key
+      let cleanKey = this.privateKey.trim();
+      
+      // If the key doesn't have headers, add them
+      if (!cleanKey.includes('-----BEGIN')) {
+        cleanKey = `-----BEGIN PRIVATE KEY-----\n${cleanKey}\n-----END PRIVATE KEY-----`;
+      }
+      
+      // Extract just the key content
+      const keyContent = cleanKey
+        .replace(/-----BEGIN PRIVATE KEY-----/g, '')
+        .replace(/-----END PRIVATE KEY-----/g, '')
+        .replace(/\s/g, '');
+      
+      // Convert to binary
+      const keyBuffer = Uint8Array.from(atob(keyContent), c => c.charCodeAt(0));
+      
+      const cryptoKey = await crypto.subtle.importKey(
+        'pkcs8',
+        keyBuffer.buffer,
+        {
+          name: 'ECDSA',
+          namedCurve: 'P-256'
+        },
+        false,
+        ['sign']
+      );
 
-    // Sign the data
-    const signature = await crypto.subtle.sign(
-      {
-        name: 'ECDSA',
-        hash: 'SHA-256'
-      },
-      cryptoKey,
-      new TextEncoder().encode(signingInput)
-    );
+      // Sign the JWT
+      const signature = await crypto.subtle.sign(
+        {
+          name: 'ECDSA',
+          hash: 'SHA-256'
+        },
+        cryptoKey,
+        new TextEncoder().encode(signingInput)
+      );
 
-    const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
-      .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+      // Convert signature to base64url
+      const signatureArray = new Uint8Array(signature);
+      const signatureB64 = btoa(String.fromCharCode(...signatureArray))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=/g, '');
 
-    return `${headerB64}.${payloadB64}.${signatureB64}`;
+      return `${headerB64}.${payloadB64}.${signatureB64}`;
+    } catch (error) {
+      console.error('JWT generation error:', error);
+      throw new Error(`Failed to generate JWT: ${error.message}`);
+    }
   }
 
   async sendPushNotifications(
