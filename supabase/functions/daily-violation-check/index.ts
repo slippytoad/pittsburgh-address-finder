@@ -4,6 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { PropertyApiClient } from "./api-client.ts";
 import { DatabaseService } from "./database-service.ts";
 import { EmailService } from "./email-service.ts";
+import { PushService } from "./push-service.ts";
 import { ViolationProcessor } from "./violation-processor.ts";
 
 const corsHeaders = {
@@ -14,6 +15,12 @@ const corsHeaders = {
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const resendApiKey = Deno.env.get("RESEND_API_KEY")!;
+
+// APNs configuration (optional)
+const apnsTeamId = Deno.env.get("APNS_TEAM_ID");
+const apnsKeyId = Deno.env.get("APNS_KEY_ID");
+const apnsPrivateKey = Deno.env.get("APNS_PRIVATE_KEY");
+const apnsBundleId = Deno.env.get("APNS_BUNDLE_ID");
 
 serve(async (req: Request) => {
   // Handle CORS preflight requests
@@ -155,6 +162,36 @@ serve(async (req: Request) => {
       }
     } else {
       console.log("Skipping email notification");
+    }
+
+    // Send push notifications (only if there are new violations and APNs is configured)
+    if (filterResult.newRecords.length > 0 && apnsTeamId && apnsKeyId && apnsPrivateKey && apnsBundleId) {
+      try {
+        console.log("Sending push notifications...");
+        const pushService = new PushService(apnsTeamId, apnsKeyId, apnsPrivateKey, apnsBundleId);
+        const deviceTokens = await dbService.getDeviceTokens();
+        
+        if (deviceTokens.length > 0) {
+          const pushPayload = PushService.createPushPayload(
+            filterResult.newRecords.length,
+            filterResult.newCasefiles.length
+          );
+          
+          await pushService.sendPushNotifications(deviceTokens, pushPayload);
+          console.log("Push notifications sent successfully");
+        } else {
+          console.log("No device tokens found for push notifications");
+        }
+      } catch (pushError) {
+        console.error("Failed to send push notifications:", pushError);
+        // Don't fail the whole process for push notification errors
+      }
+    } else {
+      if (filterResult.newRecords.length === 0) {
+        console.log("Skipping push notifications - no new violations");
+      } else {
+        console.log("Skipping push notifications - APNs not configured");
+      }
     }
 
     // Update the last API check timestamp with the new records count

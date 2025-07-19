@@ -231,6 +231,25 @@ export class DatabaseService {
     }
   }
 
+  async getDeviceTokens(): Promise<Array<{device_token: string, platform: string, permission_granted: boolean}>> {
+    try {
+      const { data, error } = await this.supabase
+        .from('push_settings')
+        .select('device_token, platform, permission_granted')
+        .eq('permission_granted', true);
+
+      if (error) {
+        console.error('Error fetching device tokens:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getDeviceTokens:', error);
+      return [];
+    }
+  }
+
   async logEmailNotification(newRecordsCount: number, newCasefilesCount: number, emailAddress: string): Promise<void> {
     const { error } = await this.supabase
       .from('email_notifications')
