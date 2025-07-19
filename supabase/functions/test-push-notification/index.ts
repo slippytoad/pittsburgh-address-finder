@@ -42,13 +42,43 @@ class PushService {
       iat: Math.floor(Date.now() / 1000)
     };
 
-    // For now, we'll create a basic JWT
-    // In production, you'd want to use a proper JWT library
-    const headerB64 = btoa(JSON.stringify(header));
-    const payloadB64 = btoa(JSON.stringify(payload));
+    const headerB64 = btoa(JSON.stringify(header)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    const payloadB64 = btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
     
-    // This is a simplified version - in production you'd need proper ES256 signing
-    return `${headerB64}.${payloadB64}.signature`;
+    const signingInput = `${headerB64}.${payloadB64}`;
+    
+    // Import the private key
+    const keyData = this.privateKey.replace(/-----BEGIN PRIVATE KEY-----/g, '')
+      .replace(/-----END PRIVATE KEY-----/g, '')
+      .replace(/\s/g, '');
+    
+    const binaryKey = Uint8Array.from(atob(keyData), c => c.charCodeAt(0));
+    
+    const cryptoKey = await crypto.subtle.importKey(
+      'pkcs8',
+      binaryKey,
+      {
+        name: 'ECDSA',
+        namedCurve: 'P-256'
+      },
+      false,
+      ['sign']
+    );
+
+    // Sign the data
+    const signature = await crypto.subtle.sign(
+      {
+        name: 'ECDSA',
+        hash: 'SHA-256'
+      },
+      cryptoKey,
+      new TextEncoder().encode(signingInput)
+    );
+
+    const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
+      .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+
+    return `${headerB64}.${payloadB64}.${signatureB64}`;
   }
 
   async sendPushNotifications(
