@@ -4,7 +4,7 @@ import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PropertyHeader from '@/components/property/PropertyHeader';
 import PropertyList from '@/components/property/PropertyList';
-import StatusFilter from '@/components/property/StatusFilter';
+import StatusTabs from '@/components/property/StatusTabs';
 import ErrorDisplay from '@/components/property/ErrorDisplay';
 import { useUrlParameters } from '@/hooks/useUrlParameters';
 import { usePropertyData } from '@/hooks/usePropertyData';
@@ -55,7 +55,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
 
         {data && (
           <div className="space-y-8">
-            <StatusFilter
+            <StatusTabs
               availableStatuses={availableStatuses}
               selectedStatuses={selectedStatuses}
               onStatusChange={setSelectedStatuses}
