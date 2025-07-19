@@ -1,12 +1,116 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { PushService } from "../daily-violation-check/push-service.ts";
-import { DatabaseService } from "../daily-violation-check/database-service.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+interface PushNotificationPayload {
+  title: string;
+  body: string;
+  data?: Record<string, any>;
+}
+
+interface DeviceToken {
+  device_token: string;
+  platform: string;
+  permission_granted: boolean;
+}
+
+class PushService {
+  private teamId: string;
+  private keyId: string;
+  private privateKey: string;
+  private bundleId: string;
+
+  constructor(teamId: string, keyId: string, privateKey: string, bundleId: string) {
+    this.teamId = teamId;
+    this.keyId = keyId;
+    this.privateKey = privateKey;
+    this.bundleId = bundleId;
+  }
+
+  private async generateJWT(): Promise<string> {
+    const header = {
+      alg: 'ES256',
+      kid: this.keyId
+    };
+
+    const payload = {
+      iss: this.teamId,
+      iat: Math.floor(Date.now() / 1000)
+    };
+
+    // For now, we'll create a basic JWT
+    // In production, you'd want to use a proper JWT library
+    const headerB64 = btoa(JSON.stringify(header));
+    const payloadB64 = btoa(JSON.stringify(payload));
+    
+    // This is a simplified version - in production you'd need proper ES256 signing
+    return `${headerB64}.${payloadB64}.signature`;
+  }
+
+  async sendPushNotifications(
+    deviceTokens: DeviceToken[],
+    payload: PushNotificationPayload
+  ): Promise<void> {
+    console.log(`Sending push notifications to ${deviceTokens.length} devices`);
+
+    // Filter for iOS devices with permission granted
+    const iosDevices = deviceTokens.filter(
+      device => device.platform === 'ios' && device.permission_granted
+    );
+
+    if (iosDevices.length === 0) {
+      console.log('No iOS devices with granted permissions found');
+      return;
+    }
+
+    const jwt = await this.generateJWT();
+    const apnsPayload = {
+      aps: {
+        alert: {
+          title: payload.title,
+          body: payload.body
+        },
+        badge: 1,
+        sound: 'default'
+      },
+      ...payload.data
+    };
+
+    const promises = iosDevices.map(async (device) => {
+      try {
+        const response = await fetch(
+          `https://api.push.apple.com/3/device/${device.device_token}`,
+          {
+            method: 'POST',
+            headers: {
+              'authorization': `bearer ${jwt}`,
+              'apns-topic': this.bundleId,
+              'apns-push-type': 'alert',
+              'apns-priority': '10',
+              'content-type': 'application/json'
+            },
+            body: JSON.stringify(apnsPayload)
+          }
+        );
+
+        if (response.ok) {
+          console.log(`Push notification sent successfully to device: ${device.device_token.substring(0, 10)}...`);
+        } else {
+          console.error(`Failed to send push notification to device: ${device.device_token.substring(0, 10)}...`, await response.text());
+        }
+      } catch (error) {
+        console.error(`Error sending push notification to device: ${device.device_token.substring(0, 10)}...`, error);
+      }
+    });
+
+    await Promise.all(promises);
+    console.log('Push notification sending completed');
+  }
+}
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -48,14 +152,21 @@ serve(async (req: Request) => {
 
     // Initialize services
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const dbService = new DatabaseService(supabase);
     const pushService = new PushService(apnsTeamId, apnsKeyId, apnsPrivateKey, apnsBundleId);
 
-    // Get device tokens
+    // Get device tokens from push_settings table
     console.log("Fetching device tokens...");
-    const deviceTokens = await dbService.getDeviceTokens();
+    const { data: deviceTokens, error } = await supabase
+      .from('push_settings')
+      .select('device_token, platform, permission_granted')
+      .eq('permission_granted', true);
+
+    if (error) {
+      console.error("Error fetching device tokens:", error);
+      throw error;
+    }
     
-    if (deviceTokens.length === 0) {
+    if (!deviceTokens || deviceTokens.length === 0) {
       console.log("No device tokens found");
       return new Response(
         JSON.stringify({ 
@@ -72,14 +183,12 @@ serve(async (req: Request) => {
     let customTitle = "Test Notification";
     let customBody = "This is a test push notification from your app";
     
-    if (req.body) {
-      try {
-        const body = await req.json();
-        if (body.title) customTitle = body.title;
-        if (body.body) customBody = body.body;
-      } catch (e) {
-        console.log("No custom message provided, using defaults");
-      }
+    try {
+      const body = await req.json();
+      if (body.title) customTitle = body.title;
+      if (body.body) customBody = body.body;
+    } catch (e) {
+      console.log("No custom message provided, using defaults");
     }
 
     // Create test payload
