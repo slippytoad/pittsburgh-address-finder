@@ -34,7 +34,7 @@ class PushService {
     this.isProduction = isProduction;
   }
 
-  private getApnsUrl(): string {
+  getApnsUrl(): string {
     return this.isProduction 
       ? 'https://api.push.apple.com/3/device/'
       : 'https://api.sandbox.push.apple.com/3/device/';
@@ -265,7 +265,11 @@ serve(async (req: Request) => {
       token.apns_environment === 'production' || !token.apns_environment
     );
     
+    console.log(`Using APNs environment: ${isProduction ? 'production' : 'sandbox'}`);
+    
     const pushService = new PushService(apnsTeamId, apnsKeyId, apnsPrivateKey, apnsBundleId, isProduction);
+    
+    console.log(`APNs endpoint: ${pushService.getApnsUrl ? pushService.getApnsUrl() : (isProduction ? 'https://api.push.apple.com/3/device/' : 'https://api.sandbox.push.apple.com/3/device/')}`);
     let customTitle = "Test Notification";
     let customBody = "This is a test push notification from your app";
     
