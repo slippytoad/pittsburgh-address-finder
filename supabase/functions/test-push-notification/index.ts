@@ -143,8 +143,10 @@ class PushService {
           body: payload.body
         },
         badge: 1,
-        sound: 'default'
+        sound: 'default',
+        'mutable-content': 1
       },
+      'attachment-url': 'https://72f422ba-d056-495b-be0e-dffed3e7e0a4.lovableproject.com/src/assets/logo.png',
       ...payload.data
     };
 
