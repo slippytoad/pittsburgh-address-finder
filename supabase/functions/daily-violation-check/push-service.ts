@@ -15,12 +15,20 @@ export class PushService {
   private keyId: string;
   private privateKey: string;
   private bundleId: string;
+  private isProduction: boolean;
 
-  constructor(teamId: string, keyId: string, privateKey: string, bundleId: string) {
+  constructor(teamId: string, keyId: string, privateKey: string, bundleId: string, isProduction: boolean = true) {
     this.teamId = teamId;
     this.keyId = keyId;
     this.privateKey = privateKey;
     this.bundleId = bundleId;
+    this.isProduction = isProduction;
+  }
+
+  private getApnsUrl(): string {
+    return this.isProduction 
+      ? 'https://api.push.apple.com/3/device/'
+      : 'https://api.sandbox.push.apple.com/3/device/';
   }
 
   private async generateJWT(): Promise<string> {
@@ -126,7 +134,7 @@ export class PushService {
     const promises = iosDevices.map(async (device) => {
       try {
         const response = await fetch(
-          `https://api.push.apple.com/3/device/${device.device_token}`,
+          `${this.getApnsUrl()}${device.device_token}`,
           {
             method: 'POST',
             headers: {
