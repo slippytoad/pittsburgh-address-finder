@@ -41,7 +41,8 @@ class PushService {
 
     const payload = {
       iss: this.teamId,
-      iat: Math.floor(Date.now() / 1000)
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 3600 // 1 hour expiration
     };
 
     console.log('JWT payload:', payload);
@@ -150,7 +151,7 @@ class PushService {
     const promises = iosDevices.map(async (device) => {
       try {
         const response = await fetch(
-          `https://api.push.apple.com/3/device/${device.device_token}`,
+          `https://api.sandbox.push.apple.com/3/device/${device.device_token}`,
           {
             method: 'POST',
             headers: {
