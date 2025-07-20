@@ -16,6 +16,7 @@ interface DeviceToken {
   device_token: string;
   platform: string;
   permission_granted: boolean;
+  apns_environment?: string;
 }
 
 class PushService {
@@ -23,12 +24,20 @@ class PushService {
   private keyId: string;
   private privateKey: string;
   private bundleId: string;
+  private isProduction: boolean;
 
-  constructor(teamId: string, keyId: string, privateKey: string, bundleId: string) {
+  constructor(teamId: string, keyId: string, privateKey: string, bundleId: string, isProduction: boolean = true) {
     this.teamId = teamId;
     this.keyId = keyId;
     this.privateKey = privateKey;
     this.bundleId = bundleId;
+    this.isProduction = isProduction;
+  }
+
+  private getApnsUrl(): string {
+    return this.isProduction 
+      ? 'https://api.push.apple.com/3/device/'
+      : 'https://api.sandbox.push.apple.com/3/device/';
   }
 
   private async generateJWT(): Promise<string> {
@@ -153,7 +162,7 @@ class PushService {
     const promises = iosDevices.map(async (device) => {
       try {
         const response = await fetch(
-          `https://api.sandbox.push.apple.com/3/device/${device.device_token}`,
+          `${this.getApnsUrl()}${device.device_token}`,
           {
             method: 'POST',
             headers: {
@@ -222,13 +231,14 @@ serve(async (req: Request) => {
 
     // Initialize services
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const pushService = new PushService(apnsTeamId, apnsKeyId, apnsPrivateKey, apnsBundleId);
+    
+    // Parse request body for custom message
 
     // Get device tokens from push_settings table
     console.log("Fetching device tokens...");
     const { data: deviceTokens, error } = await supabase
       .from('push_settings')
-      .select('device_token, platform, permission_granted')
+      .select('device_token, platform, permission_granted, apns_environment')
       .eq('permission_granted', true);
 
     if (error) {
@@ -249,7 +259,13 @@ serve(async (req: Request) => {
 
     console.log(`Found ${deviceTokens.length} device tokens`);
 
-    // Parse request body for custom message
+    // Determine if we should use production environment
+    // Use production if any device has 'production' environment or if not specified
+    const isProduction = deviceTokens.some(token => 
+      token.apns_environment === 'production' || !token.apns_environment
+    );
+    
+    const pushService = new PushService(apnsTeamId, apnsKeyId, apnsPrivateKey, apnsBundleId, isProduction);
     let customTitle = "Test Notification";
     let customBody = "This is a test push notification from your app";
     

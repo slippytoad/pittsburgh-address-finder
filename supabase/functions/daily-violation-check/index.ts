@@ -168,10 +168,30 @@ serve(async (req: Request) => {
     if (filterResult.newRecords.length > 0 && apnsTeamId && apnsKeyId && apnsPrivateKey && apnsBundleId) {
       try {
         console.log("Sending push notifications...");
-        const pushService = new PushService(apnsTeamId, apnsKeyId, apnsPrivateKey, apnsBundleId);
-        const deviceTokens = await dbService.getDeviceTokens();
         
-        if (deviceTokens.length > 0) {
+        // Fetch device tokens with environment info
+        const { data: deviceTokens, error: deviceError } = await supabase
+          .from('push_settings')
+          .select('device_token, platform, permission_granted, apns_environment')
+          .eq('permission_granted', true);
+
+        if (deviceError) {
+          console.error('Error fetching device tokens:', deviceError);
+        } else if (deviceTokens && deviceTokens.length > 0) {
+          // Determine if we should use production environment
+          // Use production if any device has 'production' environment or if not specified
+          const isProduction = deviceTokens.some(token => 
+            token.apns_environment === 'production' || !token.apns_environment
+          );
+          
+          const pushService = new PushService(
+            apnsTeamId, 
+            apnsKeyId, 
+            apnsPrivateKey, 
+            apnsBundleId, 
+            isProduction
+          );
+          
           const pushPayload = PushService.createPushPayload(
             filterResult.newRecords.length,
             filterResult.newCasefiles.length
