@@ -19,6 +19,20 @@ interface DeviceToken {
   apns_environment?: string;
 }
 
+interface ViolationRecord {
+  _id: number;
+  casefile_number?: string;
+  address?: string;
+  parcel_id?: string;
+  status?: string;
+  investigation_date?: string;
+  violation_description?: string;
+  violation_code_section?: string;
+  violation_spec_instructions?: string;
+  investigation_outcome?: string;
+  investigation_findings?: string;
+}
+
 class PushService {
   private teamId: string;
   private keyId: string;
@@ -183,6 +197,68 @@ class PushService {
     await Promise.all(promises);
     console.log('Push notification sending completed');
   }
+
+  static createPushPayload(
+    newCasefiles: ViolationRecord[], 
+    newRecordsForExistingCases: ViolationRecord[]
+  ): PushNotificationPayload {
+    const totalNewRecords = newCasefiles.length + newRecordsForExistingCases.length;
+    let title = 'New Violations Found';
+    let body = '';
+    
+    // Handle new casefiles (completely new violations)
+    if (newCasefiles.length > 0 && newRecordsForExistingCases.length === 0) {
+      // Only new violations
+      if (newCasefiles.length === 1) {
+        const address = newCasefiles[0].address || 'Unknown Address';
+        title = 'New Violation Found';
+        body = `New violation found at ${address}`;
+      } else {
+        const firstAddress = newCasefiles[0].address || 'Unknown Address';
+        body = `${newCasefiles.length} new violations found including ${firstAddress}`;
+      }
+    }
+    // Handle updates to existing cases
+    else if (newRecordsForExistingCases.length > 0 && newCasefiles.length === 0) {
+      // Only updates to existing cases
+      if (newRecordsForExistingCases.length === 1) {
+        const address = newRecordsForExistingCases[0].address || 'Unknown Address';
+        title = 'Violation Update';
+        body = `Update to violation at ${address}`;
+      } else {
+        const firstAddress = newRecordsForExistingCases[0].address || 'Unknown Address';
+        title = 'Violation Updates';
+        body = `Updates to violations including ${firstAddress}`;
+      }
+    }
+    // Handle mixed scenario (both new and updates)
+    else if (newCasefiles.length > 0 && newRecordsForExistingCases.length > 0) {
+      const firstAddress = newCasefiles[0].address || newRecordsForExistingCases[0].address || 'Unknown Address';
+      body = `${totalNewRecords} violation updates including ${firstAddress}`;
+    }
+    // Fallback (should not happen, but just in case)
+    else {
+      body = `${totalNewRecords} new violation records found`;
+    }
+
+    // Get all addresses for custom data
+    const allAddresses = [
+      ...newCasefiles.map(r => r.address).filter(Boolean),
+      ...newRecordsForExistingCases.map(r => r.address).filter(Boolean)
+    ];
+
+    return {
+      title,
+      body,
+      data: {
+        newCasefilesCount: newCasefiles.length,
+        newRecordsForExistingCasesCount: newRecordsForExistingCases.length,
+        totalNewRecords,
+        addresses: allAddresses,
+        type: 'violation_update'
+      }
+    };
+  }
 }
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -253,29 +329,47 @@ serve(async (req: Request) => {
 
     console.log(`Found ${deviceTokens.length} device tokens`);
 
-    // Create push service (environment is determined per-device)
-    const pushService = new PushService(apnsTeamId, apnsKeyId, apnsPrivateKey, apnsBundleId, true);
-    let customTitle = "Test Notification";
-    let customBody = "This is a test push notification from your app";
-    
-    try {
-      const body = await req.json();
-      if (body.title) customTitle = body.title;
-      if (body.body) customBody = body.body;
-    } catch (e) {
-      console.log("No custom message provided, using defaults");
+    // Fetch the most recent violation to use as test data
+    console.log("Fetching most recent violation for test...");
+    const { data: recentViolation, error: violationError } = await supabase
+      .from('violations')
+      .select('_id, casefile_number, address, parcel_id, status, investigation_date, violation_description, violation_code_section, violation_spec_instructions, investigation_outcome, investigation_findings')
+      .order('_id', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (violationError) {
+      console.error("Error fetching recent violation:", violationError);
     }
 
-    // Create test payload
-    const testPayload = {
-      title: customTitle,
-      body: customBody,
-      data: {
+    // Create push service (environment is determined per-device)
+    const pushService = new PushService(apnsTeamId, apnsKeyId, apnsPrivateKey, apnsBundleId, true);
+    
+    let testPayload: PushNotificationPayload;
+    
+    // If we have a recent violation, use the new logic
+    if (recentViolation) {
+      console.log(`Using recent violation at: ${recentViolation.address || 'Unknown Address'}`);
+      testPayload = PushService.createPushPayload([recentViolation], []);
+      // Mark it as a test
+      testPayload.data = {
+        ...testPayload.data,
         test: true,
-        timestamp: new Date().toISOString(),
-        type: 'test_notification'
-      }
-    };
+        timestamp: new Date().toISOString()
+      };
+    } else {
+      // Fallback to generic test message if no violations found
+      console.log("No violations found, using generic test message");
+      testPayload = {
+        title: "Test Notification",
+        body: "This is a test push notification from your app",
+        data: {
+          test: true,
+          timestamp: new Date().toISOString(),
+          type: 'test_notification'
+        }
+      };
+    }
 
     // Send push notifications
     console.log("Sending test push notifications...");
