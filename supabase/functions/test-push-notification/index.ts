@@ -144,7 +144,6 @@ class PushService {
       return;
     }
 
-    const jwt = await this.generateJWT();
     const apnsPayload = {
       aps: {
         alert: {
@@ -161,8 +160,19 @@ class PushService {
 
     const promises = iosDevices.map(async (device) => {
       try {
+        // Determine environment for this specific device
+        const deviceIsProduction = device.apns_environment === 'production' || !device.apns_environment;
+        const deviceApnsUrl = deviceIsProduction 
+          ? 'https://api.push.apple.com/3/device/'
+          : 'https://api.sandbox.push.apple.com/3/device/';
+        
+        console.log(`Device ${device.device_token.substring(0, 10)}... - Environment: ${deviceIsProduction ? 'production' : 'sandbox'}, URL: ${deviceApnsUrl}`);
+        
+        // Generate JWT for each device (in case we need different configurations later)
+        const jwt = await this.generateJWT();
+        
         const response = await fetch(
-          `${this.getApnsUrl()}${device.device_token}`,
+          `${deviceApnsUrl}${device.device_token}`,
           {
             method: 'POST',
             headers: {
