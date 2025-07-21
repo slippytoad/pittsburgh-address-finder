@@ -198,6 +198,14 @@ class PushService {
     console.log('Push notification sending completed');
   }
 
+  private static extractStreetAddress(fullAddress?: string): string {
+    if (!fullAddress) return 'Unknown Address';
+    
+    // Split by comma and take the first part (street address)
+    const streetAddress = fullAddress.split(',')[0].trim();
+    return streetAddress || 'Unknown Address';
+  }
+
   static createPushPayload(
     newCasefiles: ViolationRecord[], 
     newRecordsForExistingCases: ViolationRecord[]
@@ -210,11 +218,11 @@ class PushService {
     if (newCasefiles.length > 0 && newRecordsForExistingCases.length === 0) {
       // Only new violations
       if (newCasefiles.length === 1) {
-        const address = newCasefiles[0].address || 'Unknown Address';
+        const address = this.extractStreetAddress(newCasefiles[0].address);
         title = 'New Violation Found';
         body = `New violation found at ${address}`;
       } else {
-        const firstAddress = newCasefiles[0].address || 'Unknown Address';
+        const firstAddress = this.extractStreetAddress(newCasefiles[0].address);
         body = `${newCasefiles.length} new violations found including ${firstAddress}`;
       }
     }
@@ -222,18 +230,18 @@ class PushService {
     else if (newRecordsForExistingCases.length > 0 && newCasefiles.length === 0) {
       // Only updates to existing cases
       if (newRecordsForExistingCases.length === 1) {
-        const address = newRecordsForExistingCases[0].address || 'Unknown Address';
+        const address = this.extractStreetAddress(newRecordsForExistingCases[0].address);
         title = 'Violation Update';
         body = `Update to violation at ${address}`;
       } else {
-        const firstAddress = newRecordsForExistingCases[0].address || 'Unknown Address';
+        const firstAddress = this.extractStreetAddress(newRecordsForExistingCases[0].address);
         title = 'Violation Updates';
         body = `Updates to violations including ${firstAddress}`;
       }
     }
     // Handle mixed scenario (both new and updates)
     else if (newCasefiles.length > 0 && newRecordsForExistingCases.length > 0) {
-      const firstAddress = newCasefiles[0].address || newRecordsForExistingCases[0].address || 'Unknown Address';
+      const firstAddress = this.extractStreetAddress(newCasefiles[0].address) || this.extractStreetAddress(newRecordsForExistingCases[0].address);
       body = `${totalNewRecords} violation updates including ${firstAddress}`;
     }
     // Fallback (should not happen, but just in case)
