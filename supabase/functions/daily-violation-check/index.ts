@@ -134,52 +134,40 @@ serve(async (req: Request) => {
       console.log("No new violations to save");
     }
 
-    // Send daily email notification (only once per day if there are new violations)
+    // Send daily email notification with detailed breakdown (only if not skipping email and there are new violations)
     if (!skipEmail && settings?.email_reports_enabled && settings?.email_report_address && filterResult.newRecords.length > 0) {
-      // Check if email was already sent today
-      const today = new Date().toISOString().split('T')[0];
-      const { data: todayEmails } = await supabase
-        .from('email_notifications')
-        .select('id')
-        .gte('sent_at', today + 'T00:00:00Z')
-        .lt('sent_at', today + 'T23:59:59Z');
+      console.log("Sending daily email report...");
+      const emailResponse = await emailService.sendDailyReport(
+        settings.email_report_address, 
+        filterResult.newRecords, 
+        apiData.result.records,
+        filterResult.newCasefiles.length,
+        filterResult.newRecordsForExistingCases.length,
+        dbService // Pass the database service for querying open cases
+      );
 
-      if (!todayEmails || todayEmails.length === 0) {
-        console.log("Sending daily email report...");
-        const emailResponse = await emailService.sendDailyReport(
-          settings.email_report_address, 
-          filterResult.newRecords, 
-          apiData.result.records,
+      console.log("Email sent successfully:", emailResponse);
+
+      // Log the email notification with case breakdown
+      try {
+        await dbService.logEmailNotification(
+          filterResult.newRecords.length, 
           filterResult.newCasefiles.length,
-          filterResult.newRecordsForExistingCases.length,
-          dbService // Pass the database service for querying open cases
+          settings.email_report_address
         );
-
-        console.log("Email sent successfully:", emailResponse);
-
-        // Log the email notification with case breakdown
-        try {
-          await dbService.logEmailNotification(
-            filterResult.newRecords.length, 
-            filterResult.newCasefiles.length,
-            settings.email_report_address
-          );
-          console.log("Email notification logged successfully");
-        } catch (logError) {
-          console.error("Failed to log email notification:", logError);
-          // Don't fail the whole process for logging errors
-        }
-      } else {
-        console.log("Skipping email notification - already sent today");
+        console.log("Email notification logged successfully");
+      } catch (logError) {
+        console.error("Failed to log email notification:", logError);
+        // Don't fail the whole process for logging errors
       }
     } else {
       console.log("Skipping email notification");
     }
 
-    // Send push notifications every hour regardless of new violations (only if APNs is configured)
-    if (apnsTeamId && apnsKeyId && apnsPrivateKey && apnsBundleId) {
+    // Send push notifications (only if there are new violations and APNs is configured)
+    if (filterResult.newRecords.length > 0 && apnsTeamId && apnsKeyId && apnsPrivateKey && apnsBundleId) {
       try {
-        console.log("Sending hourly push notifications...");
+        console.log("Sending push notifications...");
         
         // Fetch device tokens with environment info
         const { data: deviceTokens, error: deviceError } = await supabase
@@ -204,22 +192,13 @@ serve(async (req: Request) => {
             isProduction
           );
           
-          // Create payload for hourly notification with current status
-          const pushPayload = {
-            title: "Hourly Status Update",
-            body: filterResult.newRecords.length > 0 
-              ? `${filterResult.newRecords.length} new violations found this hour`
-              : "No new violations this hour - system running normally",
-            data: {
-              type: 'hourly_update',
-              newRecordsCount: filterResult.newRecords.length,
-              newCasefilesCount: filterResult.newCasefiles.length,
-              timestamp: new Date().toISOString()
-            }
-          };
+          const pushPayload = PushService.createPushPayload(
+            filterResult.newRecords.length,
+            filterResult.newCasefiles.length
+          );
           
           await pushService.sendPushNotifications(deviceTokens, pushPayload);
-          console.log("Hourly push notifications sent successfully");
+          console.log("Push notifications sent successfully");
         } else {
           console.log("No device tokens found for push notifications");
         }
@@ -228,7 +207,11 @@ serve(async (req: Request) => {
         // Don't fail the whole process for push notification errors
       }
     } else {
-      console.log("Skipping push notifications - APNs not configured");
+      if (filterResult.newRecords.length === 0) {
+        console.log("Skipping push notifications - no new violations");
+      } else {
+        console.log("Skipping push notifications - APNs not configured");
+      }
     }
 
     // Update the last API check timestamp with the new records count
