@@ -1,3 +1,4 @@
+
 interface PushNotificationPayload {
   title: string;
   body: string;
@@ -9,6 +10,20 @@ interface DeviceToken {
   platform: string;
   permission_granted: boolean;
   apns_environment?: string;
+}
+
+interface ViolationRecord {
+  _id: number;
+  casefile_number?: string;
+  address?: string;
+  parcel_id?: string;
+  status?: string;
+  investigation_date?: string;
+  violation_description?: string;
+  violation_code_section?: string;
+  violation_spec_instructions?: string;
+  investigation_outcome?: string;
+  investigation_findings?: string;
 }
 
 export class PushService {
@@ -173,26 +188,63 @@ export class PushService {
     console.log('Push notification sending completed');
   }
 
-  static createPushPayload(newRecordsCount: number, newCasefilesCount: number): PushNotificationPayload {
+  static createPushPayload(
+    newCasefiles: ViolationRecord[], 
+    newRecordsForExistingCases: ViolationRecord[]
+  ): PushNotificationPayload {
+    const totalNewRecords = newCasefiles.length + newRecordsForExistingCases.length;
     let title = 'New Violations Found';
     let body = '';
-
-    if (newRecordsCount === 1) {
-      body = '1 new violation record found';
-    } else {
-      body = `${newRecordsCount} new violation records found`;
+    
+    // Handle new casefiles (completely new violations)
+    if (newCasefiles.length > 0 && newRecordsForExistingCases.length === 0) {
+      // Only new violations
+      if (newCasefiles.length === 1) {
+        const address = newCasefiles[0].address || 'Unknown Address';
+        title = 'New Violation Found';
+        body = `New violation found at ${address}`;
+      } else {
+        const firstAddress = newCasefiles[0].address || 'Unknown Address';
+        body = `${newCasefiles.length} new violations found including ${firstAddress}`;
+      }
+    }
+    // Handle updates to existing cases
+    else if (newRecordsForExistingCases.length > 0 && newCasefiles.length === 0) {
+      // Only updates to existing cases
+      if (newRecordsForExistingCases.length === 1) {
+        const address = newRecordsForExistingCases[0].address || 'Unknown Address';
+        title = 'Violation Update';
+        body = `Update to violation at ${address}`;
+      } else {
+        const firstAddress = newRecordsForExistingCases[0].address || 'Unknown Address';
+        title = 'Violation Updates';
+        body = `Updates to violations including ${firstAddress}`;
+      }
+    }
+    // Handle mixed scenario (both new and updates)
+    else if (newCasefiles.length > 0 && newRecordsForExistingCases.length > 0) {
+      const firstAddress = newCasefiles[0].address || newRecordsForExistingCases[0].address || 'Unknown Address';
+      body = `${totalNewRecords} violation updates including ${firstAddress}`;
+    }
+    // Fallback (should not happen, but just in case)
+    else {
+      body = `${totalNewRecords} new violation records found`;
     }
 
-    if (newCasefilesCount > 0) {
-      body += ` (${newCasefilesCount} new case${newCasefilesCount > 1 ? 's' : ''})`;
-    }
+    // Get all addresses for custom data
+    const allAddresses = [
+      ...newCasefiles.map(r => r.address).filter(Boolean),
+      ...newRecordsForExistingCases.map(r => r.address).filter(Boolean)
+    ];
 
     return {
       title,
       body,
       data: {
-        newRecordsCount,
-        newCasefilesCount,
+        newCasefilesCount: newCasefiles.length,
+        newRecordsForExistingCasesCount: newRecordsForExistingCases.length,
+        totalNewRecords,
+        addresses: allAddresses,
         type: 'violation_update'
       }
     };

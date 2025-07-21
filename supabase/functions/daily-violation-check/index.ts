@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { PropertyApiClient } from "./api-client.ts";
@@ -192,9 +191,10 @@ serve(async (req: Request) => {
             isProduction
           );
           
+          // Create push payload with actual violation records
           const pushPayload = PushService.createPushPayload(
-            filterResult.newRecords.length,
-            filterResult.newCasefiles.length
+            filterResult.newCasefiles,
+            filterResult.newRecordsForExistingCases
           );
           
           await pushService.sendPushNotifications(deviceTokens, pushPayload);
