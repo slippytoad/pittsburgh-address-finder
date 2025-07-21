@@ -187,12 +187,12 @@ class PushService {
         );
 
         if (response.ok) {
-          console.log(`Push notification sent successfully to device: ${device.device_token.substring(0, 10)}...`);
+          console.log(`Push notification sent successfully to device: ${device.device_token.substring(0, 10)}... (${deviceIsProduction ? 'production' : 'sandbox'})`);
         } else {
-          console.error(`Failed to send push notification to device: ${device.device_token.substring(0, 10)}...`, await response.text());
+          console.error(`Failed to send push notification to device: ${device.device_token.substring(0, 10)}... (${deviceIsProduction ? 'production' : 'sandbox'})`, await response.text());
         }
       } catch (error) {
-        console.error(`Error sending push notification to device: ${device.device_token.substring(0, 10)}...`, error);
+        console.error(`Error sending push notification to device: ${device.device_token.substring(0, 10)}... (${deviceIsProduction ? 'production' : 'sandbox'})`, error);
       }
     });
 
