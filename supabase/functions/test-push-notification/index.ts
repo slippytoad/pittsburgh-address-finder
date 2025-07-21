@@ -141,7 +141,8 @@ class PushService {
       ...payload.data
     };
 
-    const promises = iosDevices.map(async (device) => {
+    const promises = iosDevices.map(async (device, index) => {
+      const deviceCount = `${index + 1}/${iosDevices.length}`;
       try {
         // Determine environment for this specific device
         const deviceIsProduction = device.apns_environment === 'production' || !device.apns_environment;
@@ -149,7 +150,7 @@ class PushService {
           ? 'https://api.push.apple.com/3/device/'
           : 'https://api.sandbox.push.apple.com/3/device/';
         
-        console.log(`Device ${device.device_token.substring(0, 10)}... - Environment: ${deviceIsProduction ? 'production' : 'sandbox'}, URL: ${deviceApnsUrl}`);
+        console.log(`${deviceCount} Device ${device.device_token.substring(0, 10)}... - Environment: ${deviceIsProduction ? 'production' : 'sandbox'}, URL: ${deviceApnsUrl}`);
         
         // Generate JWT for each device (in case we need different configurations later)
         const jwt = await this.generateJWT();
@@ -170,12 +171,12 @@ class PushService {
         );
 
         if (response.ok) {
-          console.log(`Push notification sent successfully to device: ${device.device_token.substring(0, 10)}... (${deviceIsProduction ? 'production' : 'sandbox'})`);
+          console.log(`${deviceCount} Push notification sent successfully to device: ${device.device_token.substring(0, 10)}... (${deviceIsProduction ? 'production' : 'sandbox'})`);
         } else {
-          console.error(`Failed to send push notification to device: ${device.device_token.substring(0, 10)}... (${deviceIsProduction ? 'production' : 'sandbox'})`, await response.text());
+          console.error(`${deviceCount} Failed to send push notification to device: ${device.device_token.substring(0, 10)}... (${deviceIsProduction ? 'production' : 'sandbox'})`, await response.text());
         }
       } catch (error) {
-        console.error(`Error sending push notification to device: ${device.device_token.substring(0, 10)}... (${deviceIsProduction ? 'production' : 'sandbox'})`, error);
+        console.error(`${deviceCount} Error sending push notification to device: ${device.device_token.substring(0, 10)}... (${deviceIsProduction ? 'production' : 'sandbox'})`, error);
       }
     });
 
