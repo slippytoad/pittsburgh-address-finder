@@ -164,10 +164,10 @@ serve(async (req: Request) => {
       console.log("Skipping email notification");
     }
 
-    // Send push notifications (only if there are new violations and APNs is configured)
-    if (filterResult.newRecords.length > 0 && apnsTeamId && apnsKeyId && apnsPrivateKey && apnsBundleId) {
+    // Send push notifications every hour regardless of new violations (only if APNs is configured)
+    if (apnsTeamId && apnsKeyId && apnsPrivateKey && apnsBundleId) {
       try {
-        console.log("Sending push notifications...");
+        console.log("Sending hourly push notifications...");
         
         // Fetch device tokens with environment info
         const { data: deviceTokens, error: deviceError } = await supabase
@@ -192,13 +192,22 @@ serve(async (req: Request) => {
             isProduction
           );
           
-          const pushPayload = PushService.createPushPayload(
-            filterResult.newRecords.length,
-            filterResult.newCasefiles.length
-          );
+          // Create payload for hourly notification with current status
+          const pushPayload = {
+            title: "Hourly Status Update",
+            body: filterResult.newRecords.length > 0 
+              ? `${filterResult.newRecords.length} new violations found this hour`
+              : "No new violations this hour - system running normally",
+            data: {
+              type: 'hourly_update',
+              newRecordsCount: filterResult.newRecords.length,
+              newCasefilesCount: filterResult.newCasefiles.length,
+              timestamp: new Date().toISOString()
+            }
+          };
           
           await pushService.sendPushNotifications(deviceTokens, pushPayload);
-          console.log("Push notifications sent successfully");
+          console.log("Hourly push notifications sent successfully");
         } else {
           console.log("No device tokens found for push notifications");
         }
@@ -207,11 +216,7 @@ serve(async (req: Request) => {
         // Don't fail the whole process for push notification errors
       }
     } else {
-      if (filterResult.newRecords.length === 0) {
-        console.log("Skipping push notifications - no new violations");
-      } else {
-        console.log("Skipping push notifications - APNs not configured");
-      }
+      console.log("Skipping push notifications - APNs not configured");
     }
 
     // Update the last API check timestamp with the new records count
