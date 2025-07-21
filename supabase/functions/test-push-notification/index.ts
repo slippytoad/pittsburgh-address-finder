@@ -278,6 +278,9 @@ serve(async (req: Request) => {
 
     // Send push notifications
     console.log("Sending test push notifications...");
+    console.log("APNS Key ID:", apnsKeyId);
+    console.log("APNS Team ID:", apnsTeamId);
+    console.log("APNS Bundle ID:", apnsBundleId);
     await pushService.sendPushNotifications(deviceTokens, testPayload);
 
     return new Response(
