@@ -41,8 +41,6 @@ class PushService {
   }
 
   private async generateJWT(): Promise<string> {
-    console.log('Generating JWT with Team ID:', this.teamId, 'Key ID:', this.keyId);
-    
     const header = {
       alg: 'ES256',
       kid: this.keyId
@@ -54,18 +52,14 @@ class PushService {
       exp: Math.floor(Date.now() / 1000) + 3600 // 1 hour expiration
     };
 
-    console.log('JWT payload:', payload);
-
     const headerB64 = btoa(JSON.stringify(header)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
     const payloadB64 = btoa(JSON.stringify(payload)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
     
     const signingInput = `${headerB64}.${payloadB64}`;
-    console.log('Signing input length:', signingInput.length);
     
     try {
       // Clean the private key - handle both formats
       let cleanKey = this.privateKey.trim();
-      console.log('Private key starts with:', cleanKey.substring(0, 50));
       
       // Remove any existing headers and whitespace
       const keyContent = cleanKey
@@ -76,11 +70,8 @@ class PushService {
         .replace(/\s/g, '')
         .replace(/\n/g, '');
       
-      console.log('Cleaned key content length:', keyContent.length);
-      
       // Convert to binary
       const keyBuffer = Uint8Array.from(atob(keyContent), c => c.charCodeAt(0));
-      console.log('Key buffer length:', keyBuffer.length);
       
       const cryptoKey = await crypto.subtle.importKey(
         'pkcs8',
@@ -93,8 +84,6 @@ class PushService {
         ['sign']
       );
 
-      console.log('Crypto key imported successfully');
-
       // Sign the JWT
       const signature = await crypto.subtle.sign(
         {
@@ -105,8 +94,6 @@ class PushService {
         new TextEncoder().encode(signingInput)
       );
 
-      console.log('Signature generated, length:', signature.byteLength);
-
       // Convert signature to base64url
       const signatureArray = new Uint8Array(signature);
       const signatureB64 = btoa(String.fromCharCode(...signatureArray))
@@ -115,10 +102,6 @@ class PushService {
         .replace(/=/g, '');
 
       const jwt = `${headerB64}.${payloadB64}.${signatureB64}`;
-      console.log('Generated JWT length:', jwt.length);
-      console.log('JWT header:', headerB64);
-      console.log('JWT payload:', payloadB64);
-      console.log('JWT signature length:', signatureB64.length);
       
       return jwt;
     } catch (error) {
