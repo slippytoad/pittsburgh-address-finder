@@ -269,17 +269,10 @@ serve(async (req: Request) => {
 
     console.log(`Found ${deviceTokens.length} device tokens`);
 
-    // Determine if we should use production environment
-    // Use production if any device has 'production' environment or if not specified
-    const isProduction = deviceTokens.some(token => 
-      token.apns_environment === 'production' || !token.apns_environment
-    );
+    // Create push service (environment is determined per-device)
+    const pushService = new PushService(apnsTeamId, apnsKeyId, apnsPrivateKey, apnsBundleId, true);
     
-    console.log(`Using APNs environment: ${isProduction ? 'production' : 'sandbox'}`);
-    
-    const pushService = new PushService(apnsTeamId, apnsKeyId, apnsPrivateKey, apnsBundleId, isProduction);
-    
-    console.log(`APNs endpoint: ${pushService.getApnsUrl ? pushService.getApnsUrl() : (isProduction ? 'https://api.push.apple.com/3/device/' : 'https://api.sandbox.push.apple.com/3/device/')}`);
+    console.log(`APNs endpoint: ${pushService.getApnsUrl()}`);
     let customTitle = "Test Notification";
     let customBody = "This is a test push notification from your app";
     
