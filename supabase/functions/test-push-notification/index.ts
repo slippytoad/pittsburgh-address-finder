@@ -271,8 +271,6 @@ serve(async (req: Request) => {
 
     // Create push service (environment is determined per-device)
     const pushService = new PushService(apnsTeamId, apnsKeyId, apnsPrivateKey, apnsBundleId, true);
-    
-    console.log(`APNs endpoint: ${pushService.getApnsUrl()}`);
     let customTitle = "Test Notification";
     let customBody = "This is a test push notification from your app";
     
