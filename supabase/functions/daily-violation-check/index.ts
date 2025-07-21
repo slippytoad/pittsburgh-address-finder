@@ -134,31 +134,43 @@ serve(async (req: Request) => {
       console.log("No new violations to save");
     }
 
-    // Send daily email notification with detailed breakdown (only if not skipping email and there are new violations)
+    // Send daily email notification (only once per day if there are new violations)
     if (!skipEmail && settings?.email_reports_enabled && settings?.email_report_address && filterResult.newRecords.length > 0) {
-      console.log("Sending daily email report...");
-      const emailResponse = await emailService.sendDailyReport(
-        settings.email_report_address, 
-        filterResult.newRecords, 
-        apiData.result.records,
-        filterResult.newCasefiles.length,
-        filterResult.newRecordsForExistingCases.length,
-        dbService // Pass the database service for querying open cases
-      );
+      // Check if email was already sent today
+      const today = new Date().toISOString().split('T')[0];
+      const { data: todayEmails } = await supabase
+        .from('email_notifications')
+        .select('id')
+        .gte('sent_at', today + 'T00:00:00Z')
+        .lt('sent_at', today + 'T23:59:59Z');
 
-      console.log("Email sent successfully:", emailResponse);
-
-      // Log the email notification with case breakdown
-      try {
-        await dbService.logEmailNotification(
-          filterResult.newRecords.length, 
+      if (!todayEmails || todayEmails.length === 0) {
+        console.log("Sending daily email report...");
+        const emailResponse = await emailService.sendDailyReport(
+          settings.email_report_address, 
+          filterResult.newRecords, 
+          apiData.result.records,
           filterResult.newCasefiles.length,
-          settings.email_report_address
+          filterResult.newRecordsForExistingCases.length,
+          dbService // Pass the database service for querying open cases
         );
-        console.log("Email notification logged successfully");
-      } catch (logError) {
-        console.error("Failed to log email notification:", logError);
-        // Don't fail the whole process for logging errors
+
+        console.log("Email sent successfully:", emailResponse);
+
+        // Log the email notification with case breakdown
+        try {
+          await dbService.logEmailNotification(
+            filterResult.newRecords.length, 
+            filterResult.newCasefiles.length,
+            settings.email_report_address
+          );
+          console.log("Email notification logged successfully");
+        } catch (logError) {
+          console.error("Failed to log email notification:", logError);
+          // Don't fail the whole process for logging errors
+        }
+      } else {
+        console.log("Skipping email notification - already sent today");
       }
     } else {
       console.log("Skipping email notification");
