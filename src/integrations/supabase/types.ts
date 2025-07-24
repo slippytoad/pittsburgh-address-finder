@@ -101,6 +101,45 @@ export type Database = {
         }
         Relationships: []
       }
+      push_settings: {
+        Row: {
+          apns_environment: string | null
+          app_version: string | null
+          created_at: string | null
+          device_model: string | null
+          device_token: string
+          id: number
+          os_version: string | null
+          permission_granted: boolean | null
+          platform: string
+          updated_at: string | null
+        }
+        Insert: {
+          apns_environment?: string | null
+          app_version?: string | null
+          created_at?: string | null
+          device_model?: string | null
+          device_token: string
+          id?: number
+          os_version?: string | null
+          permission_granted?: boolean | null
+          platform: string
+          updated_at?: string | null
+        }
+        Update: {
+          apns_environment?: string | null
+          app_version?: string | null
+          created_at?: string | null
+          device_model?: string | null
+          device_token?: string
+          id?: number
+          os_version?: string | null
+          permission_granted?: boolean | null
+          platform?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
