@@ -1,6 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Settings } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Settings, LogOut } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import PropertyHeader from '@/components/property/PropertyHeader';
 import PropertyList from '@/components/property/PropertyList';
@@ -11,6 +13,9 @@ import { usePropertyData } from '@/hooks/usePropertyData';
 import { useAddressSearch } from '@/hooks/useAddressSearch';
 
 const PropertyInvestigationDashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
   const {
     selectedStatuses,
     setSelectedStatuses,
@@ -71,13 +76,36 @@ const PropertyInvestigationDashboard: React.FC = () => {
           </div>
         )}
 
-        <div className="pt-12 border-t border-gray-100 flex justify-center">
+        <div className="pt-12 border-t border-gray-100 flex justify-center gap-4">
           <Link to="/admin">
             <Button variant="outline" className="flex items-center gap-2 rounded-full px-6 py-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50">
               <Settings className="h-4 w-4" />
               Admin Settings
             </Button>
           </Link>
+          <Button 
+            variant="outline" 
+            onClick={async () => {
+              try {
+                await supabase.auth.signOut();
+                toast({
+                  title: "Signed out successfully",
+                  description: "You have been logged out of the system",
+                });
+                navigate('/');
+              } catch (error) {
+                toast({
+                  title: "Error",
+                  description: "Failed to sign out",
+                  variant: "destructive",
+                });
+              }
+            }}
+            className="flex items-center gap-2 rounded-full px-6 py-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </Button>
         </div>
       </div>
     </div>
