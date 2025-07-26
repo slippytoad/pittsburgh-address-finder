@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import EmailSettingsSection from '@/components/property/EmailSettingsSection';
 import AddressManager from '@/components/AddressManager';
 import EmailTestButtons from '@/components/EmailTestButtons';
+import UserManagement from '@/components/UserManagement';
 
 const Admin = () => {
   return (
@@ -21,6 +22,7 @@ const Admin = () => {
           <h1 className="text-2xl font-bold text-gray-800">Admin Settings</h1>
         </div>
         
+        <UserManagement />
         <AddressManager />
         <EmailSettingsSection />
         <EmailTestButtons />
