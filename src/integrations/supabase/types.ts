@@ -208,6 +208,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_first_admin_user: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       delete_all_violations: {
         Args: Record<PropertyKey, never>
         Returns: undefined
