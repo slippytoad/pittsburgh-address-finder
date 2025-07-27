@@ -33,24 +33,55 @@ const Login = () => {
 
   const handleGoogleLogin = async () => {
     try {
+      console.log('Initiating Google OAuth login...');
+      console.log('Current origin:', window.location.origin);
+      
+      // Use different redirect URLs for development vs production
+      const isDevelopment = window.location.hostname === 'localhost';
+      const redirectTo = isDevelopment 
+        ? `${window.location.origin}/dashboard`
+        : `${window.location.origin}/dashboard`;
+
+      console.log('Redirect URL:', redirectTo);
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`
+          redirectTo,
+          queryParams: {
+            access_type: 'online',
+            prompt: 'select_account',
+          }
         }
       });
 
       if (error) {
+        console.error('OAuth error:', error);
+        
+        let errorMessage = error.message;
+        
+        // Provide more specific error messages for common issues
+        if (error.message.includes('redirect_uri_mismatch')) {
+          errorMessage = 'OAuth redirect URL mismatch. Please check your Google Cloud Console configuration for localhost URLs.';
+        } else if (error.message.includes('unauthorized_client')) {
+          errorMessage = 'OAuth client not authorized. Please verify your Google Cloud Console client ID configuration.';
+        } else if (error.message.includes('access_denied')) {
+          errorMessage = 'Access denied by Google. Please try again or contact support.';
+        }
+
         toast({
           title: "Authentication Error",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
         });
+      } else {
+        console.log('OAuth request initiated successfully');
       }
     } catch (error) {
+      console.error('Unexpected error during OAuth:', error);
       toast({
         title: "Error",
-        description: "Failed to initiate Google login",
+        description: `Failed to initiate Google login: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: "destructive",
       });
     }
