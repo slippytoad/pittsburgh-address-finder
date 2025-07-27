@@ -104,7 +104,6 @@ const Login = () => {
             <h2 className="text-2xl font-semibold text-gray-700">
               Property Violations
             </h2>
-            </p>
           </div>
         </div>
 
