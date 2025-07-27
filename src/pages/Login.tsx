@@ -102,7 +102,7 @@ const Login = () => {
               JFW Oakland
             </h1>
             <h2 className="text-2xl font-semibold text-gray-700">
-              Property Violation
+              Property Violations
             </h2>
             <p className="text-muted-foreground">
               Monitor and track property violations across Oakland
