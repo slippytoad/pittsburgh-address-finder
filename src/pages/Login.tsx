@@ -104,8 +104,6 @@ const Login = () => {
             <h2 className="text-2xl font-semibold text-gray-700">
               Property Violations
             </h2>
-            <p className="text-muted-foreground">
-              Monitor and track property violations across Oakland
             </p>
           </div>
         </div>
@@ -118,7 +116,7 @@ const Login = () => {
               Sign In
             </CardTitle>
             <CardDescription>
-              Access the property violation monitoring system
+              Sign In to access the property violation monitoring system
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -136,9 +134,6 @@ const Login = () => {
               Continue with Google
             </Button>
 
-            <div className="text-center text-sm text-muted-foreground">
-              <p>By signing in, you agree to access the property violation monitoring system.</p>
-            </div>
           </CardContent>
         </Card>
 
