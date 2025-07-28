@@ -18,7 +18,7 @@ const badgeVariants = cva(
         warning:
           "border-transparent bg-warning text-warning-foreground hover:bg-warning/80",
         violation:
-          "border-transparent bg-gray-600 text-white hover:bg-gray-700",
+          "border-transparent bg-gray-500 text-white hover:bg-gray-600",
         success:
           "border-transparent bg-green-600 text-white hover:bg-green-700",
         closed:
