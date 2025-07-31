@@ -24,7 +24,7 @@ export const CaseCardHeader: React.FC<CaseCardHeaderProps> = ({
       {/* Address Section */}
       <div className="flex items-center gap-2 min-w-0">
         <MapPin className="h-5 w-5 text-blue-600 flex-shrink-0" />
-        <CardTitle className="text-sm font-bold truncate">
+        <CardTitle className="text-lg font-bold truncate">
           {formattedStreetAddress}
         </CardTitle>
       </div>
@@ -54,7 +54,7 @@ export const CaseCardHeader: React.FC<CaseCardHeaderProps> = ({
       {earliestDate && (
         <div className="flex items-start gap-2 text-sm text-gray-500">
           <Calendar className="h-4 w-4 flex-shrink-0 mt-0.5" />
-          <span className="font-bold">Opened: {formatDate(earliestDate)}</span>
+          <span className="font-normal">Opened: <span className="font-bold">{formatDate(earliestDate)}</span></span>
         </div>
       )}
     </div>

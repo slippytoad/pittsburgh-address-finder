@@ -132,7 +132,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                       <circle cx="12" cy="10" r="3"/>
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold truncate">
+                  <h3 className="text-xl font-semibold truncate">
                     {formattedStreetAddress}
                   </h3>
                 </div>
@@ -156,8 +156,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                         </svg>
                       </div>
                       <div>
-                        <span className="font-medium">Parcel ID:</span>
-                        <span className="font-mono ml-1">{parcelId}</span>
+                        <span className="font-normal">Parcel ID:</span>
+                        <span className="font-bold font-mono ml-1">{parcelId}</span>
                       </div>
                     </div>
                   )}
@@ -191,7 +191,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                           <line x1="3" y1="10" x2="21" y2="10"/>
                         </svg>
                       </div>
-                      <span>Opened: {new Date(earliestDate).toLocaleDateString()}</span>
+                      <span className="font-normal">Opened: <span className="font-bold">{new Date(earliestDate).toLocaleDateString()}</span></span>
                     </div>
                   )}
                 </div>
