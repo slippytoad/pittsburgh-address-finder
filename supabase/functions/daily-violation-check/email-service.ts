@@ -28,7 +28,7 @@ export class EmailService {
       
       <p>If you received this email, your notification system is working properly!</p>
       
-      <p><a href="https://jfw-oakland-property-violations-tracker.lovable.app" style="background-color: #2754C5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">View Dashboard</a></p>
+      <p><a href="https://jfw-oakland.slippytoad.com" style="background-color: #2754C5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">View Dashboard</a></p>
       
       <p><em>This is a test message from the Property Investigation Dashboard.</em></p>
     `;
@@ -75,7 +75,7 @@ export class EmailService {
       // Get the status counts for open (non-closed) cases from the database
       const statusCounts = await dbService.getOpenCasesCountByStatus();
       
-      const dashboardUrl = "https://jfw-oakland-property-violations-tracker.lovable.app";
+      const dashboardUrl = "https://jfw-oakland.slippytoad.com";
 
       return Object.entries(statusCounts)
         .map(([status, count]) => {
@@ -92,7 +92,7 @@ export class EmailService {
   }
 
   private formatNewRecordsList(newRecords: ViolationRecord[]): string {
-    const dashboardUrl = "https://jfw-oakland-property-violations-tracker.lovable.app";
+    const dashboardUrl = "https://jfw-oakland.slippytoad.com";
     
     return newRecords.slice(0, 10).map((record: any) => {
       const caseParam = encodeURIComponent(record.casefile_number || '');
@@ -117,7 +117,7 @@ export class EmailService {
     let emailBody: string;
 
     const statusSummary = await this.getOpenCasesSummary(dbService);
-    const dashboardUrl = "https://jfw-oakland-property-violations-tracker.lovable.app";
+    const dashboardUrl = "https://jfw-oakland.slippytoad.com";
     const currentDate = new Date().toLocaleDateString('en-US', { 
       weekday: 'long', 
       year: 'numeric', 
