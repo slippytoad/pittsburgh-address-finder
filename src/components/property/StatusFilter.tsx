@@ -55,7 +55,6 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
     }
   };
 
-  const totalCases = Object.values(statusCounts).reduce((sum, count) => sum + count, 0);
   const isShowingAll = selectedStatuses.length === 0;
 
   // Define the desired order of statuses
@@ -85,7 +84,7 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
             }
           `}
         >
-          All ({totalCases})
+          All
         </button>
         
         {/* Individual status options in specified order */}

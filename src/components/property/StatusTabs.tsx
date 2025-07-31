@@ -20,7 +20,6 @@ const StatusTabs: React.FC<StatusTabsProps> = ({
   onAddressSearch,
   addressSearch = '',
 }) => {
-  const totalCases = Object.values(statusCounts).reduce((sum, count) => sum + count, 0);
   
   // Define the groups
   const inViolationStatuses = ['IN VIOLATION', 'IN COURT', 'READY TO CLOSE'];
@@ -32,17 +31,14 @@ const StatusTabs: React.FC<StatusTabsProps> = ({
   
   // Determine current tab based on selected statuses
   const getCurrentTab = () => {
-    if (selectedStatuses.length === 0) return 'all';
+    if (selectedStatuses.length === 0) return 'in-violation';
     if (selectedStatuses.length === 1 && closedStatuses.includes(selectedStatuses[0])) return 'closed';
     if (selectedStatuses.every(status => inViolationStatuses.includes(status))) return 'in-violation';
-    return 'all';
+    return 'closed';
   };
 
   const handleTabChange = (value: string) => {
     switch (value) {
-      case 'all':
-        onStatusChange([]);
-        break;
       case 'closed':
         onStatusChange(closedStatuses.filter(status => availableStatuses.includes(status)));
         break;
@@ -62,8 +58,7 @@ const StatusTabs: React.FC<StatusTabsProps> = ({
     <div className="space-y-6">
       {/* Status Tabs */}
       <Tabs value={getCurrentTab()} onValueChange={handleTabChange}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="all">All ({totalCases})</TabsTrigger>
+        <TabsList className="inline-flex gap-2">
           <TabsTrigger value="in-violation">In Violation ({inViolationCount})</TabsTrigger>
           <TabsTrigger value="closed">Closed ({closedCount})</TabsTrigger>
         </TabsList>
