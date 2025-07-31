@@ -9,6 +9,7 @@ import { CaseCardHeader } from './CaseCardHeader';
 import { CaseCardStatus } from './CaseCardStatus';
 import { CaseCardOutcome } from './CaseCardOutcome';
 import { CaseCardInstructions } from './CaseCardInstructions';
+import { CaseCardDescription } from './CaseCardDescription';
 import { CaseCardRecord } from './CaseCardRecord';
 import { CaseHistoryDialog } from './CaseHistoryDialog';
 
@@ -46,6 +47,11 @@ export const CaseCard: React.FC<CaseCardProps> = ({
     groupedCase.records[0]?.violation_spec_instructions || null : null;
   const formattedInstructions = violationInstructions ? 
     violationInstructions.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) : null;
+
+  // Get violation description from the latest record
+  const violationDescription = groupedCase.records[0]?.violation_description || null;
+  const formattedDescription = violationDescription ? 
+    violationDescription.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) : null;
 
   // Get the earliest investigation date (when case was first opened)
   const earliestDate = groupedCase.records.reduce((earliest, record) => {
@@ -98,6 +104,9 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                     recordCount={groupedCase.records.length}
                     isOpen={isOpen}
                   />
+                  
+                  {/* Description */}
+                  <CaseCardDescription formattedDescription={formattedDescription} />
                   
                   {(groupedCase.currentStatus === 'CLOSED' || groupedCase.currentStatus === 'READY TO CLOSE') ? (
                     <CaseCardOutcome
@@ -187,7 +196,9 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   )}
                 </div>
 
-                {/* Outcome or Instructions based on status */}
+                {/* Description, Outcome or Instructions based on status */}
+                <CaseCardDescription formattedDescription={formattedDescription} />
+                
                 {(groupedCase.currentStatus === 'CLOSED' || groupedCase.currentStatus === 'READY TO CLOSE') ? (
                   <CaseCardOutcome
                     formattedOutcome={formattedOutcome}

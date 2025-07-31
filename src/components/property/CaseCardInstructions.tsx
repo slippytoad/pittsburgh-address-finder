@@ -28,8 +28,8 @@ export const CaseCardInstructions: React.FC<CaseCardInstructionsProps> = ({
           </svg>
         </div>
         <div>
-          <span className="font-medium">Instructions:</span> 
-          <span className="ml-1 break-words">{formattedInstructions}</span>
+          <span className="font-normal">Instructions:</span> 
+          <span className="ml-1 font-bold break-words">{formattedInstructions}</span>
         </div>
       </div>
       
