@@ -86,7 +86,10 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                       latestDate={groupedCase.latestDate}
                     />
                   ) : (
-                    <CaseCardInstructions formattedInstructions={formattedInstructions} />
+                    <CaseCardInstructions 
+                      formattedInstructions={formattedInstructions} 
+                      latestDate={groupedCase.latestDate}
+                    />
                   )}
                 </div>
               </div>
@@ -172,7 +175,10 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                     latestDate={groupedCase.latestDate}
                   />
                 ) : (
-                  <CaseCardInstructions formattedInstructions={formattedInstructions} />
+                  <CaseCardInstructions 
+                    formattedInstructions={formattedInstructions} 
+                    latestDate={groupedCase.latestDate}
+                  />
                 )}
               </div>
 

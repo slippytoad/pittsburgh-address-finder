@@ -1,12 +1,16 @@
 
 import React from 'react';
+import { Calendar } from 'lucide-react';
+import { formatDate } from '@/utils/propertyUtils';
 
 interface CaseCardInstructionsProps {
   formattedInstructions: string | null;
+  latestDate: string;
 }
 
 export const CaseCardInstructions: React.FC<CaseCardInstructionsProps> = ({
-  formattedInstructions
+  formattedInstructions,
+  latestDate
 }) => {
   if (!formattedInstructions) return null;
 
@@ -22,11 +26,15 @@ export const CaseCardInstructions: React.FC<CaseCardInstructionsProps> = ({
             <polyline points="10,9 9,9 8,9"/>
           </svg>
         </div>
+        <Calendar className="h-4 w-4 text-gray-500 flex-shrink-0 mt-0.5" />
       </div>
       <div className="flex flex-col gap-3 min-w-0 flex-1">
         <div className="flex flex-col text-sm text-gray-700">
           <span className="font-medium mb-1">Instructions:</span> 
           <span className="break-words whitespace-pre-wrap text-wrap overflow-wrap-anywhere">{formattedInstructions}</span>
+        </div>
+        <div className="text-sm text-gray-500 flex items-start">
+          <span>Last update: {formatDate(latestDate)}</span>
         </div>
       </div>
     </div>
