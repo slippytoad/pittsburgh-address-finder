@@ -169,19 +169,9 @@ export const CaseCard: React.FC<CaseCardProps> = ({
               </div>
 
               <CaseCardInstructions formattedInstructions={formattedInstructions} />
-            </div>
-          </CardHeader>
-        </CollapsibleTrigger>
-        
-        <CollapsibleContent>
-          <CardContent className="pt-0 p-0">
-            <div className="space-y-4 px-6 pb-6">
-              {groupedCase.records.map((record, index) => (
-                <CaseCardRecord key={record._id || index} record={record} index={index} />
-              ))}
               
-              {/* Case History Button - Bottom Right */}
-              <div className="flex justify-end pt-4 border-t border-gray-200">
+              {/* Case History Button - Bottom Right of Main Card */}
+              <div className="flex justify-end pt-2">
                 <Button
                   variant="outline"
                   size="sm"
@@ -195,6 +185,16 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   Case History
                 </Button>
               </div>
+            </div>
+          </CardHeader>
+        </CollapsibleTrigger>
+        
+        <CollapsibleContent>
+          <CardContent className="pt-0 p-0">
+            <div className="space-y-4 px-6 pb-6">
+              {groupedCase.records.map((record, index) => (
+                <CaseCardRecord key={record._id || index} record={record} index={index} />
+              ))}
             </div>
           </CardContent>
         </CollapsibleContent>
