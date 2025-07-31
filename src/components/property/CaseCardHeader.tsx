@@ -43,13 +43,10 @@ export const CaseCardHeader: React.FC<CaseCardHeaderProps> = ({
       {/* Case Number Section */}
       <div className="flex items-start gap-2">
         <FileText className="h-4 w-4 text-gray-500 flex-shrink-0 mt-0.5" />
-        <span className={`text-sm ${
+        <span className={`text-sm font-bold ${
           isHighlighted ? 'text-blue-700' : 'text-gray-600'
         }`}>
-          Case #
-        </span>
-        <span className="font-bold ml-1">
-          {casefileNumber}
+          Case #{casefileNumber}
         </span>
       </div>
       
@@ -57,10 +54,7 @@ export const CaseCardHeader: React.FC<CaseCardHeaderProps> = ({
       {earliestDate && (
         <div className="flex items-start gap-2 text-sm text-gray-500">
           <Calendar className="h-4 w-4 flex-shrink-0 mt-0.5" />
-          <span className="font-normal">Opened: </span>
-          <span className="font-bold ml-1">
-            {formatDate(earliestDate)}
-          </span>
+          <span className="font-bold">Opened: {formatDate(earliestDate)}</span>
         </div>
       )}
     </div>
