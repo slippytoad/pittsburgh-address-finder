@@ -61,9 +61,10 @@ export const CaseCard: React.FC<CaseCardProps> = ({
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors p-0">
             <div className="flex flex-col gap-4 p-6">
-              {/* Desktop Layout - side by side */}
-              <div className="hidden sm:flex sm:items-start sm:justify-between gap-6">
-                <div className="flex flex-col gap-3 min-w-0 flex-1">
+              {/* Desktop Layout - Two Column Structure */}
+              <div className="hidden sm:grid sm:grid-cols-2 sm:gap-8">
+                {/* Column 1: Property Information */}
+                <div className="flex flex-col gap-3">
                   <CaseCardHeader
                     formattedStreetAddress={formattedStreetAddress}
                     parcelId={parcelId}
@@ -73,7 +74,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   />
                 </div>
                 
-                <div className="flex flex-col gap-3 justify-start sm:flex-shrink-0 sm:min-w-[320px] sm:items-end">
+                {/* Column 2: Status and Case Information */}
+                <div className="flex flex-col gap-3">
                   <CaseCardStatus
                     currentStatus={groupedCase.currentStatus}
                     recordCount={groupedCase.records.length}
