@@ -15,8 +15,9 @@ export const CaseCardInstructions: React.FC<CaseCardInstructionsProps> = ({
   if (!formattedInstructions) return null;
 
   return (
-    <div className="flex gap-2 text-sm text-gray-600 justify-between items-start">
-      <div className="flex flex-col items-start gap-3 flex-shrink-0">
+    <div className="flex flex-col gap-3 text-sm">
+      {/* Instructions with FileText icon */}
+      <div className="flex items-start gap-2 text-gray-700">
         <div className="h-4 w-4 text-gray-500 flex-shrink-0 mt-0.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -26,16 +27,16 @@ export const CaseCardInstructions: React.FC<CaseCardInstructionsProps> = ({
             <polyline points="10,9 9,9 8,9"/>
           </svg>
         </div>
-        <Calendar className="h-4 w-4 text-gray-500 flex-shrink-0 mt-0.5" />
+        <div>
+          <span className="font-medium">Instructions:</span> 
+          <span className="ml-1 break-words">{formattedInstructions}</span>
+        </div>
       </div>
-      <div className="flex flex-col gap-3 max-w-[50%] text-left">
-        <div className="flex flex-col text-sm text-gray-700">
-          <span className="font-medium mb-1">Instructions:</span> 
-          <span className="break-words whitespace-pre-wrap text-wrap overflow-wrap-anywhere">{formattedInstructions}</span>
-        </div>
-        <div className="text-sm text-gray-500">
-          <span>Last update: {formatDate(latestDate)}</span>
-        </div>
+      
+      {/* Last update with Calendar icon */}
+      <div className="flex items-start gap-2 text-gray-500">
+        <Calendar className="h-4 w-4 flex-shrink-0 mt-0.5" />
+        <span>Last update: {formatDate(latestDate)}</span>
       </div>
     </div>
   );
