@@ -241,24 +241,6 @@ export const CaseHistoryDialog: React.FC<CaseHistoryDialogProps> = ({
                             No field changes detected. This may be a duplicate entry or investigation update.
                           </p>
                         )}
-                        
-                        {/* Always show investigation outcome and findings if present */}
-                        {(record.investigation_outcome || record.investigation_findings) && (
-                          <div className="mt-4 pt-3 border-t border-gray-200">
-                            {record.investigation_outcome && (
-                              <div className="mb-2">
-                                <span className="text-sm font-medium text-gray-600">Investigation Outcome:</span>
-                                <p className="text-sm">{formatFieldValue(record.investigation_outcome)}</p>
-                              </div>
-                            )}
-                            {record.investigation_findings && (
-                              <div>
-                                <span className="text-sm font-medium text-gray-600">Investigation Findings:</span>
-                                <p className="text-sm">{formatFieldValue(record.investigation_findings)}</p>
-                              </div>
-                            )}
-                          </div>
-                        )}
                       </div>
                     </div>
                   );
