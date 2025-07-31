@@ -54,8 +54,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   }, '');
 
   return (
-    <Card className={`hover:bg-muted/50 transition-all duration-300 ${
-      isHighlighted ? 'ring-2 ring-blue-500 bg-blue-50 border-blue-200' : 'border-gray-200 hover:border-gray-300'
+    <Card className={`border-2 rounded-lg hover:bg-muted/50 transition-all duration-300 ${
+      isHighlighted ? 'ring-2 ring-blue-500 bg-blue-50 border-blue-300' : 'border-gray-300 hover:border-gray-400'
     }`}>
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
