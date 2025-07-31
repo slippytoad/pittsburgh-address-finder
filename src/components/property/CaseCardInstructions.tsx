@@ -36,7 +36,7 @@ export const CaseCardInstructions: React.FC<CaseCardInstructionsProps> = ({
       {/* Last update with Calendar icon */}
       <div className="flex items-start gap-2 text-gray-500">
         <Calendar className="h-4 w-4 flex-shrink-0 mt-0.5" />
-        <span>Last update: {formatDate(latestDate)}</span>
+        <span className="font-bold">Last update: {formatDate(latestDate)}</span>
       </div>
     </div>
   );
