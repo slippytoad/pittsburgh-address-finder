@@ -80,10 +80,14 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                     isOpen={isOpen}
                   />
                   
-                  <CaseCardOutcome
-                    formattedOutcome={formattedOutcome}
-                    latestDate={groupedCase.latestDate}
-                  />
+                  {(groupedCase.currentStatus === 'CLOSED' || groupedCase.currentStatus === 'READY TO CLOSE') ? (
+                    <CaseCardOutcome
+                      formattedOutcome={formattedOutcome}
+                      latestDate={groupedCase.latestDate}
+                    />
+                  ) : (
+                    <CaseCardInstructions formattedInstructions={formattedInstructions} />
+                  )}
                 </div>
               </div>
 
@@ -161,14 +165,17 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   )}
                 </div>
 
-                {/* Outcome */}
-                <CaseCardOutcome
-                  formattedOutcome={formattedOutcome}
-                  latestDate={groupedCase.latestDate}
-                />
+                {/* Outcome or Instructions based on status */}
+                {(groupedCase.currentStatus === 'CLOSED' || groupedCase.currentStatus === 'READY TO CLOSE') ? (
+                  <CaseCardOutcome
+                    formattedOutcome={formattedOutcome}
+                    latestDate={groupedCase.latestDate}
+                  />
+                ) : (
+                  <CaseCardInstructions formattedInstructions={formattedInstructions} />
+                )}
               </div>
 
-              <CaseCardInstructions formattedInstructions={formattedInstructions} />
               
               {/* Case History Button - Bottom Right of Main Card */}
               <div className="flex justify-end pt-2">
