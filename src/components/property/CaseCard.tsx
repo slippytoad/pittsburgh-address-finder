@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { History } from 'lucide-react';
@@ -53,6 +54,13 @@ export const CaseCard: React.FC<CaseCardProps> = ({
     return new Date(record.investigation_date) < new Date(earliest) ? record.investigation_date : earliest;
   }, '');
 
+  // Check if case is new (opened < 1 week ago) or updated (last update < 1 week ago)
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  
+  const isNew = earliestDate && new Date(earliestDate) > oneWeekAgo;
+  const isUpdated = !isNew && groupedCase.latestDate && new Date(groupedCase.latestDate) > oneWeekAgo;
+
   return (
     <Card className={`border-2 rounded-lg hover:bg-muted/50 transition-all duration-300 ${
       isHighlighted ? 'ring-2 ring-blue-500 bg-blue-50 border-blue-300' : 'border-gray-300 hover:border-gray-400'
@@ -60,7 +68,16 @@ export const CaseCard: React.FC<CaseCardProps> = ({
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors p-0">
-            <div className="flex flex-col gap-4 p-6">
+            <div className="flex flex-col gap-4 p-6 relative">
+              {/* New/Updated Badge */}
+              {(isNew || isUpdated) && (
+                <div className="absolute top-4 right-4">
+                  <Badge variant="default" className="bg-blue-600 text-white">
+                    {isNew ? 'New' : 'Updated'}
+                  </Badge>
+                </div>
+              )}
+              
               {/* Desktop Layout - Two Column Structure */}
               <div className="hidden sm:grid sm:grid-cols-2 sm:gap-8">
                 {/* Column 1: Property Information */}
