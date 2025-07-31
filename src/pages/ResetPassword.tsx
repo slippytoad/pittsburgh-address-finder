@@ -21,9 +21,14 @@ const ResetPassword = () => {
 
   useEffect(() => {
     // Check if we have the necessary parameters from the email link
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
-    const type = searchParams.get('type');
+    // Supabase sends tokens in URL hash, not search params
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const searchParamsValues = searchParams;
+    
+    // Try hash first, then search params as fallback
+    const accessToken = hashParams.get('access_token') || searchParamsValues.get('access_token');
+    const refreshToken = hashParams.get('refresh_token') || searchParamsValues.get('refresh_token');
+    const type = hashParams.get('type') || searchParamsValues.get('type');
 
     if (type === 'recovery' && accessToken && refreshToken) {
       setIsValidToken(true);
