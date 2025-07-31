@@ -43,10 +43,10 @@ export const CaseCardHeader: React.FC<CaseCardHeaderProps> = ({
       {/* Case Number Section */}
       <div className="flex items-start gap-2">
         <FileText className="h-4 w-4 text-gray-500 flex-shrink-0 mt-0.5" />
-        <span className={`text-sm font-bold ${
+        <span className={`text-sm font-normal ${
           isHighlighted ? 'text-blue-700' : 'text-gray-600'
         }`}>
-          Case #{casefileNumber}
+          Case #<span className="font-bold">{casefileNumber}</span>
         </span>
       </div>
       

@@ -173,10 +173,10 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                         <polyline points="10,9 9,9 8,9"/>
                       </svg>
                     </div>
-                    <span className={`text-sm ${
-                      isHighlighted ? 'text-blue-700 font-medium' : 'text-gray-600'
+                    <span className={`text-sm font-normal ${
+                      isHighlighted ? 'text-blue-700' : 'text-gray-600'
                     }`}>
-                      Case #{groupedCase.casefileNumber}
+                      Case #<span className="font-bold">{groupedCase.casefileNumber}</span>
                     </span>
                   </div>
                   
