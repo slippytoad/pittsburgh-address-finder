@@ -7,6 +7,11 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Bypass auth check in development mode
+    if (import.meta.env.DEV) {
+      return;
+    }
+
     // Check authentication
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -17,14 +22,17 @@ const Dashboard = () => {
 
     checkAuth();
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT' || !session) {
-        navigate('/');
-      }
-    });
+    // Listen for auth changes (skip in development)
+    if (!import.meta.env.DEV) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_OUT' || !session) {
+          navigate('/');
+        }
+      });
 
-    return () => subscription.unsubscribe();
+      return () => subscription.unsubscribe();
+    }
+
   }, [navigate]);
 
   return <PropertyInvestigationDashboard />;
