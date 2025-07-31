@@ -19,12 +19,6 @@ const Login = () => {
   const [resetEmail, setResetEmail] = useState('');
 
   useEffect(() => {
-    // Bypass login in development mode
-    if (import.meta.env.DEV) {
-      navigate('/dashboard');
-      return;
-    }
-
     // Check if user is already logged in
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
