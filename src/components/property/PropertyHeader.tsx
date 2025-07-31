@@ -108,27 +108,27 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
           <div className="mt-6 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-start justify-between gap-4">
             {showResults && newRecordsCount !== undefined && newRecordsCount > 0 && (
               <div className="text-sm text-gray-600 space-y-1 bg-green-50 px-4 py-3 rounded-xl border border-green-200">
-                <div className="font-medium text-green-800">
-                  Found <span className="font-semibold">{newRecordsCount}</span> new records total.
+                <div className="font-normal text-green-800">
+                  Found <span className="font-bold">{newRecordsCount}</span> new records total.
                 </div>
                 {(newCasefilesCount !== undefined && newCasefilesCount > 0) && (
                   <div className="text-xs text-green-700">
-                    • <span className="font-medium">{newCasefilesCount}</span> new casefiles
+                    • <span className="font-bold">{newCasefilesCount}</span> new casefiles
                   </div>
                 )}
                 {(newRecordsForExistingCasesCount !== undefined && newRecordsForExistingCasesCount > 0) && (
                   <div className="text-xs text-green-700">
-                    • <span className="font-medium">{newRecordsForExistingCasesCount}</span> new records for existing cases
+                    • <span className="font-bold">{newRecordsForExistingCasesCount}</span> new records for existing cases
                   </div>
                 )}
               </div>
             )}
             {lastApiCheckTime && (
               <div className="text-sm text-gray-500 bg-gray-50 px-4 py-3 rounded-xl">
-                Last API Check: <span className="font-medium text-gray-700">{lastApiCheckTime}</span>
+                <span className="font-normal">Last API Check:</span> <span className="font-bold text-gray-700">{lastApiCheckTime}</span>
                 {lastApiNewRecordsCount !== undefined && (
                   <>
-                    {' '}(<span className="font-medium text-gray-700">{lastApiNewRecordsCount}</span> new)
+                    {' '}(<span className="font-bold text-gray-700">{lastApiNewRecordsCount}</span> <span className="font-normal">new</span>)
                   </>
                 )}
               </div>

@@ -67,10 +67,10 @@ export const CaseCardRecord: React.FC<CaseCardRecordProps> = ({ record, index })
             const value = record[key];
             return (
               <div key={key} className="flex flex-col sm:grid sm:grid-cols-3 gap-1 sm:gap-4">
-                <div className="font-medium text-gray-700 text-sm lg:text-base">
+                <div className="font-normal text-gray-700 text-sm lg:text-base">
                   {formatFieldName(key)}:
                 </div>
-                <div className="sm:col-span-2 text-gray-600 text-sm lg:text-base break-words">
+                <div className="sm:col-span-2 text-gray-600 text-sm lg:text-base break-words font-bold">
                   {formatFieldValue(key, value)}
                 </div>
               </div>
