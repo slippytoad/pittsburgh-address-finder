@@ -24,7 +24,7 @@ export const CaseCardHeader: React.FC<CaseCardHeaderProps> = ({
       {/* Address Section */}
       <div className="flex items-center gap-2 min-w-0">
         <MapPin className="h-5 w-5 text-blue-600 flex-shrink-0" />
-        <CardTitle className="text-lg lg:text-xl truncate">
+        <CardTitle className="text-sm font-bold truncate">
           {formattedStreetAddress}
         </CardTitle>
       </div>
@@ -35,7 +35,7 @@ export const CaseCardHeader: React.FC<CaseCardHeaderProps> = ({
           <House className="h-4 w-4 text-gray-500 flex-shrink-0 mt-0.5" />
           <div>
             <span className="font-normal">Parcel ID:</span>
-            <span className="font-mono font-bold ml-1">{parcelId}</span>
+            <span className="font-bold ml-1">{parcelId}</span>
           </div>
         </div>
       )}
