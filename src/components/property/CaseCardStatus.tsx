@@ -16,15 +16,15 @@ export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
   isOpen
 }) => {
   return (
-    <div className="flex items-center justify-between gap-3 w-full">
+    <div className="flex items-center justify-between gap-2 w-full min-h-[2rem]">
       {/* Status Badge */}
-      <Badge variant={getStatusColor(currentStatus)} className="w-fit">
+      <Badge variant={getStatusColor(currentStatus)} className="w-fit flex-shrink-0">
         {currentStatus}
       </Badge>
       
       {/* Record Count with Toggle */}
-      <div className="flex items-center gap-1 text-sm text-gray-500">
-        <span>
+      <div className="flex items-center gap-1 text-sm text-gray-500 flex-shrink-0">
+        <span className="whitespace-nowrap">
           {recordCount} record{recordCount !== 1 ? 's' : ''}
         </span>
         {isOpen ? (
