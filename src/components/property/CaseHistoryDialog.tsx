@@ -164,9 +164,16 @@ export const CaseHistoryDialog: React.FC<CaseHistoryDialogProps> = ({
                 <p className="text-sm mt-1">{formatFieldValue(originalRecord?.violation_description)}</p>
               </div>
               
+              {originalRecord?.investigation_findings && (
+                <div className="md:col-span-2">
+                  <span className="text-sm font-medium text-gray-600">Investigation Findings:</span>
+                  <p className="text-sm mt-1">{formatFieldValue(originalRecord.investigation_findings)}</p>
+                </div>
+              )}
+              
               <div className="md:col-span-2">
-                <span className="text-sm font-medium text-gray-600">Code Section:</span>
-                <p className="text-sm mt-1">{formatFieldValue(originalRecord?.violation_code_section)}</p>
+                <span className="text-sm font-medium text-gray-600">Investigation Outcome:</span>
+                <p className="text-sm mt-1">{formatFieldValue(originalRecord?.investigation_outcome)}</p>
               </div>
               
               {originalRecord?.violation_spec_instructions && (
@@ -177,16 +184,9 @@ export const CaseHistoryDialog: React.FC<CaseHistoryDialogProps> = ({
               )}
               
               <div className="md:col-span-2">
-                <span className="text-sm font-medium text-gray-600">Investigation Outcome:</span>
-                <p className="text-sm mt-1">{formatFieldValue(originalRecord?.investigation_outcome)}</p>
+                <span className="text-sm font-medium text-gray-600">Code Section:</span>
+                <p className="text-sm mt-1">{formatFieldValue(originalRecord?.violation_code_section)}</p>
               </div>
-              
-              {originalRecord?.investigation_findings && (
-                <div className="md:col-span-2">
-                  <span className="text-sm font-medium text-gray-600">Investigation Findings:</span>
-                  <p className="text-sm mt-1">{formatFieldValue(originalRecord.investigation_findings)}</p>
-                </div>
-              )}
             </div>
           </div>
 
