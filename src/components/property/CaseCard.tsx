@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { History } from 'lucide-react';
 import { GroupedCase } from '@/types/propertyTypes';
 import { CaseCardHeader } from './CaseCardHeader';
 import { CaseCardStatus } from './CaseCardStatus';
 import { CaseCardOutcome } from './CaseCardOutcome';
 import { CaseCardInstructions } from './CaseCardInstructions';
 import { CaseCardRecord } from './CaseCardRecord';
+import { CaseHistoryDialog } from './CaseHistoryDialog';
 
 interface CaseCardProps {
   groupedCase: GroupedCase;
@@ -20,6 +23,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   isHighlighted = false 
 }) => {
   const [isOpen, setIsOpen] = useState(defaultExpanded);
+  const [showCaseHistory, setShowCaseHistory] = useState(false);
 
   // Get the primary address from the first record and extract just the street
   const fullAddress = groupedCase.records[0]?.address || 'Unknown Address';
@@ -175,10 +179,33 @@ export const CaseCard: React.FC<CaseCardProps> = ({
               {groupedCase.records.map((record, index) => (
                 <CaseCardRecord key={record._id || index} record={record} index={index} />
               ))}
+              
+              {/* Case History Button - Bottom Right */}
+              <div className="flex justify-end pt-4 border-t border-gray-200">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowCaseHistory(true);
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <History className="h-4 w-4" />
+                  Case History
+                </Button>
+              </div>
             </div>
           </CardContent>
         </CollapsibleContent>
       </Collapsible>
+      
+      {/* Case History Dialog */}
+      <CaseHistoryDialog
+        isOpen={showCaseHistory}
+        onOpenChange={setShowCaseHistory}
+        groupedCase={groupedCase}
+      />
     </Card>
   );
 };
