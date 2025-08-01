@@ -102,20 +102,20 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
               {getButtonContent()}
             </Button>
           </div>
-          
-          {lastApiCheckTime && (
-            <div className="mt-3 flex justify-end">
-              <div className="text-sm text-gray-500 bg-gray-50 px-4 py-3 rounded-xl">
-                <span className="font-normal">Last API Check:</span> <span className="font-bold text-gray-700">{lastApiCheckTime}</span>
-                {lastApiNewRecordsCount !== undefined && (
-                  <>
-                    {' '}(<span className="font-bold text-gray-700">{lastApiNewRecordsCount}</span> <span className="font-normal">new</span>)
-                  </>
-                )}
-              </div>
-            </div>
-          )}
         </div>
+
+        {lastApiCheckTime && (
+          <div className="mt-4 flex justify-center">
+            <div className="text-sm text-gray-500 bg-gray-50 px-4 py-3 rounded-xl">
+              <span className="font-normal">Last API Check:</span> <span className="font-bold text-gray-700">{lastApiCheckTime}</span>
+              {lastApiNewRecordsCount !== undefined && (
+                <>
+                  {' '}(<span className="font-bold text-gray-700">{lastApiNewRecordsCount}</span> <span className="font-normal">new</span>)
+                </>
+              )}
+            </div>
+          </div>
+        )}
 
         {showResults && newRecordsCount !== undefined && newRecordsCount > 0 && (
           <div className="mt-6 pt-6 border-t border-gray-100">
