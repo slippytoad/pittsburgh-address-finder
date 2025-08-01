@@ -89,6 +89,11 @@ export const usePropertyData = (selectedStatuses: string[], addressSearch?: stri
     return groupedCases.length > 0 ? groupedCases[0].latestDate : undefined;
   };
 
+  // Debug logging
+  console.log('usePropertyData - appSettings:', appSettings);
+  console.log('usePropertyData - last_api_check_time:', appSettings?.last_api_check_time);
+  console.log('usePropertyData - formatted timestamp:', formatLastApiCheckTime(appSettings?.last_api_check_time || null));
+
   return {
     data,
     isLoading: mutation.isPending, // Only show loading when API mutation is pending

@@ -23,6 +23,10 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
   lastApiCheckTime,
   lastApiNewRecordsCount
 }) => {
+  // Debug logging
+  console.log('PropertyHeader - lastApiCheckTime:', lastApiCheckTime);
+  console.log('PropertyHeader - lastApiNewRecordsCount:', lastApiNewRecordsCount);
+  
   const [buttonState, setButtonState] = useState<'default' | 'loading' | 'success'>('default');
   const [hasBeenClicked, setHasBeenClicked] = useState(false);
 
@@ -104,10 +108,10 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
           </div>
         </div>
 
-        {lastApiCheckTime && (
+          {/* Force showing timestamp section for debugging */}
           <div className="mt-4 flex justify-center">
             <div className="text-sm text-gray-500 bg-gray-50 px-4 py-3 rounded-xl">
-              <span className="font-normal">Last API Check:</span> <span className="font-bold text-gray-700">{lastApiCheckTime}</span>
+              <span className="font-normal">Debug - lastApiCheckTime value:</span> <span className="font-bold text-gray-700">"{lastApiCheckTime}"</span>
               {lastApiNewRecordsCount !== undefined && (
                 <>
                   {' '}(<span className="font-bold text-gray-700">{lastApiNewRecordsCount}</span> <span className="font-normal">new</span>)
@@ -115,7 +119,6 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
               )}
             </div>
           </div>
-        )}
 
         {showResults && newRecordsCount !== undefined && newRecordsCount > 0 && (
           <div className="mt-6 pt-6 border-t border-gray-100">
