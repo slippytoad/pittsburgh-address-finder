@@ -102,28 +102,9 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
               {getButtonContent()}
             </Button>
           </div>
-        </div>
-
-        {(showResults && newRecordsCount !== undefined && newRecordsCount > 0) || lastApiCheckTime ? (
-          <div className="mt-6 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-start justify-between gap-4">
-            {showResults && newRecordsCount !== undefined && newRecordsCount > 0 && (
-              <div className="text-sm text-gray-600 space-y-1 bg-green-50 px-4 py-3 rounded-xl border border-green-200">
-                <div className="font-normal text-green-800">
-                  Found <span className="font-bold">{newRecordsCount}</span> new records total.
-                </div>
-                {(newCasefilesCount !== undefined && newCasefilesCount > 0) && (
-                  <div className="text-xs text-green-700">
-                    • <span className="font-bold">{newCasefilesCount}</span> new casefiles
-                  </div>
-                )}
-                {(newRecordsForExistingCasesCount !== undefined && newRecordsForExistingCasesCount > 0) && (
-                  <div className="text-xs text-green-700">
-                    • <span className="font-bold">{newRecordsForExistingCasesCount}</span> new records for existing cases
-                  </div>
-                )}
-              </div>
-            )}
-            {lastApiCheckTime && (
+          
+          {lastApiCheckTime && (
+            <div className="mt-3 flex justify-end">
               <div className="text-sm text-gray-500 bg-gray-50 px-4 py-3 rounded-xl">
                 <span className="font-normal">Last API Check:</span> <span className="font-bold text-gray-700">{lastApiCheckTime}</span>
                 {lastApiNewRecordsCount !== undefined && (
@@ -132,9 +113,29 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
                   </>
                 )}
               </div>
-            )}
+            </div>
+          )}
+        </div>
+
+        {showResults && newRecordsCount !== undefined && newRecordsCount > 0 && (
+          <div className="mt-6 pt-6 border-t border-gray-100">
+            <div className="text-sm text-gray-600 space-y-1 bg-green-50 px-4 py-3 rounded-xl border border-green-200">
+              <div className="font-normal text-green-800">
+                Found <span className="font-bold">{newRecordsCount}</span> new records total.
+              </div>
+              {(newCasefilesCount !== undefined && newCasefilesCount > 0) && (
+                <div className="text-xs text-green-700">
+                  • <span className="font-bold">{newCasefilesCount}</span> new casefiles
+                </div>
+              )}
+              {(newRecordsForExistingCasesCount !== undefined && newRecordsForExistingCasesCount > 0) && (
+                <div className="text-xs text-green-700">
+                  • <span className="font-bold">{newRecordsForExistingCasesCount}</span> new records for existing cases
+                </div>
+              )}
+            </div>
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );
