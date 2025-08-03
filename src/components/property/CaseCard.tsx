@@ -234,10 +234,39 @@ export const CaseCard: React.FC<CaseCardProps> = ({
         
         <CollapsibleContent>
           <CardContent className="pt-0 p-0">
-            <div className="space-y-4 px-6 pb-6">
-              {groupedCase.records.map((record, index) => (
-                <CaseCardRecord key={record._id || index} record={record} index={index} />
-              ))}
+            <div className="space-y-6 px-6 pb-6">
+              {(() => {
+                // Group records by violation code section
+                const recordsByCodeSection = groupedCase.records.reduce((acc, record) => {
+                  const codeSection = record.violation_code_section || 'Unknown Code Section';
+                  if (!acc[codeSection]) {
+                    acc[codeSection] = [];
+                  }
+                  acc[codeSection].push(record);
+                  return acc;
+                }, {} as Record<string, typeof groupedCase.records>);
+
+                // Sort code sections alphabetically
+                const sortedCodeSections = Object.keys(recordsByCodeSection).sort();
+
+                return sortedCodeSections.map(codeSection => (
+                  <div key={codeSection} className="space-y-4">
+                    {/* Code Section Header */}
+                    <div className="pb-2 border-b border-gray-300">
+                      <h4 className="font-semibold text-gray-800 text-base">
+                        {codeSection.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
+                      </h4>
+                    </div>
+                    
+                    {/* Records under this code section */}
+                    <div className="space-y-4">
+                      {recordsByCodeSection[codeSection].map((record, index) => (
+                        <CaseCardRecord key={record._id || index} record={record} index={index} />
+                      ))}
+                    </div>
+                  </div>
+                ));
+              })()}
             </div>
           </CardContent>
         </CollapsibleContent>
