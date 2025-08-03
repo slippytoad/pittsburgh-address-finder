@@ -101,12 +101,27 @@ export const CaseHistoryDialog: React.FC<CaseHistoryDialogProps> = ({
   onOpenChange,
   groupedCase
 }) => {
-  // Sort records by date (oldest first for timeline)
-  const sortedRecords = [...groupedCase.records].sort((a, b) => 
-    new Date(a.investigation_date || '').getTime() - new Date(b.investigation_date || '').getTime()
-  );
+  // Group records by code section and sort within each group by date
+  const recordsByCodeSection = groupedCase.records.reduce((acc, record) => {
+    const codeSection = record.violation_code_section || 'Unknown Code Section';
+    if (!acc[codeSection]) {
+      acc[codeSection] = [];
+    }
+    acc[codeSection].push(record);
+    return acc;
+  }, {} as Record<string, PropertyRecord[]>);
 
-  const originalRecord = sortedRecords[0];
+  // Sort each group by date (oldest first for timeline)
+  Object.keys(recordsByCodeSection).forEach(codeSection => {
+    recordsByCodeSection[codeSection].sort((a, b) => 
+      new Date(a.investigation_date || '').getTime() - new Date(b.investigation_date || '').getTime()
+    );
+  });
+
+  // Sort code sections alphabetically
+  const sortedCodeSections = Object.keys(recordsByCodeSection).sort();
+
+  const originalRecord = Object.values(recordsByCodeSection)[0]?.[0];
   const streetAddress = originalRecord?.address?.split(',')[0] || 'Unknown Address';
   const formattedStreetAddress = streetAddress.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
 
@@ -199,57 +214,79 @@ export const CaseHistoryDialog: React.FC<CaseHistoryDialogProps> = ({
             </div>
           </div>
 
-          {/* Timeline of Updates */}
-          {sortedRecords.length > 1 && (
+          {/* Timeline of Updates by Code Section */}
+          {sortedCodeSections.length > 0 && (
             <div>
-              <h3 className="text-lg font-semibold mb-4">Timeline of Updates</h3>
+              <h3 className="text-lg font-semibold mb-4">Case Updates by Code Section</h3>
               
-              <div className="space-y-4">
-                {sortedRecords.slice(1).map((record, index) => {
-                  const previousRecord = sortedRecords[index]; // Previous record in timeline
-                  const changes = compareRecords(record, previousRecord);
+              <div className="space-y-6">
+                {sortedCodeSections.map(codeSection => {
+                  const sectionRecords = recordsByCodeSection[codeSection];
                   
                   return (
-                    <div key={record._id} className="border-l-2 border-blue-200 pl-6 pb-6 relative">
-                      {/* Timeline dot */}
-                      <div className="absolute -left-2 top-0 w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>
+                    <div key={codeSection} className="border border-gray-200 rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-300">
+                        {formatFieldValue(codeSection)}
+                      </h4>
                       
-                      <div className="bg-white border border-gray-200 rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="font-medium flex items-center gap-2">
-                            <Calendar className="h-4 w-4" />
-                            Update - {formatDate(record.investigation_date || '')}
-                          </h4>
-                          <Badge className={getStatusColor(record.status || '')} variant="outline">
-                            {getStatusIcon(record.status || '')}
-                            <span className="ml-1">{formatFieldValue(record.status)}</span>
-                          </Badge>
-                        </div>
-                        
-                        {changes.length > 0 ? (
-                          <div className="space-y-3">
-                            <p className="text-sm text-gray-600 font-medium">Changed Fields:</p>
-                            {changes.map((change, changeIndex) => (
-                              <div key={changeIndex} className="bg-yellow-50 border border-yellow-200 rounded p-3">
-                                <p className="text-sm font-medium text-gray-700 mb-1">{change.displayName}:</p>
-                                <div className="grid grid-cols-1 gap-2">
-                                  <div>
-                                    <span className="text-xs text-gray-500">Previous:</span>
-                                    <p className="text-sm text-gray-600 line-through">{change.oldValue}</p>
-                                  </div>
-                                  <div>
-                                    <span className="text-xs text-green-600">Updated:</span>
-                                    <p className="text-sm text-green-700 font-medium">{change.newValue}</p>
-                                  </div>
+                      <div className="space-y-4">
+                        {sectionRecords.map((record, index) => {
+                          const previousRecord = index > 0 ? sectionRecords[index - 1] : null;
+                          const changes = compareRecords(record, previousRecord);
+                          
+                          return (
+                            <div key={record._id} className="border-l-2 border-blue-200 pl-6 pb-4 relative">
+                              {/* Timeline dot */}
+                              <div className="absolute -left-2 top-0 w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>
+                              
+                              <div className="bg-white border border-gray-100 rounded-lg p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                  <h5 className="font-medium flex items-center gap-2">
+                                    <Calendar className="h-4 w-4" />
+                                    {index === 0 ? 'Case Created' : 'Update'} - {formatDate(record.investigation_date || '')}
+                                  </h5>
+                                  <Badge className={getStatusColor(record.status || '')} variant="outline">
+                                    {getStatusIcon(record.status || '')}
+                                    <span className="ml-1">{formatFieldValue(record.status)}</span>
+                                  </Badge>
                                 </div>
+                                
+                                {index === 0 ? (
+                                  <div className="space-y-2">
+                                    <p className="text-sm text-gray-600">Initial case details:</p>
+                                    <p className="text-sm">{formatFieldValue(record.violation_description)}</p>
+                                    {record.investigation_outcome && (
+                                      <p className="text-sm"><span className="font-medium">Outcome:</span> {formatFieldValue(record.investigation_outcome)}</p>
+                                    )}
+                                  </div>
+                                ) : changes.length > 0 ? (
+                                  <div className="space-y-3">
+                                    <p className="text-sm text-gray-600 font-medium">Changed Fields:</p>
+                                    {changes.map((change, changeIndex) => (
+                                      <div key={changeIndex} className="bg-yellow-50 border border-yellow-200 rounded p-3">
+                                        <p className="text-sm font-medium text-gray-700 mb-1">{change.displayName}:</p>
+                                        <div className="grid grid-cols-1 gap-2">
+                                          <div>
+                                            <span className="text-xs text-gray-500">Previous:</span>
+                                            <p className="text-sm text-gray-600 line-through">{change.oldValue}</p>
+                                          </div>
+                                          <div>
+                                            <span className="text-xs text-green-600">Updated:</span>
+                                            <p className="text-sm text-green-700 font-medium">{change.newValue}</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <p className="text-sm text-gray-500 italic">
+                                    No field changes detected. This may be a duplicate entry or investigation update.
+                                  </p>
+                                )}
                               </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-sm text-gray-500 italic">
-                            No field changes detected. This may be a duplicate entry or investigation update.
-                          </p>
-                        )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   );
