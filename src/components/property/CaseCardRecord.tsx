@@ -69,6 +69,13 @@ export const CaseCardRecord: React.FC<CaseCardRecordProps> = ({ record, index })
   return (
     <Card key={record._id || index} className="border border-gray-200 bg-gray-50">
       <CardContent className="p-3 lg:p-4">
+        {/* Code Section Header */}
+        <div className="mb-3 pb-2 border-b border-gray-300">
+          <h4 className="font-semibold text-gray-800 text-sm lg:text-base">
+            {formatFieldValue('violation_code_section', record.violation_code_section) || 'Unknown Code Section'}
+          </h4>
+        </div>
+        
         <div className="space-y-3">
           {getOrderedFields(record).map((key) => {
             const value = record[key];
