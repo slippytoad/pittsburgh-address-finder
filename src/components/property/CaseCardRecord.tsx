@@ -12,9 +12,16 @@ export const CaseCardRecord: React.FC<CaseCardRecordProps> = ({ record, index })
   // Fields to exclude from the expanded view
   const excludedFields = ['_id', 'full_text', '_full_text', 'casefile_number', 'address', 'parcel_id', 'violation_type'];
 
-  // Field order for better presentation
+  // Field order for better presentation: Date, Status, Description, Findings, Instructions, Outcome
   const getOrderedFields = (record: any) => {
-    const orderedKeys = ['investigation_date', 'status', 'investigation_outcome'];
+    const orderedKeys = [
+      'investigation_date', 
+      'status', 
+      'violation_description',
+      'investigation_findings',
+      'violation_spec_instructions',
+      'investigation_outcome'
+    ];
     const remainingKeys = Object.keys(record).filter(
       key => !excludedFields.includes(key) && !orderedKeys.includes(key)
     );
@@ -62,13 +69,6 @@ export const CaseCardRecord: React.FC<CaseCardRecordProps> = ({ record, index })
   return (
     <Card key={record._id || index} className="border border-gray-200 bg-gray-50">
       <CardContent className="p-3 lg:p-4">
-        {/* Code Section Header */}
-        <div className="mb-3 pb-2 border-b border-gray-300">
-          <h4 className="font-semibold text-gray-800 text-sm lg:text-base">
-            {formatFieldValue('violation_code_section', record.violation_code_section) || 'Unknown Code Section'}
-          </h4>
-        </div>
-        
         <div className="space-y-3">
           {getOrderedFields(record).map((key) => {
             const value = record[key];
