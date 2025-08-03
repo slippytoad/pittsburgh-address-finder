@@ -59,23 +59,47 @@ export const CaseCardRecord: React.FC<CaseCardRecordProps> = ({ record, index })
     return stringValue.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
   };
 
+  // Group fields by code section
+  const groupFieldsByCodeSection = (record: any) => {
+    const codeSection = record.violation_code_section || 'Unknown Code Section';
+    const orderedFields = getOrderedFields(record);
+    
+    return [{
+      codeSection,
+      fields: orderedFields
+    }];
+  };
+
+  const groupedFields = groupFieldsByCodeSection(record);
+
   return (
     <Card key={record._id || index} className="border border-gray-200 bg-gray-50">
       <CardContent className="p-3 lg:p-4">
-        <div className="space-y-3">
-          {getOrderedFields(record).map((key) => {
-            const value = record[key];
-            return (
-              <div key={key} className="flex flex-col sm:grid sm:grid-cols-3 gap-1 sm:gap-4">
-                <div className="font-normal text-gray-700 text-sm lg:text-base">
-                  {formatFieldName(key)}:
-                </div>
-                <div className="sm:col-span-2 text-gray-600 text-sm lg:text-base break-words font-bold">
-                  {formatFieldValue(key, value)}
-                </div>
+        <div className="space-y-4">
+          {groupedFields.map((group, groupIndex) => (
+            <div key={groupIndex}>
+              <div className="mb-3 pb-2 border-b border-gray-300">
+                <h4 className="font-semibold text-gray-800 text-sm lg:text-base">
+                  {group.codeSection}
+                </h4>
               </div>
-            );
-          })}
+              <div className="space-y-3">
+                {group.fields.map((key) => {
+                  const value = record[key];
+                  return (
+                    <div key={key} className="flex flex-col sm:grid sm:grid-cols-3 gap-1 sm:gap-4">
+                      <div className="font-normal text-gray-700 text-sm lg:text-base">
+                        {formatFieldName(key)}:
+                      </div>
+                      <div className="sm:col-span-2 text-gray-600 text-sm lg:text-base break-words font-bold">
+                        {formatFieldValue(key, value)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>

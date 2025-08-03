@@ -128,64 +128,73 @@ export const CaseHistoryDialog: React.FC<CaseHistoryDialogProps> = ({
               Original Case Created
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <span className="text-sm font-medium text-gray-600">Address:</span>
-                <p className="text-sm">{formatFieldValue(originalRecord?.address)}</p>
-              </div>
-              
-              <div>
-                <span className="text-sm font-medium text-gray-600">Case Number:</span>
-                <p className="text-sm font-mono">{originalRecord?.casefile_number}</p>
-              </div>
-              
-              <div>
-                <span className="text-sm font-medium text-gray-600">Parcel ID:</span>
-                <p className="text-sm font-mono">{originalRecord?.parcel_id || 'N/A'}</p>
-              </div>
-              
-              <div>
-                <span className="text-sm font-medium text-gray-600">Date:</span>
-                <p className="text-sm">{formatDate(originalRecord?.investigation_date || '')}</p>
-              </div>
-              
-              <div className="md:col-span-2">
-                <span className="text-sm font-medium text-gray-600">Initial Status:</span>
-                <div className="mt-1">
-                  <Badge className={getStatusColor(originalRecord?.status || '')} variant="outline">
-                    {getStatusIcon(originalRecord?.status || '')}
-                    <span className="ml-1">{formatFieldValue(originalRecord?.status)}</span>
-                  </Badge>
+            {/* Case Information Group */}
+            <div className="mb-6">
+              <h4 className="font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-300">
+                Case Information
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <span className="text-sm font-medium text-gray-600">Address:</span>
+                  <p className="text-sm">{formatFieldValue(originalRecord?.address)}</p>
                 </div>
-              </div>
-              
-              <div className="md:col-span-2">
-                <span className="text-sm font-medium text-gray-600">Violation Description:</span>
-                <p className="text-sm mt-1">{formatFieldValue(originalRecord?.violation_description)}</p>
-              </div>
-              
-              {originalRecord?.investigation_findings && (
+                
+                <div>
+                  <span className="text-sm font-medium text-gray-600">Case Number:</span>
+                  <p className="text-sm font-mono">{originalRecord?.casefile_number}</p>
+                </div>
+                
+                <div>
+                  <span className="text-sm font-medium text-gray-600">Parcel ID:</span>
+                  <p className="text-sm font-mono">{originalRecord?.parcel_id || 'N/A'}</p>
+                </div>
+                
+                <div>
+                  <span className="text-sm font-medium text-gray-600">Date:</span>
+                  <p className="text-sm">{formatDate(originalRecord?.investigation_date || '')}</p>
+                </div>
+                
                 <div className="md:col-span-2">
-                  <span className="text-sm font-medium text-gray-600">Investigation Findings:</span>
-                  <p className="text-sm mt-1">{formatFieldValue(originalRecord.investigation_findings)}</p>
+                  <span className="text-sm font-medium text-gray-600">Initial Status:</span>
+                  <div className="mt-1">
+                    <Badge className={getStatusColor(originalRecord?.status || '')} variant="outline">
+                      {getStatusIcon(originalRecord?.status || '')}
+                      <span className="ml-1">{formatFieldValue(originalRecord?.status)}</span>
+                    </Badge>
+                  </div>
                 </div>
-              )}
-              
-              <div className="md:col-span-2">
-                <span className="text-sm font-medium text-gray-600">Investigation Outcome:</span>
-                <p className="text-sm mt-1">{formatFieldValue(originalRecord?.investigation_outcome)}</p>
               </div>
-              
-              {originalRecord?.violation_spec_instructions && (
-                <div className="md:col-span-2">
-                  <span className="text-sm font-medium text-gray-600">Instructions:</span>
-                  <p className="text-sm mt-1">{formatFieldValue(originalRecord.violation_spec_instructions)}</p>
+            </div>
+
+            {/* Code Section Group */}
+            <div>
+              <h4 className="font-semibold text-gray-800 mb-3 pb-2 border-b border-gray-300">
+                {formatFieldValue(originalRecord?.violation_code_section) || 'Unknown Code Section'}
+              </h4>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <span className="text-sm font-medium text-gray-600">Violation Description:</span>
+                  <p className="text-sm mt-1">{formatFieldValue(originalRecord?.violation_description)}</p>
                 </div>
-              )}
-              
-              <div className="md:col-span-2">
-                <span className="text-sm font-medium text-gray-600">Code Section:</span>
-                <p className="text-sm mt-1">{formatFieldValue(originalRecord?.violation_code_section)}</p>
+                
+                {originalRecord?.investigation_findings && (
+                  <div>
+                    <span className="text-sm font-medium text-gray-600">Investigation Findings:</span>
+                    <p className="text-sm mt-1">{formatFieldValue(originalRecord.investigation_findings)}</p>
+                  </div>
+                )}
+                
+                <div>
+                  <span className="text-sm font-medium text-gray-600">Investigation Outcome:</span>
+                  <p className="text-sm mt-1">{formatFieldValue(originalRecord?.investigation_outcome)}</p>
+                </div>
+                
+                {originalRecord?.violation_spec_instructions && (
+                  <div>
+                    <span className="text-sm font-medium text-gray-600">Instructions:</span>
+                    <p className="text-sm mt-1">{formatFieldValue(originalRecord.violation_spec_instructions)}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
