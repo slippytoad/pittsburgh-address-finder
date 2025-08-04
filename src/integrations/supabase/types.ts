@@ -161,6 +161,24 @@ export type Database = {
         }
         Relationships: []
       }
+      violation_code_sections: {
+        Row: {
+          definition: string
+          id: number
+          violation_code_section: string
+        }
+        Insert: {
+          definition: string
+          id?: number
+          violation_code_section: string
+        }
+        Update: {
+          definition?: string
+          id?: number
+          violation_code_section?: string
+        }
+        Relationships: []
+      }
       violations: {
         Row: {
           _id: number
