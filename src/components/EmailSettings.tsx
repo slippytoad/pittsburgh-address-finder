@@ -127,7 +127,7 @@ const EmailSettings: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="email-reports">Enable Daily Email Reports</Label>
+              <Label htmlFor="email-reports">Enable Hourly Email Reports</Label>
               <p className="text-sm text-gray-600">
                 Receive email notifications when new violation records are found
               </p>
@@ -159,7 +159,7 @@ const EmailSettings: React.FC = () => {
             <div className="space-y-0.5">
               <Label htmlFor="violation-checks">Enable Violation Checks</Label>
               <p className="text-sm text-gray-600">
-                Enable the daily automated violation checking system
+                Enable the hourly automated violation checking system
               </p>
             </div>
             <Switch
@@ -179,7 +179,7 @@ const EmailSettings: React.FC = () => {
         </div>
 
         <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-md">
-          <strong>Note:</strong> The daily email check runs automatically at 6:00 AM every day. 
+          <strong>Note:</strong> The hourly email check runs automatically at 5 minutes past every hour. 
           You will only receive emails when new violation records are found.
         </div>
       </CardContent>

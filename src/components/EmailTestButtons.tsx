@@ -16,7 +16,7 @@ const EmailTestButtons: React.FC = () => {
   const sendTestEmail = async () => {
     setSendingTest(true);
     try {
-      const { data, error } = await supabase.functions.invoke('daily-violation-check', {
+      const { data, error } = await supabase.functions.invoke('hourly-violation-check', {
         body: { test_run: true }
       });
 
@@ -46,32 +46,32 @@ const EmailTestButtons: React.FC = () => {
     }
   };
 
-  const sendDailyReport = async () => {
+  const sendHourlyReport = async () => {
     setSendingDaily(true);
     try {
-      const { data, error } = await supabase.functions.invoke('daily-violation-check', {
+      const { data, error } = await supabase.functions.invoke('hourly-violation-check', {
         body: { test_run: false }
       });
 
       if (error) {
         console.error('Error sending daily report:', error);
         toast({
-          title: "Daily Report Failed",
-          description: "Failed to send daily report email",
+          title: "Hourly Report Failed",
+          description: "Failed to send hourly report email",
           variant: "destructive"
         });
         return;
       }
 
       toast({
-        title: "Daily Report Sent",
-        description: "Daily violation report has been sent successfully. Check your inbox!"
+        title: "Hourly Report Sent",
+        description: "Hourly violation report has been sent successfully. Check your inbox!"
       });
     } catch (error) {
       console.error('Error:', error);
       toast({
-        title: "Daily Report Failed",
-        description: "Failed to send daily report email",
+        title: "Hourly Report Failed",
+        description: "Failed to send hourly report email",
         variant: "destructive"
       });
     } finally {
@@ -79,33 +79,33 @@ const EmailTestButtons: React.FC = () => {
     }
   };
 
-  const runDailyCheck = async () => {
+  const runHourlyCheck = async () => {
     setRunningCheck(true);
     try {
-      const { data, error } = await supabase.functions.invoke('daily-violation-check', {
+      const { data, error } = await supabase.functions.invoke('hourly-violation-check', {
         body: { test_run: false }
       });
 
       if (error) {
-        console.error('Error running daily check:', error);
+        console.error('Error running hourly check:', error);
         toast({
-          title: "Daily Check Failed",
-          description: `Failed to run daily check: ${error.message}`,
+          title: "Hourly Check Failed",
+          description: `Failed to run hourly check: ${error.message}`,
           variant: "destructive"
         });
         return;
       }
 
-      console.log('Daily check response:', data);
+      console.log('Hourly check response:', data);
       toast({
-        title: "Daily Check Completed",
-        description: `Daily check completed successfully. ${data?.newRecordsCount || 0} new records found.`
+        title: "Hourly Check Completed",
+        description: `Hourly check completed successfully. ${data?.newRecordsCount || 0} new records found.`
       });
     } catch (error) {
       console.error('Error:', error);
       toast({
-        title: "Daily Check Failed",
-        description: "Failed to run daily check",
+        title: "Hourly Check Failed",
+        description: "Failed to run hourly check",
         variant: "destructive"
       });
     } finally {
@@ -205,7 +205,7 @@ const EmailTestButtons: React.FC = () => {
       console.log('Starting full sync to pull all records from 2024...');
 
       // Run the daily check to fetch everything from 2024 without sending email
-      const { data, error } = await supabase.functions.invoke('daily-violation-check', {
+      const { data, error } = await supabase.functions.invoke('hourly-violation-check', {
         body: { test_run: false, full_sync: true, skip_email: true }
       });
 
@@ -259,22 +259,22 @@ const EmailTestButtons: React.FC = () => {
           </Button>
           
           <Button 
-            onClick={sendDailyReport} 
+            onClick={sendHourlyReport} 
             disabled={sendingDaily}
             className="flex items-center gap-2"
           >
             <Send className="h-4 w-4" />
-            {sendingDaily ? 'Sending...' : 'Send Daily Report'}
+            {sendingDaily ? 'Sending...' : 'Send Hourly Report'}
           </Button>
 
           <Button 
-            onClick={runDailyCheck} 
+            onClick={runHourlyCheck} 
             disabled={runningCheck}
             className="flex items-center gap-2"
             variant="default"
           >
             <Play className="h-4 w-4" />
-            {runningCheck ? 'Running...' : 'Run Daily Check'}
+            {runningCheck ? 'Running...' : 'Run Hourly Check'}
           </Button>
 
           <Button 
@@ -290,8 +290,8 @@ const EmailTestButtons: React.FC = () => {
         
         <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-md">
           <strong>Test Email:</strong> Sends a simple test message to verify email functionality.<br/>
-          <strong>Daily Report:</strong> Sends the actual daily violation report with current data.<br/>
-          <strong>Run Daily Check:</strong> Executes the full daily violation check process including data fetching and database updates.<br/>
+          <strong>Hourly Report:</strong> Sends the actual hourly violation report with current data.<br/>
+          <strong>Run Hourly Check:</strong> Executes the full hourly violation check process including data fetching and database updates.<br/>
           <strong>Full Sync:</strong> <span className="text-red-600 font-medium">Deletes ALL violation records and re-syncs everything from 2024. Reports count of retrieved records. No email is sent. Use with caution!</span>
         </div>
       </CardContent>

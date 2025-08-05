@@ -28,7 +28,7 @@ serve(async (req: Request) => {
   }
 
   try {
-    console.log("Starting daily violation check...");
+    console.log("Starting hourly violation check...");
     console.log("Using Supabase URL:", supabaseUrl);
     console.log("Service key available:", !!supabaseServiceKey);
 
@@ -133,9 +133,9 @@ serve(async (req: Request) => {
       console.log("No new violations to save");
     }
 
-    // Send daily email notification with detailed breakdown (only if not skipping email and there are new violations)
+    // Send hourly email notification with detailed breakdown (only if not skipping email and there are new violations)
     if (!skipEmail && settings?.email_reports_enabled && settings?.email_report_address && filterResult.newRecords.length > 0) {
-      console.log("Sending daily email report...");
+      console.log("Sending hourly email report...");
       const emailResponse = await emailService.sendDailyReport(
         settings.email_report_address, 
         filterResult.newRecords, 
@@ -225,7 +225,7 @@ serve(async (req: Request) => {
 
     return new Response(
       JSON.stringify({ 
-        message: isFullSync ? "Full sync completed successfully" : "Daily check completed successfully",
+        message: isFullSync ? "Full sync completed successfully" : "Hourly check completed successfully",
         newRecordsCount: filterResult.newRecords.length,
         newCasefilesCount: filterResult.newCasefiles.length,
         newRecordsForExistingCasesCount: filterResult.newRecordsForExistingCases.length,
@@ -236,7 +236,7 @@ serve(async (req: Request) => {
     );
 
   } catch (error: any) {
-    console.error("Error in daily-violation-check function:", error);
+    console.error("Error in hourly-violation-check function:", error);
     console.error("Error stack:", error.stack);
     return new Response(
       JSON.stringify({ error: error.message, stack: error.stack }),

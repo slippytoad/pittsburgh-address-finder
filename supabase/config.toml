@@ -6,5 +6,8 @@ verify_jwt = false
 [functions.get-violation-definition]
 verify_jwt = false
 
+[functions.hourly-violation-check]
+verify_jwt = false
+
 [functions.test-push-notification]
 verify_jwt = false
