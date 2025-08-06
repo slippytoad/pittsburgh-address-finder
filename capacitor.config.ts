@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.72f422bad056495bbe0edffed3e7e0a4',
+  appId: 'com.slippytoad.JFWViolationsApp',
   appName: 'jfw-oakland-property-violations-tracker',
   webDir: 'dist',
   server: {
