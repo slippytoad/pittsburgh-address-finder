@@ -19,4 +19,18 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      external: [],
+      output: {
+        // Ensure apple-app-site-association is copied to build
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name === 'apple-app-site-association') {
+            return '.well-known/apple-app-site-association';
+          }
+          return 'assets/[name]-[hash][extname]';
+        }
+      }
+    }
+  }
 }));
