@@ -42,6 +42,24 @@ export default defineConfig(({ mode }) => ({
             next();
           }
         });
+      },
+      writeBundle() {
+        // Copy apple-app-site-association to both locations in dist
+        const sourceFile = path.join(__dirname, 'public/.well-known/apple-app-site-association');
+        const wellKnownDir = path.join(__dirname, 'dist/.well-known');
+        const destFile1 = path.join(wellKnownDir, 'apple-app-site-association');
+        const destFile2 = path.join(__dirname, 'dist/apple-app-site-association');
+        
+        // Create .well-known directory if it doesn't exist
+        if (!fs.existsSync(wellKnownDir)) {
+          fs.mkdirSync(wellKnownDir, { recursive: true });
+        }
+        
+        // Copy to both locations
+        if (fs.existsSync(sourceFile)) {
+          fs.copyFileSync(sourceFile, destFile1);
+          fs.copyFileSync(sourceFile, destFile2);
+        }
       }
     }
   ].filter(Boolean),
