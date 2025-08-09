@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.aasa]
 verify_jwt = false
+
+[functions.apple-app-site-association]
+verify_jwt = false
