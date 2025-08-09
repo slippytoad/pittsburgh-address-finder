@@ -61,26 +61,38 @@ export const usePropertyData = (selectedStatuses: string[], addressSearch?: stri
   };
 
   // Get available statuses, status counts, and filtered data
-  const { availableStatuses, statusCounts, filteredRecords } = useMemo(() => {
+  const { availableStatuses, statusCounts, filteredRecords, recentCount } = useMemo(() => {
     if (!groupedCases.length) {
-      return { availableStatuses: [], statusCounts: {}, filteredRecords: [] };
+      return { availableStatuses: [], statusCounts: {}, filteredRecords: [], recentCount: 0 };
     }
 
     const availableStatuses = getAvailableStatuses(groupedCases);
     const statusCounts = getStatusCounts(groupedCases);
-    
-    // Filter cases based on selected statuses
-    let filteredCases = filterCasesByStatus(groupedCases, selectedStatuses);
+
+    // Compute recent cases (last 30 days by latest record date)
+    const threshold = new Date();
+    threshold.setDate(threshold.getDate() - 30);
+    const recentCases = groupedCases.filter(c => {
+      if (!c.latestDate) return false;
+      const d = new Date(c.latestDate);
+      return !isNaN(d.getTime()) && d >= threshold;
+    });
+
+    // Filter cases based on selected statuses or recent sentinel
+    let filteredCases = selectedStatuses.includes('__RECENT__')
+      ? recentCases
+      : filterCasesByStatus(groupedCases, selectedStatuses);
 
     // Filter by address search if provided
     if (addressSearch) {
       filteredCases = filterCasesByAddress(filteredCases, addressSearch);
     }
 
-    return { 
+    return {
       availableStatuses,
       statusCounts,
-      filteredRecords: filteredCases.flatMap(c => c.records)
+      filteredRecords: filteredCases.flatMap(c => c.records),
+      recentCount: recentCases.length,
     };
   }, [groupedCases, selectedStatuses, addressSearch]);
 
@@ -109,6 +121,7 @@ export const usePropertyData = (selectedStatuses: string[], addressSearch?: stri
     appSettings,
     handleFetchData,
     getLatestDate,
-    formatLastApiCheckTime: (timestamp: string | null) => formatLastApiCheckTime(timestamp)
+    formatLastApiCheckTime: (timestamp: string | null) => formatLastApiCheckTime(timestamp),
+    recentCount,
   };
 };

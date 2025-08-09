@@ -39,7 +39,8 @@ const PropertyInvestigationDashboard: React.FC = () => {
     lastApiNewRecordsCount,
     appSettings,
     handleFetchData,
-    formatLastApiCheckTime
+    formatLastApiCheckTime,
+    recentCount
   } = usePropertyData(selectedStatuses, addressSearch);
 
   return (
@@ -65,6 +66,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
               statusCounts={statusCounts}
               onAddressSearch={setAddressSearch}
               addressSearch={addressSearch}
+              recentCount={recentCount}
             />
             <PropertyList 
               records={filteredRecords} 
