@@ -19,8 +19,8 @@ export const CaseCardInstructions: React.FC<CaseCardInstructionsProps> = ({
   return (
     <div className="flex flex-col gap-3 text-sm">
       {/* Instructions with FileText icon */}
-      <div className="flex items-start gap-2 text-gray-700">
-        <div className="h-4 w-4 text-gray-500 flex-shrink-0 mt-0.5">
+      <div className="flex items-start gap-2">
+        <div className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14,2 14,8 20,8"/>
@@ -30,16 +30,17 @@ export const CaseCardInstructions: React.FC<CaseCardInstructionsProps> = ({
           </svg>
         </div>
         <div>
-          <span className="font-normal">Instructions:</span> 
-          <span className="ml-1 font-bold break-words">{formattedInstructions}</span>
+          <span className="font-normal text-muted-foreground">Instructions:</span>
+          <span className="ml-1 font-medium text-foreground break-words">{formattedInstructions}</span>
         </div>
       </div>
       
       {/* Notice timing with Calendar icon (conditional) */}
       {noticeLabel && (
-        <div className="flex items-start gap-2 text-gray-500">
-          <Calendar className="h-4 w-4 flex-shrink-0 mt-0.5" />
-          <span className="font-normal">{noticeLabel}: <span className="font-bold">{formatDate(latestDate)}</span></span>
+        <div className="flex items-start gap-2">
+          <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+          <span className="font-normal text-muted-foreground">{noticeLabel}:</span>
+          <span className="ml-1 font-medium text-foreground">{formatDate(latestDate)}</span>
         </div>
       )}
     </div>
