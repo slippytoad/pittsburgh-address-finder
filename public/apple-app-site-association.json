@@ -1,0 +1,16 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["R2KP28N6MD.com.slippytoad.JFWViolationsApp"],
+        "components": [
+          {
+            "/": "*",
+            "comment": "Matches all paths"
+          }
+        ]
+      }
+    ]
+  }
+}
