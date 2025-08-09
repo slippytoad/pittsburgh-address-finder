@@ -6,7 +6,19 @@
   Content-Type: application/json
   X-Content-Type-Options: nosniff
   Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+/apple-app-site-association/
+  Content-Type: application/json
+  X-Content-Type-Options: nosniff
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
 /.well-known/apple-app-site-association
+  Content-Type: application/json
+  X-Content-Type-Options: nosniff
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+/.well-known/apple-app-site-association/
+  Content-Type: application/json
+  X-Content-Type-Options: nosniff
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
+/.well-known/apple-app-site-association.json
   Content-Type: application/json
   X-Content-Type-Options: nosniff
   Cache-Control: no-store, no-cache, must-revalidate, max-age=0
