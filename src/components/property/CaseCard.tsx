@@ -101,7 +101,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                 <div className="flex flex-col gap-3">
                   <CaseCardStatus
                     currentStatus={groupedCase.currentStatus}
-                    recordCount={groupedCase.records.length}
+                    uniqueCodesCount={new Set(groupedCase.records.map(r => (r.violation_code_section ?? '').trim()).filter(Boolean)).size}
                     isOpen={isOpen}
                   />
                   
@@ -140,7 +140,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                 {/* Status and Toggle immediately after street address */}
                 <CaseCardStatus
                   currentStatus={groupedCase.currentStatus}
-                  recordCount={groupedCase.records.length}
+                  uniqueCodesCount={new Set(groupedCase.records.map(r => (r.violation_code_section ?? '').trim()).filter(Boolean)).size}
                   isOpen={isOpen}
                 />
 
