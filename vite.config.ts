@@ -12,6 +12,49 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     mode === 'development' && componentTagger(),
+    {
+      name: 'apple-app-site-association',
+      configureServer(server: any) {
+        server.middlewares.use('/.well-known/apple-app-site-association', (req: any, res: any) => {
+          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('Cache-Control', 'public, max-age=86400');
+          res.end(JSON.stringify({
+            "applinks": {
+              "details": [
+                {
+                  "appIDs": ["com.slippytoad.JFWViolationsApp"],
+                  "components": [
+                    {
+                      "/": "*",
+                      "comment": "Matches all paths"
+                    }
+                  ]
+                }
+              ]
+            }
+          }));
+        });
+        server.middlewares.use('/apple-app-site-association', (req: any, res: any) => {
+          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('Cache-Control', 'public, max-age=86400');
+          res.end(JSON.stringify({
+            "applinks": {
+              "details": [
+                {
+                  "appIDs": ["com.slippytoad.JFWViolationsApp"],
+                  "components": [
+                    {
+                      "/": "*",
+                      "comment": "Matches all paths"
+                    }
+                  ]
+                }
+              ]
+            }
+          }));
+        });
+      }
+    }
   ].filter(Boolean),
   resolve: {
     alias: {
