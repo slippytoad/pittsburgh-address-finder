@@ -21,9 +21,11 @@ export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
         <Badge variant={getStatusColor(currentStatus)} className="flex-shrink-0">
           {currentStatus === 'IN VIOLATION' ? 'Open' : currentStatus}
         </Badge>
-        <Badge variant="secondary" className="flex-shrink-0">
-          {uniqueCodesCount} {`CODE VIOLATION${uniqueCodesCount === 1 ? '' : 'S'}`}
-        </Badge>
+        {uniqueCodesCount > 1 && (
+          <Badge variant="secondary" className="flex-shrink-0">
+            {uniqueCodesCount} CODE VIOLATIONS
+          </Badge>
+        )}
       </div>
       <div className="flex items-center text-sm text-gray-500 flex-shrink-0">
         {isOpen ? (
