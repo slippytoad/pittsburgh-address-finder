@@ -1,5 +1,5 @@
-/.well-known/apple-app-site-association /apple-app-site-association.json 200!
-/.well-known/apple-app-site-association/ /apple-app-site-association.json 200!
-/apple-app-site-association /apple-app-site-association.json 200!
-/apple-app-site-association/ /apple-app-site-association.json 200!
+/.well-known/apple-app-site-association https://qdjfzjqhnhrlkpqdtssp.supabase.co/functions/v1/aasa 200!
+/.well-known/apple-app-site-association/ https://qdjfzjqhnhrlkpqdtssp.supabase.co/functions/v1/aasa 200!
+/apple-app-site-association https://qdjfzjqhnhrlkpqdtssp.supabase.co/functions/v1/aasa 200!
+/apple-app-site-association/ https://qdjfzjqhnhrlkpqdtssp.supabase.co/functions/v1/aasa 200!
 /* /index.html 200
