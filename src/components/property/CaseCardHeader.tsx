@@ -54,7 +54,7 @@ export const CaseCardHeader: React.FC<CaseCardHeaderProps> = ({
       {earliestDate && (
         <div className="flex items-start gap-2 text-sm text-gray-500">
           <Calendar className="h-4 w-4 flex-shrink-0 mt-0.5" />
-          <span className="font-normal">Opened: <span className="font-bold">{formatDate(earliestDate)}</span></span>
+          <span className="font-normal">First notice: <span className="font-bold">{formatDate(earliestDate)}</span></span>
         </div>
       )}
     </div>

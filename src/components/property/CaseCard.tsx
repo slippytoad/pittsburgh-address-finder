@@ -53,6 +53,15 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   const formattedDescription = violationDescription ? 
     violationDescription.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) : null;
 
+  // Determine notice label based on count of notices for the latest code section
+  const latestCodeSectionKey = (groupedCase.records[0]?.violation_code_section || '').trim();
+  const latestCodeCount = latestCodeSectionKey
+    ? groupedCase.records.filter(r => (r.violation_code_section || '').trim() === latestCodeSectionKey).length
+    : 0;
+  let noticeLabel: string | null = 'Last update';
+  if (latestCodeCount <= 1) noticeLabel = null;
+  else if (latestCodeCount >= 3) noticeLabel = 'Final notice';
+
   // Get the earliest investigation date (when case was first opened)
   const earliestDate = groupedCase.records.reduce((earliest, record) => {
     if (!record.investigation_date) return earliest;
@@ -112,6 +121,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                     <CaseCardOutcome
                       formattedOutcome={formattedOutcome}
                       latestDate={groupedCase.latestDate}
+                      noticeLabel={noticeLabel}
                     />
                   ) : (
                     <CaseCardInstructions 
@@ -191,7 +201,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                           <line x1="3" y1="10" x2="21" y2="10"/>
                         </svg>
                       </div>
-                      <span className="font-normal">Opened: <span className="font-bold">{new Date(earliestDate).toLocaleDateString()}</span></span>
+                      <span className="font-normal">First notice: <span className="font-bold">{new Date(earliestDate).toLocaleDateString()}</span></span>
                     </div>
                   )}
                 </div>
@@ -203,11 +213,13 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   <CaseCardOutcome
                     formattedOutcome={formattedOutcome}
                     latestDate={groupedCase.latestDate}
+                    noticeLabel={noticeLabel}
                   />
                 ) : (
                   <CaseCardInstructions 
                     formattedInstructions={formattedInstructions} 
                     latestDate={groupedCase.latestDate}
+                    noticeLabel={noticeLabel}
                   />
                 )}
               </div>

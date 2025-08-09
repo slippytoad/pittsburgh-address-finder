@@ -6,11 +6,13 @@ import { formatDate } from '@/utils/propertyUtils';
 interface CaseCardInstructionsProps {
   formattedInstructions: string | null;
   latestDate: string;
+  noticeLabel?: string | null;
 }
 
 export const CaseCardInstructions: React.FC<CaseCardInstructionsProps> = ({
   formattedInstructions,
-  latestDate
+  latestDate,
+  noticeLabel = 'Last update',
 }) => {
   if (!formattedInstructions) return null;
 
@@ -33,11 +35,13 @@ export const CaseCardInstructions: React.FC<CaseCardInstructionsProps> = ({
         </div>
       </div>
       
-      {/* Last update with Calendar icon */}
-      <div className="flex items-start gap-2 text-gray-500">
-        <Calendar className="h-4 w-4 flex-shrink-0 mt-0.5" />
-        <span className="font-normal">Last update: <span className="font-bold">{formatDate(latestDate)}</span></span>
-      </div>
+      {/* Notice timing with Calendar icon (conditional) */}
+      {noticeLabel && (
+        <div className="flex items-start gap-2 text-gray-500">
+          <Calendar className="h-4 w-4 flex-shrink-0 mt-0.5" />
+          <span className="font-normal">{noticeLabel}: <span className="font-bold">{formatDate(latestDate)}</span></span>
+        </div>
+      )}
     </div>
   );
 };
