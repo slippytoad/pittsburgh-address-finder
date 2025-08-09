@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => ({
             "applinks": {
               "details": [
                 {
-                  "appIDs": ["com.slippytoad.JFWViolationsApp"],
+                  "appIDs": ["R2KP28N6MD.com.slippytoad.JFWViolationsApp"],
                   "components": [
                     {
                       "/": "*",
@@ -41,7 +41,7 @@ export default defineConfig(({ mode }) => ({
             "applinks": {
               "details": [
                 {
-                  "appIDs": ["com.slippytoad.JFWViolationsApp"],
+                  "appIDs": ["R2KP28N6MD.com.slippytoad.JFWViolationsApp"],
                   "components": [
                     {
                       "/": "*",
