@@ -52,8 +52,6 @@ const PropertyInvestigationDashboard: React.FC = () => {
           newRecordsCount={lastNewRecordsCount}
           newCasefilesCount={lastNewCasefilesCount}
           newRecordsForExistingCasesCount={lastNewRecordsForExistingCasesCount}
-          lastApiCheckTime={formatLastApiCheckTime(appSettings?.last_api_check_time || null)}
-          lastApiNewRecordsCount={lastApiNewRecordsCount}
         />
 
         {error && <ErrorDisplay error={error} />}
