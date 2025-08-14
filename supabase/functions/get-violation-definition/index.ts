@@ -49,7 +49,7 @@ serve(async (req) => {
     // Query the violation_code_sections table
     const { data, error } = await supabase
       .from('violation_code_sections')
-      .select('definition')
+      .select('definition, short_definition')
       .eq('violation_code_section', violation_code_section)
       .maybeSingle();
 
@@ -84,7 +84,8 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true,
         violation_code_section,
-        definition: data.definition 
+        definition: data.definition,
+        short_definition: data.short_definition
       }),
       {
         status: 200,
