@@ -20,6 +20,12 @@ export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
   const [violationDescriptions, setViolationDescriptions] = useState<string[]>([]);
 
   useEffect(() => {
+    // Safety check: ensure groupedCase and records exist
+    if (!groupedCase?.records) {
+      setViolationDescriptions([]);
+      return;
+    }
+
     const fetchViolationDescriptions = async () => {
       const uniqueCodeSections = new Set(
         groupedCase.records
@@ -56,7 +62,7 @@ export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
     };
 
     fetchViolationDescriptions();
-  }, [groupedCase.records]);
+  }, [groupedCase?.records]);
 
   return (
     <div className="flex items-center justify-between w-full flex-nowrap">
