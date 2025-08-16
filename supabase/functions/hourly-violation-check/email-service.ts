@@ -128,6 +128,7 @@ export class EmailService {
     if (newRecords.length > 0) {
       // Email for when new violations are found
       const hasUpdatesOnly = newCasefilesCount === 0 && newRecordsForExistingCasesCount > 0;
+      const hasBothNewAndUpdated = newCasefilesCount > 0 && newRecordsForExistingCasesCount > 0;
       
       if (hasUpdatesOnly) {
         emailSubject = `JFW Oakland Violations Report - ${newRecords.length} updated violation${newRecords.length > 1 ? 's' : ''}`;
@@ -136,6 +137,17 @@ export class EmailService {
           <p>We found <strong>${newRecords.length} updated violation${newRecords.length > 1 ? 's' : ''}</strong> during today's check.</p>
           
           <h3>Updated Records (click case numbers for direct access):</h3>
+          <ul style="list-style-type: none; padding: 0;">
+            ${this.formatNewRecordsList(newRecords)}
+            ${newRecords.length > 10 ? `<li><em>... and ${newRecords.length - 10} more records</em></li>` : ''}
+          </ul>`;
+      } else if (hasBothNewAndUpdated) {
+        emailSubject = `JFW Oakland Violations Report - ${newCasefilesCount} new and ${newRecordsForExistingCasesCount} updated violation${(newCasefilesCount + newRecordsForExistingCasesCount) > 1 ? 's' : ''}`;
+        emailBody = `
+          <h2>Daily Property Violation Report - ${currentDate}</h2>
+          <p>We found <strong>${newCasefilesCount} new and ${newRecordsForExistingCasesCount} updated violation${(newCasefilesCount + newRecordsForExistingCasesCount) > 1 ? 's' : ''}</strong> during today's check.</p>
+          
+          <h3>New and Updated Records (click case numbers for direct access):</h3>
           <ul style="list-style-type: none; padding: 0;">
             ${this.formatNewRecordsList(newRecords)}
             ${newRecords.length > 10 ? `<li><em>... and ${newRecords.length - 10} more records</em></li>` : ''}
