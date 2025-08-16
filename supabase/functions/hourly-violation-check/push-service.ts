@@ -32,6 +32,11 @@ export class PushService {
   private privateKey: string;
   private bundleId: string;
   private isProduction: boolean;
+  
+  // JWT caching properties
+  private cachedJWT: string | null = null;
+  private jwtExpirationTime: number = 0;
+  private readonly JWT_CACHE_DURATION = 3600 * 1000; // 60 minutes in milliseconds
 
   constructor(teamId: string, keyId: string, privateKey: string, bundleId: string, isProduction: boolean = true) {
     this.teamId = teamId;
@@ -116,6 +121,23 @@ export class PushService {
     }
   }
 
+  private async getCachedJWT(): Promise<string> {
+    const currentTime = Date.now();
+    
+    // Check if we have a valid cached JWT (with 5 minutes buffer before expiration)
+    if (this.cachedJWT && currentTime < (this.jwtExpirationTime - 5 * 60 * 1000)) {
+      console.log('Using cached JWT token');
+      return this.cachedJWT;
+    }
+    
+    // Generate a new JWT and cache it
+    console.log('Generating new JWT token for caching');
+    this.cachedJWT = await this.generateJWT();
+    this.jwtExpirationTime = currentTime + this.JWT_CACHE_DURATION;
+    
+    return this.cachedJWT;
+  }
+
   async sendPushNotifications(
     deviceTokens: DeviceToken[],
     payload: PushNotificationPayload
@@ -156,8 +178,8 @@ export class PushService {
         
         console.log(`Device ${device.device_token.substring(0, 10)}... - Environment: ${deviceIsProduction ? 'production' : 'sandbox'}, URL: ${deviceApnsUrl}`);
         
-        // Generate JWT for each device (in case we need different configurations later)
-        const jwt = await this.generateJWT();
+        // Use cached JWT to avoid TooManyProviderTokenUpdates error
+        const jwt = await this.getCachedJWT();
         
         const response = await fetch(
           `${deviceApnsUrl}${device.device_token}`,
