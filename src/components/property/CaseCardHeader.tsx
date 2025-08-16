@@ -31,30 +31,32 @@ export const CaseCardHeader: React.FC<CaseCardHeaderProps> = ({
       
       {/* Parcel ID Section with House Icon */}
       {parcelId && (
-        <div className="flex items-start gap-2 text-sm text-gray-700">
-          <House className="h-4 w-4 text-gray-500 flex-shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 text-sm">
+          <House className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
           <div>
-            <span className="font-normal">Parcel ID:</span>
-            <span className="font-bold ml-1">{parcelId}</span>
+            <span className="font-normal text-muted-foreground">Parcel ID:</span>
+            <span className="ml-1 font-medium text-foreground">{parcelId}</span>
           </div>
         </div>
       )}
       
       {/* Case Number Section */}
-      <div className="flex items-start gap-2">
-        <FileText className="h-4 w-4 text-gray-500 flex-shrink-0 mt-0.5" />
-        <span className={`text-sm font-normal ${
-          isHighlighted ? 'text-blue-700' : 'text-gray-600'
-        }`}>
-          Case #<span className="font-bold">{casefileNumber}</span>
-        </span>
+      <div className="flex items-start gap-2 text-sm">
+        <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+        <div>
+          <span className="font-normal text-muted-foreground">Case #</span>
+          <span className="ml-1 font-medium text-foreground">{casefileNumber}</span>
+        </div>
       </div>
       
       {/* Date Opened Section */}
       {earliestDate && (
-        <div className="flex items-start gap-2 text-sm text-gray-500">
-          <Calendar className="h-4 w-4 flex-shrink-0 mt-0.5" />
-          <span className="font-normal">First notice: <span className="font-bold">{formatDate(earliestDate)}</span></span>
+        <div className="flex items-start gap-2 text-sm">
+          <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+          <div>
+            <span className="font-normal text-muted-foreground">First notice:</span>
+            <span className="ml-1 font-medium text-foreground">{formatDate(earliestDate)}</span>
+          </div>
         </div>
       )}
     </div>

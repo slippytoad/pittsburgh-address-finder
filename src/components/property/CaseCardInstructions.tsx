@@ -39,8 +39,10 @@ export const CaseCardInstructions: React.FC<CaseCardInstructionsProps> = ({
       {noticeLabel && (
         <div className="flex items-start gap-2">
           <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-          <span className="font-normal text-muted-foreground">{noticeLabel}:</span>
-          <span className="ml-1 font-medium text-foreground">{formatDate(latestDate)}</span>
+          <div>
+            <span className="font-normal text-muted-foreground">{noticeLabel}:</span>
+            <span className="ml-1 font-medium text-foreground">{formatDate(latestDate)}</span>
+          </div>
         </div>
       )}
     </div>

@@ -12,10 +12,10 @@ export const CaseCardDescription: React.FC<CaseCardDescriptionProps> = ({
 
   return (
     <div className="flex items-start gap-2 text-sm">
-      <FileText className="h-4 w-4 text-gray-500 flex-shrink-0 mt-0.5" />
+      <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
       <div>
-        <span className="font-normal">Description:</span> 
-        <span className="ml-1 font-bold break-words">{formattedDescription}</span>
+        <span className="font-normal text-muted-foreground">Description:</span>
+        <span className="ml-1 font-medium text-foreground break-words">{formattedDescription}</span>
       </div>
     </div>
   );
