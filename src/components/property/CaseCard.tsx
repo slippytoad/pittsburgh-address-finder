@@ -98,7 +98,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
             <div className="flex flex-col gap-4 p-6 relative">
               {/* New/Updated Badge */}
               {(isNew || isUpdated) && (
-                <div className="absolute top-4 right-4">
+                <div className="absolute top-2 right-2">
                   <Badge variant="default" className="bg-blue-600 text-white">
                     {isNew ? 'New' : 'Updated'}
                   </Badge>
