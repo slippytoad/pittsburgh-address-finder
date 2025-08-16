@@ -74,7 +74,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
   const isNew = earliestDate && new Date(earliestDate) > oneWeekAgo;
   const isUpdated = !isNew && groupedCase.latestDate && new Date(groupedCase.latestDate) > oneWeekAgo;
-  return <Card className={`border-2 rounded-lg hover:bg-muted/50 transition-all duration-300 ${isHighlighted ? 'ring-2 ring-blue-500 bg-blue-50 border-blue-300' : 'border-gray-300 hover:border-gray-400'}`}>
+  return <Card className={`border-2 rounded-lg hover:bg-muted/50 transition-all duration-300 pt-5 ${isHighlighted ? 'ring-2 ring-blue-500 bg-blue-50 border-blue-300' : 'border-gray-300 hover:border-gray-400'}`}>
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors p-0">
