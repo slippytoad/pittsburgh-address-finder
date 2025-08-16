@@ -10,12 +10,16 @@ interface CaseCardStatusProps {
   currentStatus: string;
   groupedCase: GroupedCase;
   isOpen: boolean;
+  isNew?: boolean;
+  isUpdated?: boolean;
 }
 
 export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
   currentStatus,
   groupedCase,
-  isOpen
+  isOpen,
+  isNew = false,
+  isUpdated = false
 }) => {
   const [violationDescriptions, setViolationDescriptions] = useState<string[]>([]);
 
@@ -67,6 +71,12 @@ export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
   return (
     <div className="flex items-center justify-between w-full flex-nowrap">
       <div className="flex items-center gap-2 flex-wrap">
+        {/* New/Updated Badge */}
+        {(isNew || isUpdated) && (
+          <Badge variant="default" className="bg-blue-600 text-white">
+            {isNew ? 'New' : 'Updated'}
+          </Badge>
+        )}
         <Badge variant={getStatusColor(currentStatus)} className="flex-shrink-0">
           {currentStatus === 'IN VIOLATION' ? 'Open' : currentStatus}
         </Badge>

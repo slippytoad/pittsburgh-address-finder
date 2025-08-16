@@ -96,14 +96,6 @@ export const CaseCard: React.FC<CaseCardProps> = ({
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors p-0">
             <div className="flex flex-col gap-4 p-6 relative">
-              {/* New/Updated Badge */}
-              {(isNew || isUpdated) && (
-                <div className="absolute top-2 right-2">
-                  <Badge variant="default" className="bg-blue-600 text-white">
-                    {isNew ? 'New' : 'Updated'}
-                  </Badge>
-                </div>
-              )}
               
               {/* Desktop Layout - Two Column Structure */}
               <div className="hidden sm:grid sm:grid-cols-2 sm:gap-8">
@@ -124,6 +116,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                     currentStatus={groupedCase.currentStatus}
                     groupedCase={groupedCase}
                     isOpen={isOpen}
+                    isNew={isNew}
+                    isUpdated={isUpdated}
                   />
                   
                   {/* Description */}
@@ -165,6 +159,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   currentStatus={groupedCase.currentStatus}
                   groupedCase={groupedCase}
                   isOpen={isOpen}
+                  isNew={isNew}
+                  isUpdated={isUpdated}
                 />
 
                 {/* Rest of header info */}
