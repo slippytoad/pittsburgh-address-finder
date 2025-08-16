@@ -24,7 +24,7 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({
         }`}
       >
         <FileText className="h-4 w-4" />
-        Cases
+        <span className="hidden sm:inline">Cases</span>
       </Button>
       <Button
         variant={isPropertyView ? "default" : "ghost"}
@@ -37,7 +37,7 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({
         }`}
       >
         <Home className="h-4 w-4" />
-        Properties
+        <span className="hidden sm:inline">Properties</span>
       </Button>
     </div>
   );
