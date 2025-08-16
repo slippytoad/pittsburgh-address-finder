@@ -249,12 +249,12 @@ export const CaseCard: React.FC<CaseCardProps> = ({
               </div>
 
               {/* Chevron at bottom center */}
-              <div className="flex justify-center pt-2">
+              <div className="flex justify-center pt-1 pb-2">
                 <div className="flex items-center text-gray-400">
                   {isOpen ? (
-                    <ChevronUp className="h-5 w-5" />
+                    <ChevronUp className="h-6 w-6" />
                   ) : (
-                    <ChevronDown className="h-5 w-5" />
+                    <ChevronDown className="h-6 w-6" />
                   )}
                 </div>
               </div>
