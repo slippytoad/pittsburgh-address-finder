@@ -172,18 +172,19 @@ export const CaseCard: React.FC<CaseCardProps> = ({
 
               
               {/* Bottom section with Case History (right) and Chevron (center) */}
-              <div className="flex justify-between items-center pt-2 my-0 py-[10px]">
-                <div></div> {/* Empty spacer */}
-                <div className="flex items-center text-gray-400">
+              <div className="flex items-center pt-2 my-0 py-[10px] relative">
+                <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center text-gray-400">
                   {isOpen ? <ChevronUp className="h-6 w-6 my-[9px]" /> : <ChevronDown className="h-6 w-6" />}
                 </div>
-                <Button variant="outline" size="sm" onClick={e => {
-                e.stopPropagation();
-                setShowCaseHistory(true);
-              }} className="flex items-center gap-2">
-                  <History className="h-4 w-4" />
-                  Case History
-                </Button>
+                <div className="ml-auto">
+                  <Button variant="outline" size="sm" onClick={e => {
+                  e.stopPropagation();
+                  setShowCaseHistory(true);
+                }} className="flex items-center gap-2">
+                    <History className="h-4 w-4" />
+                    Case History
+                  </Button>
+                </div>
               </div>
             </div>
           </CardHeader>
