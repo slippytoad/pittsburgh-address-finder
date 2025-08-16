@@ -15,6 +15,7 @@ import { useAddressSearch } from '@/hooks/useAddressSearch';
 
 const PropertyInvestigationDashboard: React.FC = () => {
   const [isPropertyView, setIsPropertyView] = useState(false);
+  const [showClosedCases, setShowClosedCases] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -72,11 +73,14 @@ const PropertyInvestigationDashboard: React.FC = () => {
               recentCount={recentCount}
               isPropertyView={isPropertyView}
               onViewToggle={setIsPropertyView}
+              showClosedCases={showClosedCases}
+              onShowClosedCasesChange={setShowClosedCases}
             />
             {isPropertyView ? (
               <PropertyView 
                 records={allRecords}
                 highlightedCaseNumber={highlightedCaseNumber}
+                showClosedCases={showClosedCases}
               />
             ) : (
               <PropertyList 

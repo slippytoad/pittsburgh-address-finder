@@ -8,22 +8,24 @@ import PropertyCard from './PropertyCard';
 interface PropertyViewProps {
   records: PropertyRecord[];
   highlightedCaseNumber?: string | null;
+  showClosedCases?: boolean;
 }
 
 export const PropertyView: React.FC<PropertyViewProps> = ({ 
   records, 
-  highlightedCaseNumber = null 
+  highlightedCaseNumber = null,
+  showClosedCases = false
 }) => {
-  // Group cases by property and filter out only fully closed cases
+  // Group cases by property and filter based on showClosedCases setting
   const groupedCases = groupRecordsByCase(records);
-  const openCases = groupedCases.filter(groupedCase => {
+  const filteredCases = groupedCases.filter(groupedCase => {
     const status = groupedCase.currentStatus.toUpperCase();
-    // Only exclude cases that are actually closed (not ready to close)
-    return status !== 'CLOSED';
+    // Include all cases if showClosedCases is true, otherwise exclude closed cases
+    return showClosedCases || status !== 'CLOSED';
   });
 
   // Group by property address
-  const propertiesMap = openCases.reduce((acc, groupedCase) => {
+  const propertiesMap = filteredCases.reduce((acc, groupedCase) => {
     const address = groupedCase.records[0]?.address || 'Unknown Address';
     const streetAddress = address.split(',')[0] || address;
     

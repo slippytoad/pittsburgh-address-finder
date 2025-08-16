@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Search, X } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import ViewToggle from './ViewToggle';
 
 interface StatusTabsProps {
@@ -14,6 +15,8 @@ interface StatusTabsProps {
   recentCount: number;
   isPropertyView?: boolean;
   onViewToggle?: (isPropertyView: boolean) => void;
+  showClosedCases?: boolean;
+  onShowClosedCasesChange?: (showClosed: boolean) => void;
 }
 
 const StatusTabs: React.FC<StatusTabsProps> = ({
@@ -26,6 +29,8 @@ const StatusTabs: React.FC<StatusTabsProps> = ({
   recentCount,
   isPropertyView = false,
   onViewToggle,
+  showClosedCases = false,
+  onShowClosedCasesChange,
 }) => {
   
   // Define the groups
@@ -83,6 +88,23 @@ const StatusTabs: React.FC<StatusTabsProps> = ({
             </Tabs>
           )}
         </div>
+        
+        {/* Show Closed Cases checkbox - only in property view */}
+        {isPropertyView && onShowClosedCasesChange && (
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="show-closed-cases"
+              checked={showClosedCases}
+              onCheckedChange={onShowClosedCasesChange}
+            />
+            <label 
+              htmlFor="show-closed-cases" 
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Show Closed Cases
+            </label>
+          </div>
+        )}
       </div>
 
       {/* Address search */}
