@@ -318,15 +318,30 @@ serve(async (req: Request) => {
     // Initialize services
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    // Parse request body for device token (required)
+    // Parse request body for device token (required) and optional environment
     let customDeviceToken: string | null = null;
+    let environment: string = 'production'; // Default to production
     try {
       const body = await req.json();
       customDeviceToken = body?.device_token || null;
+      environment = body?.environment || 'production';
+      
+      // Validate environment parameter
+      if (environment !== 'production' && environment !== 'sandbox') {
+        return new Response(
+          JSON.stringify({ 
+            error: "environment must be either 'production' or 'sandbox'" 
+          }),
+          { 
+            status: 400, 
+            headers: { ...corsHeaders, "Content-Type": "application/json" } 
+          }
+        );
+      }
     } catch {
       return new Response(
         JSON.stringify({ 
-          error: "Invalid request body. Expected JSON with device_token field." 
+          error: "Invalid request body. Expected JSON with device_token field and optional environment field." 
         }),
         { 
           status: 400, 
@@ -347,13 +362,13 @@ serve(async (req: Request) => {
       );
     }
 
-    // Use provided device token
-    console.log(`Using provided device token: ${customDeviceToken.substring(0, 10)}...`);
+    // Use provided device token and environment
+    console.log(`Using provided device token: ${customDeviceToken.substring(0, 10)}... with environment: ${environment}`);
     const deviceTokens: DeviceToken[] = [{
       device_token: customDeviceToken,
       platform: 'ios',
       permission_granted: true,
-      apns_environment: undefined // Will be determined automatically
+      apns_environment: environment
     }];
 
     // Fetch the most recent violation to use as test data
