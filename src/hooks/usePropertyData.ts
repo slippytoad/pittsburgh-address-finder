@@ -61,9 +61,9 @@ export const usePropertyData = (selectedStatuses: string[], addressSearch?: stri
   };
 
   // Get available statuses, status counts, and filtered data
-  const { availableStatuses, statusCounts, filteredRecords, recentCount } = useMemo(() => {
+  const { availableStatuses, statusCounts, filteredRecords, allRecords, recentCount } = useMemo(() => {
     if (!groupedCases.length) {
-      return { availableStatuses: [], statusCounts: {}, filteredRecords: [], recentCount: 0 };
+      return { availableStatuses: [], statusCounts: {}, filteredRecords: [], allRecords: [], recentCount: 0 };
     }
 
     const availableStatuses = getAvailableStatuses(groupedCases);
@@ -92,6 +92,7 @@ export const usePropertyData = (selectedStatuses: string[], addressSearch?: stri
       availableStatuses,
       statusCounts,
       filteredRecords: filteredCases.flatMap(c => c.records),
+      allRecords: groupedCases.flatMap(c => c.records), // Add unfiltered records for property view
       recentCount: recentCases.length,
     };
   }, [groupedCases, selectedStatuses, addressSearch]);
@@ -114,6 +115,7 @@ export const usePropertyData = (selectedStatuses: string[], addressSearch?: stri
     availableStatuses,
     statusCounts,
     filteredRecords,
+    allRecords,
     lastNewRecordsCount,
     lastNewCasefilesCount,
     lastNewRecordsForExistingCasesCount,

@@ -34,6 +34,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
     showResults,
     availableStatuses,
     filteredRecords,
+    allRecords,
     statusCounts,
     lastNewRecordsCount,
     lastNewCasefilesCount,
@@ -74,7 +75,7 @@ const PropertyInvestigationDashboard: React.FC = () => {
             />
             {isPropertyView ? (
               <PropertyView 
-                records={filteredRecords}
+                records={allRecords}
                 highlightedCaseNumber={highlightedCaseNumber}
               />
             ) : (
