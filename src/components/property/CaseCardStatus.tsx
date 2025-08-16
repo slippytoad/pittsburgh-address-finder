@@ -74,7 +74,7 @@ export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
         </Badge>
       )}
       <Badge variant={getStatusColor(currentStatus)} className="flex-shrink-0">
-        {currentStatus === 'IN VIOLATION' ? 'Open' : currentStatus}
+        {currentStatus === 'IN VIOLATION' ? 'OPEN' : currentStatus}
       </Badge>
       {violationDescriptions.map((description, index) => (
         <Badge key={index} variant="secondary" className="flex-shrink-0 text-xs">
