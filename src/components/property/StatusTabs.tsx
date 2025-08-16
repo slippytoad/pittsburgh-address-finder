@@ -72,28 +72,10 @@ const StatusTabs: React.FC<StatusTabsProps> = ({
   return (
     <div className="space-y-6">
       {/* View Toggle and Status Tabs */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          {onViewToggle && (
-            <ViewToggle isPropertyView={isPropertyView} onToggle={onViewToggle} />
-          )}
-          
-          {!isPropertyView && (
-            <Tabs value={getCurrentTab()} onValueChange={handleTabChange}>
-              <TabsList className="inline-flex gap-2">
-                <TabsTrigger value="recent" className="truncate">
-                  Recent
-                </TabsTrigger>
-                <TabsTrigger value="in-violation" className="truncate">
-                  Open
-                </TabsTrigger>
-                <TabsTrigger value="closed" className="truncate">
-                  Closed
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          )}
-        </div>
+      <div className="flex items-center gap-4">
+        {onViewToggle && (
+          <ViewToggle isPropertyView={isPropertyView} onToggle={onViewToggle} />
+        )}
         
         {/* Show Closed Cases checkbox - only in property view */}
         {isPropertyView && onShowClosedCasesChange && (
@@ -110,6 +92,22 @@ const StatusTabs: React.FC<StatusTabsProps> = ({
               Show Closed Cases
             </label>
           </div>
+        )}
+        
+        {!isPropertyView && (
+          <Tabs value={getCurrentTab()} onValueChange={handleTabChange}>
+            <TabsList className="inline-flex gap-2">
+              <TabsTrigger value="recent" className="truncate">
+                Recent
+              </TabsTrigger>
+              <TabsTrigger value="in-violation" className="truncate">
+                Open
+              </TabsTrigger>
+              <TabsTrigger value="closed" className="truncate">
+                Closed
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         )}
       </div>
 

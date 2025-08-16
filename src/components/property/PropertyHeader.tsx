@@ -89,16 +89,6 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
             </div>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button 
-              onClick={handleButtonClick}
-              disabled={isLoading}
-              className="rounded-full px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white font-medium w-[180px]"
-              size="sm"
-            >
-              {getButtonContent()}
-            </Button>
-          </div>
         </div>
 
 
