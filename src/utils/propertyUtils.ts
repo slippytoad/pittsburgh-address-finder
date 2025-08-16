@@ -4,8 +4,10 @@ import { PropertyRecord, GroupedCase } from '@/types/propertyTypes';
 
 export const formatDate = (dateString: string) => {
   try {
-    // Format date in Eastern Time (America/New_York timezone)
-    return formatInTimeZone(new Date(dateString), 'America/New_York', 'MMM d, yyyy');
+    // Parse the date as if it's already in Eastern Time to avoid timezone shift
+    // Add 'T12:00:00' to treat it as noon to avoid day boundary issues
+    const dateWithTime = dateString.includes('T') ? dateString : `${dateString}T12:00:00`;
+    return formatInTimeZone(new Date(dateWithTime), 'America/New_York', 'MMM d, yyyy');
   } catch {
     return dateString;
   }
