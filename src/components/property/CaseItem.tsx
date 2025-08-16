@@ -79,7 +79,7 @@ export const CaseItem: React.FC<CaseItemProps> = ({
             {formatDate(groupedCase.latestDate)}
           </span>
           <Badge variant={getStatusColor(groupedCase.currentStatus)} className="flex-shrink-0">
-            {groupedCase.currentStatus === 'IN VIOLATION' ? 'Open' : groupedCase.currentStatus}
+            {groupedCase.currentStatus}
           </Badge>
         </div>
         
