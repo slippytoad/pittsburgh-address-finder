@@ -81,20 +81,14 @@ const StatusTabs: React.FC<StatusTabsProps> = ({
           {!isPropertyView && (
             <Tabs value={getCurrentTab()} onValueChange={handleTabChange}>
               <TabsList className="inline-flex gap-2">
-                <TabsTrigger value="recent">
-                  <span className="hidden sm:inline">Recent</span>
-                  <span className="sm:hidden">R</span>
-                  <span className="ml-1">({recentCount})</span>
+                <TabsTrigger value="recent" className="truncate">
+                  Recent
                 </TabsTrigger>
-                <TabsTrigger value="in-violation">
-                  <span className="hidden sm:inline">Open</span>
-                  <span className="sm:hidden">O</span>
-                  <span className="ml-1">({inViolationCount})</span>
+                <TabsTrigger value="in-violation" className="truncate">
+                  Open
                 </TabsTrigger>
-                <TabsTrigger value="closed">
-                  <span className="hidden sm:inline">Closed</span>
-                  <span className="sm:hidden">C</span>
-                  <span className="ml-1">({closedCount})</span>
+                <TabsTrigger value="closed" className="truncate">
+                  Closed
                 </TabsTrigger>
               </TabsList>
             </Tabs>
