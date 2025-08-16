@@ -65,6 +65,19 @@ export const CaseItem: React.FC<CaseItemProps> = ({
     setShowCaseHistory(true);
   };
 
+  // Check if case is new or updated
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  
+  const earliestDate = groupedCase.records.reduce((earliest, record) => {
+    if (!record.investigation_date) return earliest;
+    if (!earliest) return record.investigation_date;
+    return new Date(record.investigation_date) < new Date(earliest) ? record.investigation_date : earliest;
+  }, '');
+  
+  const isNew = earliestDate && new Date(earliestDate) > oneWeekAgo;
+  const isUpdated = !isNew && groupedCase.latestDate && new Date(groupedCase.latestDate) > oneWeekAgo;
+
   return (
     <>
       <div 
@@ -78,9 +91,17 @@ export const CaseItem: React.FC<CaseItemProps> = ({
           <span className="text-sm font-medium text-gray-600">
             {formatDate(groupedCase.latestDate)}
           </span>
-          <Badge variant={getStatusColor(groupedCase.currentStatus)} className="flex-shrink-0">
-            {groupedCase.currentStatus}
-          </Badge>
+          <div className="flex items-center gap-2">
+            {/* New/Updated Badge */}
+            {(isNew || isUpdated) && (
+              <Badge variant="default" className="bg-blue-600 text-white">
+                {isNew ? 'New' : 'Updated'}
+              </Badge>
+            )}
+            <Badge variant={getStatusColor(groupedCase.currentStatus)} className="flex-shrink-0">
+              {groupedCase.currentStatus}
+            </Badge>
+          </div>
         </div>
         
         {/* Second line: Violation pills */}
@@ -94,10 +115,6 @@ export const CaseItem: React.FC<CaseItemProps> = ({
           </div>
         )}
         
-        {/* Case number for reference */}
-        <div className="text-xs text-gray-400 mt-1">
-          Case #{groupedCase.casefileNumber}
-        </div>
       </div>
 
       {/* Case History Dialog */}

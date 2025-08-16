@@ -14,12 +14,12 @@ export const PropertyView: React.FC<PropertyViewProps> = ({
   records, 
   highlightedCaseNumber = null 
 }) => {
-  // Group cases by property and filter out closed cases
+  // Group cases by property and filter out only fully closed cases
   const groupedCases = groupRecordsByCase(records);
   const openCases = groupedCases.filter(groupedCase => {
     const status = groupedCase.currentStatus.toUpperCase();
-    // Only exclude truly closed cases - include everything else
-    return !status.includes('CLOSED');
+    // Only exclude cases that are actually closed (not ready to close)
+    return status !== 'CLOSED';
   });
 
   // Group by property address
