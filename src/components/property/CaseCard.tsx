@@ -98,7 +98,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
             <div className="flex flex-col gap-4 p-6 relative">
               
               {/* Desktop Layout - Two Column Structure */}
-              <div className="hidden sm:grid sm:grid-cols-2 sm:gap-8">
+              <div className="hidden sm:grid sm:grid-cols-[40%_60%] sm:gap-8">
                 {/* Column 1: Property Information */}
                 <div className="flex flex-col gap-3">
                   <CaseCardHeader
