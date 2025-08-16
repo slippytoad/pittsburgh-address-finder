@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { History } from 'lucide-react';
+import { History, ChevronDown, ChevronUp } from 'lucide-react';
 import { GroupedCase } from '@/types/propertyTypes';
 import { CaseCardHeader } from './CaseCardHeader';
 import { CaseCardStatus } from './CaseCardStatus';
@@ -115,7 +115,6 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   <CaseCardStatus
                     currentStatus={groupedCase.currentStatus}
                     groupedCase={groupedCase}
-                    isOpen={isOpen}
                     isNew={isNew}
                     isUpdated={isUpdated}
                   />
@@ -158,7 +157,6 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                 <CaseCardStatus
                   currentStatus={groupedCase.currentStatus}
                   groupedCase={groupedCase}
-                  isOpen={isOpen}
                   isNew={isNew}
                   isUpdated={isUpdated}
                 />
@@ -248,6 +246,17 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   <History className="h-4 w-4" />
                   Case History
                 </Button>
+              </div>
+
+              {/* Chevron at bottom center */}
+              <div className="flex justify-center pt-2">
+                <div className="flex items-center text-gray-400">
+                  {isOpen ? (
+                    <ChevronUp className="h-5 w-5" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5" />
+                  )}
+                </div>
               </div>
             </div>
           </CardHeader>

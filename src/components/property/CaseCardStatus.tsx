@@ -1,6 +1,5 @@
 
 import React, { useEffect, useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { getStatusColor } from '@/utils/propertyUtils';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,7 +8,6 @@ import { GroupedCase } from '@/types/propertyTypes';
 interface CaseCardStatusProps {
   currentStatus: string;
   groupedCase: GroupedCase;
-  isOpen: boolean;
   isNew?: boolean;
   isUpdated?: boolean;
 }
@@ -17,7 +15,6 @@ interface CaseCardStatusProps {
 export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
   currentStatus,
   groupedCase,
-  isOpen,
   isNew = false,
   isUpdated = false
 }) => {
@@ -69,30 +66,21 @@ export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
   }, [groupedCase?.records]);
 
   return (
-    <div className="flex items-center justify-between w-full flex-nowrap">
-      <div className="flex items-center gap-2 flex-wrap">
-        {/* New/Updated Badge */}
-        {(isNew || isUpdated) && (
-          <Badge variant="default" className="bg-blue-600 text-white">
-            {isNew ? 'New' : 'Updated'}
-          </Badge>
-        )}
-        <Badge variant={getStatusColor(currentStatus)} className="flex-shrink-0">
-          {currentStatus === 'IN VIOLATION' ? 'Open' : currentStatus}
+    <div className="flex items-center gap-2 flex-wrap">
+      {/* New/Updated Badge */}
+      {(isNew || isUpdated) && (
+        <Badge variant="default" className="bg-blue-600 text-white">
+          {isNew ? 'New' : 'Updated'}
         </Badge>
-        {violationDescriptions.map((description, index) => (
-          <Badge key={index} variant="secondary" className="flex-shrink-0 text-xs">
-            {description}
-          </Badge>
-        ))}
-      </div>
-      <div className="flex items-center text-sm text-gray-500 flex-shrink-0">
-        {isOpen ? (
-          <ChevronUp className="h-4 w-4" />
-        ) : (
-          <ChevronDown className="h-4 w-4" />
-        )}
-      </div>
+      )}
+      <Badge variant={getStatusColor(currentStatus)} className="flex-shrink-0">
+        {currentStatus === 'IN VIOLATION' ? 'Open' : currentStatus}
+      </Badge>
+      {violationDescriptions.map((description, index) => (
+        <Badge key={index} variant="secondary" className="flex-shrink-0 text-xs">
+          {description}
+        </Badge>
+      ))}
     </div>
   );
 };
