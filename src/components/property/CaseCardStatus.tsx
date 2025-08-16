@@ -66,21 +66,34 @@ export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
   }, [groupedCase?.records]);
 
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <div className="flex items-center gap-2 min-w-0 overflow-hidden">
       {/* New/Updated Badge */}
       {(isNew || isUpdated) && (
-        <Badge variant="default" className="bg-blue-600 text-white">
+        <Badge variant="default" className="bg-blue-600 text-white flex-shrink-0 whitespace-nowrap">
           {isNew ? 'New' : 'Updated'}
         </Badge>
       )}
-      <Badge variant={getStatusColor(currentStatus)} className="flex-shrink-0">
-        {currentStatus}
+      <Badge variant={getStatusColor(currentStatus)} className="flex-shrink-0 whitespace-nowrap">
+        <span className="truncate max-w-[120px]">{currentStatus}</span>
       </Badge>
-      {violationDescriptions.map((description, index) => (
-        <Badge key={index} variant="secondary" className="flex-shrink-0 text-xs">
-          {description}
-        </Badge>
-      ))}
+      
+      {/* Violation descriptions container with overflow handling */}
+      {violationDescriptions.length > 0 && (
+        <div className="flex gap-1 min-w-0 overflow-hidden">
+          {violationDescriptions.slice(0, 3).map((description, index) => (
+            <Badge key={index} variant="secondary" className="flex-shrink-0 text-xs whitespace-nowrap">
+              <span className="truncate max-w-[100px]" title={description}>
+                {description}
+              </span>
+            </Badge>
+          ))}
+          {violationDescriptions.length > 3 && (
+            <Badge variant="secondary" className="flex-shrink-0 text-xs whitespace-nowrap">
+              +{violationDescriptions.length - 3}
+            </Badge>
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -111,7 +111,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                 </div>
                 
                 {/* Column 2: Status and Case Information */}
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 min-w-0 overflow-hidden">
                   <CaseCardStatus
                     currentStatus={groupedCase.currentStatus}
                     groupedCase={groupedCase}

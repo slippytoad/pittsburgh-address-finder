@@ -106,12 +106,19 @@ export const CaseItem: React.FC<CaseItemProps> = ({
         
         {/* Second line: Violation pills */}
         {violationDescriptions.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {violationDescriptions.map((description, index) => (
-              <Badge key={index} variant="secondary" className="text-xs">
-                {description}
+          <div className="flex gap-1 min-w-0 overflow-hidden">
+            {violationDescriptions.slice(0, 3).map((description, index) => (
+              <Badge key={index} variant="secondary" className="flex-shrink-0 text-xs whitespace-nowrap">
+                <span className="truncate max-w-[100px]" title={description}>
+                  {description}
+                </span>
               </Badge>
             ))}
+            {violationDescriptions.length > 3 && (
+              <Badge variant="secondary" className="flex-shrink-0 text-xs whitespace-nowrap">
+                +{violationDescriptions.length - 3}
+              </Badge>
+            )}
           </div>
         )}
         
