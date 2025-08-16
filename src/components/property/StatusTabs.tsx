@@ -66,19 +66,23 @@ const StatusTabs: React.FC<StatusTabsProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Status Tabs with View Toggle */}
+      {/* View Toggle and Status Tabs */}
       <div className="flex items-center justify-between">
-        <Tabs value={getCurrentTab()} onValueChange={handleTabChange}>
-          <TabsList className="inline-flex gap-2">
-            <TabsTrigger value="recent">Recent ({recentCount})</TabsTrigger>
-            <TabsTrigger value="in-violation">Open ({inViolationCount})</TabsTrigger>
-            <TabsTrigger value="closed">Closed ({closedCount})</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        
-        {onViewToggle && (
-          <ViewToggle isPropertyView={isPropertyView} onToggle={onViewToggle} />
-        )}
+        <div className="flex items-center gap-4">
+          {onViewToggle && (
+            <ViewToggle isPropertyView={isPropertyView} onToggle={onViewToggle} />
+          )}
+          
+          {!isPropertyView && (
+            <Tabs value={getCurrentTab()} onValueChange={handleTabChange}>
+              <TabsList className="inline-flex gap-2">
+                <TabsTrigger value="recent">Recent ({recentCount})</TabsTrigger>
+                <TabsTrigger value="in-violation">Open ({inViolationCount})</TabsTrigger>
+                <TabsTrigger value="closed">Closed ({closedCount})</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          )}
+        </div>
       </div>
 
       {/* Address search */}
