@@ -310,32 +310,53 @@ serve(async (req: Request) => {
     // Initialize services
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    // Parse request body for custom message
-
-    // Get device tokens from push_settings table
-    console.log("Fetching device tokens...");
-    const { data: deviceTokens, error } = await supabase
-      .from('push_settings')
-      .select('device_token, platform, permission_granted, apns_environment')
-      .eq('permission_granted', true);
-
-    if (error) {
-      console.error("Error fetching device tokens:", error);
-      throw error;
+    // Parse request body for custom device token
+    let customDeviceToken: string | null = null;
+    try {
+      const body = await req.json();
+      customDeviceToken = body?.device_token || null;
+    } catch {
+      // Body parsing failed, continue with default behavior
     }
+
+    let deviceTokens: DeviceToken[];
     
-    if (!deviceTokens || deviceTokens.length === 0) {
-      console.log("No device tokens found");
-      return new Response(
-        JSON.stringify({ 
-          message: "No device tokens found in push_settings table",
-          deviceCount: 0
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    if (customDeviceToken) {
+      // Use provided device token
+      console.log(`Using provided device token: ${customDeviceToken.substring(0, 10)}...`);
+      deviceTokens = [{
+        device_token: customDeviceToken,
+        platform: 'ios',
+        permission_granted: true,
+        apns_environment: undefined // Will be determined automatically
+      }];
+    } else {
+      // Get device tokens from push_settings table
+      console.log("Fetching device tokens...");
+      const { data: fetchedTokens, error } = await supabase
+        .from('push_settings')
+        .select('device_token, platform, permission_granted, apns_environment')
+        .eq('permission_granted', true);
 
-    console.log(`Found ${deviceTokens.length} device tokens`);
+      if (error) {
+        console.error("Error fetching device tokens:", error);
+        throw error;
+      }
+      
+      if (!fetchedTokens || fetchedTokens.length === 0) {
+        console.log("No device tokens found");
+        return new Response(
+          JSON.stringify({ 
+            message: "No device tokens found in push_settings table",
+            deviceCount: 0
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      deviceTokens = fetchedTokens;
+      console.log(`Found ${deviceTokens.length} device tokens`);
+    }
 
     // Fetch the most recent violation to use as test data
     console.log("Fetching most recent violation for test...");
