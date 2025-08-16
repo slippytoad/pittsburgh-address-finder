@@ -127,17 +127,33 @@ export class EmailService {
 
     if (newRecords.length > 0) {
       // Email for when new violations are found
-      emailSubject = `JFW Oakland Violations Report - ${newRecords.length} new violations found`;
-      emailBody = `
-        <h2>Daily Property Violation Report - ${currentDate}</h2>
-        <p>We found <strong>${newRecords.length} new violations</strong> during today's check.</p>
-        
-        <h3>New Records (click case numbers for direct access):</h3>
-        <ul style="list-style-type: none; padding: 0;">
-          ${this.formatNewRecordsList(newRecords)}
-          ${newRecords.length > 10 ? `<li><em>... and ${newRecords.length - 10} more records</em></li>` : ''}
-        </ul>
-        
+      const hasUpdatesOnly = newCasefilesCount === 0 && newRecordsForExistingCasesCount > 0;
+      
+      if (hasUpdatesOnly) {
+        emailSubject = `JFW Oakland Violations Report - ${newRecords.length} updated violation${newRecords.length > 1 ? 's' : ''}`;
+        emailBody = `
+          <h2>Daily Property Violation Report - ${currentDate}</h2>
+          <p>We found <strong>${newRecords.length} updated violation${newRecords.length > 1 ? 's' : ''}</strong> during today's check.</p>
+          
+          <h3>Updated Records (click case numbers for direct access):</h3>
+          <ul style="list-style-type: none; padding: 0;">
+            ${this.formatNewRecordsList(newRecords)}
+            ${newRecords.length > 10 ? `<li><em>... and ${newRecords.length - 10} more records</em></li>` : ''}
+          </ul>`;
+      } else {
+        emailSubject = `JFW Oakland Violations Report - ${newRecords.length} new violation${newRecords.length > 1 ? 's' : ''} found`;
+        emailBody = `
+          <h2>Daily Property Violation Report - ${currentDate}</h2>
+          <p>We found <strong>${newRecords.length} new violation${newRecords.length > 1 ? 's' : ''}</strong> during today's check.</p>
+          
+          <h3>New Records (click case numbers for direct access):</h3>
+          <ul style="list-style-type: none; padding: 0;">
+            ${this.formatNewRecordsList(newRecords)}
+            ${newRecords.length > 10 ? `<li><em>... and ${newRecords.length - 10} more records</em></li>` : ''}
+          </ul>`;
+      }
+      
+      emailBody += `
         <h3>Number of open cases in each state:</h3>
         <ul>
           ${statusSummary}
