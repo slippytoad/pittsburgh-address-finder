@@ -27,14 +27,15 @@ export const PropertyView: React.FC<PropertyViewProps> = ({
     const address = groupedCase.records[0]?.address || 'Unknown Address';
     const streetAddress = address.split(',')[0] || address;
     
-    if (!acc[streetAddress]) {
-      acc[streetAddress] = {
+    // Use full address as key to avoid grouping different properties with same street number
+    if (!acc[address]) {
+      acc[address] = {
         address: streetAddress,
         fullAddress: address,
         cases: []
       };
     }
-    acc[streetAddress].cases.push(groupedCase);
+    acc[address].cases.push(groupedCase);
     return acc;
   }, {} as Record<string, { address: string; fullAddress: string; cases: GroupedCase[] }>);
 
