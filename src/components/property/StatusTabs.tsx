@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Search, X } from 'lucide-react';
+import ViewToggle from './ViewToggle';
 
 interface StatusTabsProps {
   availableStatuses: string[];
@@ -11,6 +12,8 @@ interface StatusTabsProps {
   onAddressSearch?: (search: string) => void;
   addressSearch?: string;
   recentCount: number;
+  isPropertyView?: boolean;
+  onViewToggle?: (isPropertyView: boolean) => void;
 }
 
 const StatusTabs: React.FC<StatusTabsProps> = ({
@@ -21,6 +24,8 @@ const StatusTabs: React.FC<StatusTabsProps> = ({
   onAddressSearch,
   addressSearch = '',
   recentCount,
+  isPropertyView = false,
+  onViewToggle,
 }) => {
   
   // Define the groups
@@ -61,14 +66,20 @@ const StatusTabs: React.FC<StatusTabsProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Status Tabs */}
-      <Tabs value={getCurrentTab()} onValueChange={handleTabChange}>
-        <TabsList className="inline-flex gap-2">
-          <TabsTrigger value="recent">Recent ({recentCount})</TabsTrigger>
-          <TabsTrigger value="in-violation">Open ({inViolationCount})</TabsTrigger>
-          <TabsTrigger value="closed">Closed ({closedCount})</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      {/* Status Tabs with View Toggle */}
+      <div className="flex items-center justify-between">
+        <Tabs value={getCurrentTab()} onValueChange={handleTabChange}>
+          <TabsList className="inline-flex gap-2">
+            <TabsTrigger value="recent">Recent ({recentCount})</TabsTrigger>
+            <TabsTrigger value="in-violation">Open ({inViolationCount})</TabsTrigger>
+            <TabsTrigger value="closed">Closed ({closedCount})</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        
+        {onViewToggle && (
+          <ViewToggle isPropertyView={isPropertyView} onToggle={onViewToggle} />
+        )}
+      </div>
 
       {/* Address search */}
       {onAddressSearch && (

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Settings, LogOut } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import PropertyHeader from '@/components/property/PropertyHeader';
 import PropertyList from '@/components/property/PropertyList';
+import PropertyView from '@/components/property/PropertyView';
 import StatusTabs from '@/components/property/StatusTabs';
 import ErrorDisplay from '@/components/property/ErrorDisplay';
 import { useUrlParameters } from '@/hooks/useUrlParameters';
@@ -13,6 +14,7 @@ import { usePropertyData } from '@/hooks/usePropertyData';
 import { useAddressSearch } from '@/hooks/useAddressSearch';
 
 const PropertyInvestigationDashboard: React.FC = () => {
+  const [isPropertyView, setIsPropertyView] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -67,12 +69,21 @@ const PropertyInvestigationDashboard: React.FC = () => {
               onAddressSearch={setAddressSearch}
               addressSearch={addressSearch}
               recentCount={recentCount}
+              isPropertyView={isPropertyView}
+              onViewToggle={setIsPropertyView}
             />
-            <PropertyList 
-              records={filteredRecords} 
-              expandAllCards={expandAllCards}
-              highlightedCaseNumber={highlightedCaseNumber}
-            />
+            {isPropertyView ? (
+              <PropertyView 
+                records={filteredRecords}
+                highlightedCaseNumber={highlightedCaseNumber}
+              />
+            ) : (
+              <PropertyList 
+                records={filteredRecords} 
+                expandAllCards={expandAllCards}
+                highlightedCaseNumber={highlightedCaseNumber}
+              />
+            )}
           </div>
         )}
 
