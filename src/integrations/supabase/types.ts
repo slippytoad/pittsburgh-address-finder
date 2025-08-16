@@ -113,7 +113,7 @@ export type Database = {
           permission_granted: boolean | null
           platform: string
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           apns_environment?: string | null
@@ -126,7 +126,7 @@ export type Database = {
           permission_granted?: boolean | null
           platform: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           apns_environment?: string | null
@@ -139,7 +139,7 @@ export type Database = {
           permission_granted?: boolean | null
           platform?: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
