@@ -19,35 +19,10 @@ export const PropertyList: React.FC<PropertyListProps> = ({
 }) => {
   const groupedCases = groupRecordsByCase(records);
 
-  // Sort: New (opened < 1 week) first, then Updated (<1 week), then by latestDate desc
+  // Sort by latest updated date (most recent first)
   const sortedCases = [...groupedCases].sort((a, b) => {
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-    const earliestA = a.records.reduce<string | null>((earliest, r) => {
-      if (!r.investigation_date) return earliest;
-      if (!earliest) return r.investigation_date;
-      return new Date(r.investigation_date) < new Date(earliest) ? r.investigation_date : earliest;
-    }, null);
-    const earliestB = b.records.reduce<string | null>((earliest, r) => {
-      if (!r.investigation_date) return earliest;
-      if (!earliest) return r.investigation_date;
-      return new Date(r.investigation_date) < new Date(earliest) ? r.investigation_date : earliest;
-    }, null);
-
     const latestA = new Date(a.latestDate);
     const latestB = new Date(b.latestDate);
-
-    const isNewA = !!earliestA && new Date(earliestA) > oneWeekAgo;
-    const isNewB = !!earliestB && new Date(earliestB) > oneWeekAgo;
-
-    if (isNewA !== isNewB) return isNewA ? -1 : 1;
-
-    const isUpdatedA = !isNewA && latestA > oneWeekAgo;
-    const isUpdatedB = !isNewB && latestB > oneWeekAgo;
-
-    if (isUpdatedA !== isUpdatedB) return isUpdatedA ? -1 : 1;
-
     return latestB.getTime() - latestA.getTime();
   });
 
