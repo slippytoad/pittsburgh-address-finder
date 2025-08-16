@@ -232,8 +232,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
               </div>
 
               
-              {/* Case History Button - Bottom Right of Main Card */}
-              <div className="flex justify-end pt-2">
+              {/* Case History Button and Chevron - Bottom Right Aligned */}
+              <div className="flex justify-end items-center gap-3 pt-2 pb-1">
                 <Button
                   variant="outline"
                   size="sm"
@@ -246,10 +246,6 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   <History className="h-4 w-4" />
                   Case History
                 </Button>
-              </div>
-
-              {/* Chevron at bottom center */}
-              <div className="flex justify-center pt-1 pb-2">
                 <div className="flex items-center text-gray-400">
                   {isOpen ? (
                     <ChevronUp className="h-6 w-6" />

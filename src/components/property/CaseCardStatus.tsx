@@ -77,21 +77,14 @@ export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
         <span className="truncate max-w-[120px]">{currentStatus}</span>
       </Badge>
       
-      {/* Violation descriptions container with overflow handling */}
+      {/* Violation descriptions container with horizontal scroll */}
       {violationDescriptions.length > 0 && (
-        <div className="flex gap-1 min-w-0 overflow-hidden">
-          {violationDescriptions.slice(0, 3).map((description, index) => (
+        <div className="flex gap-1 min-w-0 overflow-x-auto scrollbar-hide">
+          {violationDescriptions.map((description, index) => (
             <Badge key={index} variant="secondary" className="flex-shrink-0 text-xs whitespace-nowrap">
-              <span className="truncate max-w-[100px]" title={description}>
-                {description}
-              </span>
+              {description}
             </Badge>
           ))}
-          {violationDescriptions.length > 3 && (
-            <Badge variant="secondary" className="flex-shrink-0 text-xs whitespace-nowrap">
-              +{violationDescriptions.length - 3}
-            </Badge>
-          )}
         </div>
       )}
     </div>
