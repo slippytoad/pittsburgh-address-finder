@@ -128,7 +128,7 @@ class PushService {
   async sendPushNotifications(
     deviceTokens: DeviceToken[],
     payload: PushNotificationPayload
-  ): Promise<void> {
+  ): Promise<{success: boolean, errors: string[]}> {
     console.log(`Sending push notifications to ${deviceTokens.length} devices`);
 
     // Filter for iOS devices with permission granted
@@ -138,7 +138,7 @@ class PushService {
 
     if (iosDevices.length === 0) {
       console.log('No iOS devices with granted permissions found');
-      return;
+      return { success: false, errors: ['No iOS devices with granted permissions found'] };
     }
 
     const apnsPayload = {
@@ -155,6 +155,7 @@ class PushService {
       ...payload.data
     };
 
+    const errors: string[] = [];
     const promises = iosDevices.map(async (device, index) => {
       const deviceCount = `${index + 1}/${iosDevices.length}`;
       try {
@@ -187,15 +188,22 @@ class PushService {
         if (response.ok) {
           console.log(`${deviceCount} Push notification sent successfully to device: ${device.device_token.substring(0, 10)}... (${deviceIsProduction ? 'production' : 'sandbox'})`);
         } else {
-          console.error(`${deviceCount} Failed to send push notification to device: ${device.device_token.substring(0, 10)}... (${deviceIsProduction ? 'production' : 'sandbox'})`, await response.text());
+          const errorText = await response.text();
+          const errorMessage = `${deviceCount} Failed to send push notification to device: ${device.device_token.substring(0, 10)}... (${deviceIsProduction ? 'production' : 'sandbox'}) - Status: ${response.status}, Error: ${errorText}`;
+          console.error(errorMessage);
+          errors.push(errorMessage);
         }
       } catch (error) {
-        console.error(`${deviceCount} Error sending push notification to device: ${device.device_token.substring(0, 10)}... (${deviceIsProduction ? 'production' : 'sandbox'})`, error);
+        const errorMessage = `${deviceCount} Error sending push notification to device: ${device.device_token.substring(0, 10)}... (${deviceIsProduction ? 'production' : 'sandbox'}) - ${error.message}`;
+        console.error(errorMessage);
+        errors.push(errorMessage);
       }
     });
 
     await Promise.all(promises);
     console.log('Push notification sending completed');
+    
+    return { success: errors.length === 0, errors };
   }
 
   private static extractStreetAddress(fullAddress?: string): string {
@@ -395,7 +403,22 @@ serve(async (req: Request) => {
     console.log("APNS Key ID:", apnsKeyId);
     console.log("APNS Team ID:", apnsTeamId);
     console.log("APNS Bundle ID:", apnsBundleId);
-    await pushService.sendPushNotifications(deviceTokens, testPayload);
+    const result = await pushService.sendPushNotifications(deviceTokens, testPayload);
+
+    if (!result.success) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Push notification failed",
+          details: result.errors,
+          deviceCount: deviceTokens.length,
+          payload: testPayload
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
+    }
 
     return new Response(
       JSON.stringify({ 
