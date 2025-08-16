@@ -12,17 +12,15 @@ import { CaseCardInstructions } from './CaseCardInstructions';
 import { CaseCardDescription } from './CaseCardDescription';
 import { CaseCardRecord } from './CaseCardRecord';
 import { CaseHistoryDialog } from './CaseHistoryDialog';
-
 interface CaseCardProps {
   groupedCase: GroupedCase;
   defaultExpanded?: boolean;
   isHighlighted?: boolean;
 }
-
-export const CaseCard: React.FC<CaseCardProps> = ({ 
-  groupedCase, 
-  defaultExpanded = false, 
-  isHighlighted = false 
+export const CaseCard: React.FC<CaseCardProps> = ({
+  groupedCase,
+  defaultExpanded = false,
+  isHighlighted = false
 }) => {
   const [isOpen, setIsOpen] = useState(defaultExpanded);
   const [showCaseHistory, setShowCaseHistory] = useState(false);
@@ -43,24 +41,18 @@ export const CaseCard: React.FC<CaseCardProps> = ({
 
   // Get violation specific instructions for IN VIOLATION and IN COURT statuses
   const shouldShowInstructions = groupedCase.currentStatus === 'IN VIOLATION' || groupedCase.currentStatus === 'IN COURT';
-  const violationInstructions = shouldShowInstructions ? 
-    groupedCase.records[0]?.violation_spec_instructions || null : null;
-  const formattedInstructions = violationInstructions ? 
-    violationInstructions.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) : null;
+  const violationInstructions = shouldShowInstructions ? groupedCase.records[0]?.violation_spec_instructions || null : null;
+  const formattedInstructions = violationInstructions ? violationInstructions.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) : null;
 
   // Get violation description from the latest record
   const violationDescription = groupedCase.records[0]?.violation_description || null;
-  const formattedDescription = violationDescription ? 
-    violationDescription.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) : null;
+  const formattedDescription = violationDescription ? violationDescription.toLowerCase().replace(/\b\w/g, l => l.toUpperCase()) : null;
 
   // Determine notice label based on count of notices for the latest code section
   const latestCodeSectionKey = (groupedCase.records[0]?.violation_code_section || '').trim();
-  const latestCodeCount = latestCodeSectionKey
-    ? groupedCase.records.filter(r => (r.violation_code_section || '').trim() === latestCodeSectionKey).length
-    : 0;
+  const latestCodeCount = latestCodeSectionKey ? groupedCase.records.filter(r => (r.violation_code_section || '').trim() === latestCodeSectionKey).length : 0;
   let noticeLabel: string | null = 'Last update';
-  if (latestCodeCount <= 1) noticeLabel = null;
-  else if (latestCodeCount >= 3) noticeLabel = 'Final notice';
+  if (latestCodeCount <= 1) noticeLabel = null;else if (latestCodeCount >= 3) noticeLabel = 'Final notice';
 
   // Get the earliest investigation date (when case was first opened)
   const earliestDate = groupedCase.records.reduce((earliest, record) => {
@@ -70,11 +62,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   }, '');
 
   // Determine if there is any later date than the first notice
-  const hasLaterDate = Boolean(
-    groupedCase.latestDate &&
-    earliestDate &&
-    new Date(groupedCase.latestDate) > new Date(earliestDate)
-  );
+  const hasLaterDate = Boolean(groupedCase.latestDate && earliestDate && new Date(groupedCase.latestDate) > new Date(earliestDate));
 
   // Hide notice label if there are no later dates than first notice
   if (!hasLaterDate) {
@@ -84,57 +72,29 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   // Check if case is new (opened < 1 week ago) or updated (last update < 1 week ago)
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-  
   const isNew = earliestDate && new Date(earliestDate) > oneWeekAgo;
   const isUpdated = !isNew && groupedCase.latestDate && new Date(groupedCase.latestDate) > oneWeekAgo;
-
-  return (
-    <Card className={`border-2 rounded-lg hover:bg-muted/50 transition-all duration-300 ${
-      isHighlighted ? 'ring-2 ring-blue-500 bg-blue-50 border-blue-300' : 'border-gray-300 hover:border-gray-400'
-    }`}>
+  return <Card className={`border-2 rounded-lg hover:bg-muted/50 transition-all duration-300 ${isHighlighted ? 'ring-2 ring-blue-500 bg-blue-50 border-blue-300' : 'border-gray-300 hover:border-gray-400'}`}>
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors p-0">
-            <div className="flex flex-col gap-4 p-6 relative">
+            <div className="flex flex-col gap-4 p-6 relative my-0 py-0">
               
               {/* Desktop Layout - Two Column Structure */}
               <div className="hidden sm:grid sm:grid-cols-[40%_60%] sm:gap-8">
                 {/* Column 1: Property Information */}
                 <div className="flex flex-col gap-3">
-                  <CaseCardHeader
-                    formattedStreetAddress={formattedStreetAddress}
-                    parcelId={parcelId}
-                    casefileNumber={groupedCase.casefileNumber}
-                    earliestDate={earliestDate}
-                    isHighlighted={isHighlighted}
-                  />
+                  <CaseCardHeader formattedStreetAddress={formattedStreetAddress} parcelId={parcelId} casefileNumber={groupedCase.casefileNumber} earliestDate={earliestDate} isHighlighted={isHighlighted} />
                 </div>
                 
                 {/* Column 2: Status and Case Information */}
                 <div className="flex flex-col gap-3 min-w-0 overflow-hidden">
-                  <CaseCardStatus
-                    currentStatus={groupedCase.currentStatus}
-                    groupedCase={groupedCase}
-                    isNew={isNew}
-                    isUpdated={isUpdated}
-                  />
+                  <CaseCardStatus currentStatus={groupedCase.currentStatus} groupedCase={groupedCase} isNew={isNew} isUpdated={isUpdated} />
                   
                   {/* Description */}
                   <CaseCardDescription formattedDescription={formattedDescription} />
                   
-                  {(groupedCase.currentStatus === 'CLOSED' || groupedCase.currentStatus === 'READY TO CLOSE') ? (
-                    <CaseCardOutcome
-                      formattedOutcome={formattedOutcome}
-                      latestDate={groupedCase.latestDate}
-                      noticeLabel={noticeLabel}
-                    />
-                  ) : (
-                    <CaseCardInstructions 
-                      formattedInstructions={formattedInstructions} 
-                      latestDate={groupedCase.latestDate}
-                      noticeLabel={noticeLabel}
-                    />
-                  )}
+                  {groupedCase.currentStatus === 'CLOSED' || groupedCase.currentStatus === 'READY TO CLOSE' ? <CaseCardOutcome formattedOutcome={formattedOutcome} latestDate={groupedCase.latestDate} noticeLabel={noticeLabel} /> : <CaseCardInstructions formattedInstructions={formattedInstructions} latestDate={groupedCase.latestDate} noticeLabel={noticeLabel} />}
                 </div>
               </div>
 
@@ -144,8 +104,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                 <div className="flex items-center gap-2 min-w-0">
                   <div className="h-5 w-5 text-blue-600 flex-shrink-0">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                      <circle cx="12" cy="10" r="3"/>
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                      <circle cx="12" cy="10" r="3" />
                     </svg>
                   </div>
                   <h3 className="text-xl font-semibold truncate">
@@ -154,40 +114,33 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                 </div>
 
                 {/* Status and Toggle immediately after street address */}
-                <CaseCardStatus
-                  currentStatus={groupedCase.currentStatus}
-                  groupedCase={groupedCase}
-                  isNew={isNew}
-                  isUpdated={isUpdated}
-                />
+                <CaseCardStatus currentStatus={groupedCase.currentStatus} groupedCase={groupedCase} isNew={isNew} isUpdated={isUpdated} />
 
                 {/* Rest of header info */}
                 <div className="flex flex-col gap-3">
                   {/* Parcel ID */}
-                  {parcelId && (
-                      <div className="flex items-start gap-2 text-sm">
+                  {parcelId && <div className="flex items-start gap-2 text-sm">
                         <div className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5">
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                            <polyline points="9,22 9,12 15,12 15,22"/>
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                            <polyline points="9,22 9,12 15,12 15,22" />
                           </svg>
                         </div>
                         <div>
                           <span className="font-normal text-muted-foreground">Parcel ID:</span>
                           <span className="ml-1 font-medium text-foreground font-mono">{parcelId}</span>
                         </div>
-                      </div>
-                  )}
+                      </div>}
                   
                   {/* Case Number */}
                   <div className="flex items-start gap-2">
                     <div className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14,2 14,8 20,8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10,9 9,9 8,9"/>
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14,2 14,8 20,8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10,9 9,9 8,9" />
                       </svg>
                     </div>
                     <div className="text-sm">
@@ -197,52 +150,33 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                   </div>
                   
                   {/* Date Opened */}
-                  {earliestDate && (
-                    <div className="flex items-start gap-2 text-sm">
+                  {earliestDate && <div className="flex items-start gap-2 text-sm">
                       <div className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                          <line x1="16" y1="2" x2="16" y2="6"/>
-                          <line x1="8" y1="2" x2="8" y2="6"/>
-                          <line x1="3" y1="10" x2="21" y2="10"/>
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                          <line x1="16" y1="2" x2="16" y2="6" />
+                          <line x1="8" y1="2" x2="8" y2="6" />
+                          <line x1="3" y1="10" x2="21" y2="10" />
                         </svg>
                       </div>
                       <span className="font-normal text-muted-foreground">First notice:</span>
                       <span className="ml-1 font-medium text-foreground">{new Date(earliestDate).toLocaleDateString()}</span>
-                    </div>
-                  )}
+                    </div>}
                 </div>
 
                 {/* Description, Outcome or Instructions based on status */}
                 <CaseCardDescription formattedDescription={formattedDescription} />
                 
-                {(groupedCase.currentStatus === 'CLOSED' || groupedCase.currentStatus === 'READY TO CLOSE') ? (
-                  <CaseCardOutcome
-                    formattedOutcome={formattedOutcome}
-                    latestDate={groupedCase.latestDate}
-                    noticeLabel={noticeLabel}
-                  />
-                ) : (
-                  <CaseCardInstructions 
-                    formattedInstructions={formattedInstructions} 
-                    latestDate={groupedCase.latestDate}
-                    noticeLabel={noticeLabel}
-                  />
-                )}
+                {groupedCase.currentStatus === 'CLOSED' || groupedCase.currentStatus === 'READY TO CLOSE' ? <CaseCardOutcome formattedOutcome={formattedOutcome} latestDate={groupedCase.latestDate} noticeLabel={noticeLabel} /> : <CaseCardInstructions formattedInstructions={formattedInstructions} latestDate={groupedCase.latestDate} noticeLabel={noticeLabel} />}
               </div>
 
               
               {/* Case History Button - Bottom Right */}
               <div className="flex justify-end pt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowCaseHistory(true);
-                  }}
-                  className="flex items-center gap-2"
-                >
+                <Button variant="outline" size="sm" onClick={e => {
+                e.stopPropagation();
+                setShowCaseHistory(true);
+              }} className="flex items-center gap-2">
                   <History className="h-4 w-4" />
                   Case History
                 </Button>
@@ -251,11 +185,7 @@ export const CaseCard: React.FC<CaseCardProps> = ({
               {/* Chevron at bottom center */}
               <div className="flex justify-center">
                 <div className="flex items-center text-gray-400">
-                  {isOpen ? (
-                    <ChevronUp className="h-6 w-6" />
-                  ) : (
-                    <ChevronDown className="h-6 w-6" />
-                  )}
+                  {isOpen ? <ChevronUp className="h-6 w-6" /> : <ChevronDown className="h-6 w-6" />}
                 </div>
               </div>
             </div>
@@ -266,21 +196,19 @@ export const CaseCard: React.FC<CaseCardProps> = ({
           <CardContent className="pt-0 p-0">
             <div className="space-y-6 px-6 pb-6">
               {(() => {
-                // Group records by violation code section
-                const recordsByCodeSection = groupedCase.records.reduce((acc, record) => {
-                  const codeSection = record.violation_code_section || 'Unknown Code Section';
-                  if (!acc[codeSection]) {
-                    acc[codeSection] = [];
-                  }
-                  acc[codeSection].push(record);
-                  return acc;
-                }, {} as Record<string, typeof groupedCase.records>);
+              // Group records by violation code section
+              const recordsByCodeSection = groupedCase.records.reduce((acc, record) => {
+                const codeSection = record.violation_code_section || 'Unknown Code Section';
+                if (!acc[codeSection]) {
+                  acc[codeSection] = [];
+                }
+                acc[codeSection].push(record);
+                return acc;
+              }, {} as Record<string, typeof groupedCase.records>);
 
-                // Sort code sections alphabetically
-                const sortedCodeSections = Object.keys(recordsByCodeSection).sort();
-
-                return sortedCodeSections.map(codeSection => (
-                  <div key={codeSection} className="space-y-4">
+              // Sort code sections alphabetically
+              const sortedCodeSections = Object.keys(recordsByCodeSection).sort();
+              return sortedCodeSections.map(codeSection => <div key={codeSection} className="space-y-4">
                     {/* Code Section Header */}
                     <div className="pb-2 border-b border-gray-300">
                       <h4 className="font-semibold text-gray-800 text-base">
@@ -290,26 +218,17 @@ export const CaseCard: React.FC<CaseCardProps> = ({
                     
                     {/* Records under this code section */}
                     <div className="space-y-4">
-                      {recordsByCodeSection[codeSection].map((record, index) => (
-                        <CaseCardRecord key={record._id || index} record={record} index={index} />
-                      ))}
+                      {recordsByCodeSection[codeSection].map((record, index) => <CaseCardRecord key={record._id || index} record={record} index={index} />)}
                     </div>
-                  </div>
-                ));
-              })()}
+                  </div>);
+            })()}
             </div>
           </CardContent>
         </CollapsibleContent>
       </Collapsible>
       
       {/* Case History Dialog */}
-      <CaseHistoryDialog
-        isOpen={showCaseHistory}
-        onOpenChange={setShowCaseHistory}
-        groupedCase={groupedCase}
-      />
-    </Card>
-  );
+      <CaseHistoryDialog isOpen={showCaseHistory} onOpenChange={setShowCaseHistory} groupedCase={groupedCase} />
+    </Card>;
 };
-
 export default CaseCard;

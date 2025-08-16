@@ -1,17 +1,14 @@
-
 import React, { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { getStatusColor } from '@/utils/propertyUtils';
 import { supabase } from '@/integrations/supabase/client';
 import { GroupedCase } from '@/types/propertyTypes';
-
 interface CaseCardStatusProps {
   currentStatus: string;
   groupedCase: GroupedCase;
   isNew?: boolean;
   isUpdated?: boolean;
 }
-
 export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
   currentStatus,
   groupedCase,
@@ -19,74 +16,51 @@ export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
   isUpdated = false
 }) => {
   const [violationDescriptions, setViolationDescriptions] = useState<string[]>([]);
-
   useEffect(() => {
     // Safety check: ensure groupedCase and records exist
     if (!groupedCase?.records) {
       setViolationDescriptions([]);
       return;
     }
-
     const fetchViolationDescriptions = async () => {
-      const uniqueCodeSections = new Set(
-        groupedCase.records
-          .map(r => r.violation_code_section)
-          .filter(Boolean)
-      );
-
+      const uniqueCodeSections = new Set(groupedCase.records.map(r => r.violation_code_section).filter(Boolean));
       if (uniqueCodeSections.size === 0) {
         setViolationDescriptions([]);
         return;
       }
-
       try {
-        const { data, error } = await supabase
-          .from('violation_code_sections')
-          .select('short_definition')
-          .in('violation_code_section', Array.from(uniqueCodeSections));
-
+        const {
+          data,
+          error
+        } = await supabase.from('violation_code_sections').select('short_definition').in('violation_code_section', Array.from(uniqueCodeSections));
         if (error) {
           console.error('Error fetching violation descriptions:', error);
           setViolationDescriptions([]);
           return;
         }
-
-        const descriptions = data
-          ?.map(item => item.short_definition)
-          .filter(Boolean) || [];
-        
+        const descriptions = data?.map(item => item.short_definition).filter(Boolean) || [];
         setViolationDescriptions(descriptions);
       } catch (error) {
         console.error('Error fetching violation descriptions:', error);
         setViolationDescriptions([]);
       }
     };
-
     fetchViolationDescriptions();
   }, [groupedCase?.records]);
-
-  return (
-    <div className="flex items-center gap-2 min-w-0 overflow-hidden">
+  return <div className="flex items-center gap-2 min-w-0 overflow-hidden">
       {/* New/Updated Badge */}
-      {(isNew || isUpdated) && (
-        <Badge variant="default" className="bg-blue-600 text-white flex-shrink-0 whitespace-nowrap">
+      {(isNew || isUpdated) && <Badge variant="default" className="bg-blue-600 text-white flex-shrink-0 whitespace-nowrap py-0">
           {isNew ? 'New' : 'Updated'}
-        </Badge>
-      )}
+        </Badge>}
       <Badge variant={getStatusColor(currentStatus)} className="flex-shrink-0 whitespace-nowrap">
         <span className="truncate max-w-[120px]">{currentStatus}</span>
       </Badge>
       
       {/* Violation descriptions container with horizontal scroll */}
-      {violationDescriptions.length > 0 && (
-        <div className="flex gap-1 min-w-0 overflow-x-auto scrollbar-hide">
-          {violationDescriptions.map((description, index) => (
-            <Badge key={index} variant="secondary" className="flex-shrink-0 text-xs whitespace-nowrap">
+      {violationDescriptions.length > 0 && <div className="flex gap-1 min-w-0 overflow-x-auto scrollbar-hide">
+          {violationDescriptions.map((description, index) => <Badge key={index} variant="secondary" className="flex-shrink-0 text-xs whitespace-nowrap">
               {description}
-            </Badge>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+            </Badge>)}
+        </div>}
+    </div>;
 };
