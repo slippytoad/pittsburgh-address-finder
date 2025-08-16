@@ -1,13 +1,11 @@
 
+import { formatInTimeZone } from 'date-fns-tz';
 import { PropertyRecord, GroupedCase } from '@/types/propertyTypes';
 
 export const formatDate = (dateString: string) => {
   try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    // Format date in Eastern Time (America/New_York timezone)
+    return formatInTimeZone(new Date(dateString), 'America/New_York', 'MMM d, yyyy');
   } catch {
     return dateString;
   }
