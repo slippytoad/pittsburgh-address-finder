@@ -32,6 +32,9 @@
     --warning: 38 92% 50%;
     --warning-foreground: 48 96% 89%;
 
+    --brand: 21 97% 69%;
+    --brand-foreground: 0 0% 100%;
+
     --violation: 214 100% 47%;
     --violation-foreground: 210 40% 98%;
 
@@ -85,6 +88,9 @@
 
     --warning: 48 96% 89%;
     --warning-foreground: 38 92% 50%;
+
+    --brand: 21 97% 69%;
+    --brand-foreground: 0 0% 100%;
 
     --violation: 214 100% 47%;
     --violation-foreground: 210 40% 98%;

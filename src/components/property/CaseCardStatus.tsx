@@ -49,7 +49,7 @@ export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
   }, [groupedCase?.records]);
   return <div className="flex items-center gap-2 min-w-0 overflow-hidden">
       {/* New/Updated Badge */}
-      {(isNew || isUpdated) && <Badge variant="default" className="bg-blue-600 text-white flex-shrink-0 whitespace-nowrap py-0">
+      {(isNew || isUpdated) && <Badge variant="brand" className="flex-shrink-0 whitespace-nowrap py-0">
           {isNew ? 'New' : 'Updated'}
         </Badge>}
       <Badge variant={getStatusColor(currentStatus)} className="flex-shrink-0 whitespace-nowrap">
