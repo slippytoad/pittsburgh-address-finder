@@ -29,7 +29,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
     <Card className="border-2 border-gray-300 hover:border-gray-400 transition-all duration-300">
       <CardHeader className="pb-4">
         <div className="flex items-center gap-2 min-w-0">
-          <MapPin className="h-5 w-5 text-blue-600 flex-shrink-0" />
+          <MapPin className="h-5 w-5 text-brand flex-shrink-0" />
           <h3 className="text-lg font-semibold truncate">
             {formattedStreetAddress}
           </h3>

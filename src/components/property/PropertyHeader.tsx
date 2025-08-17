@@ -78,8 +78,8 @@ const PropertyHeader: React.FC<PropertyHeaderProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-50 rounded-xl">
-                <Building2 className="h-6 w-6 text-blue-600" />
+              <div className="p-2 bg-brand/10 rounded-xl">
+                <Building2 className="h-6 w-6 text-brand" />
               </div>
               <div>
                 <h1 className="text-2xl font-semibold text-gray-900">
