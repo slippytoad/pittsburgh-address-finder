@@ -12,15 +12,15 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({
   onToggle
 }) => {
   return (
-    <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
+    <div className="flex items-center gap-1 border border-border rounded-lg p-1">
       <Button
         variant={!isPropertyView ? "default" : "ghost"}
         size="sm"
         onClick={() => onToggle(false)}
         className={`flex items-center gap-2 px-3 py-1.5 text-xs ${
           !isPropertyView 
-            ? "bg-blue-600 text-white hover:bg-blue-700" 
-            : "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+            ? "bg-brand text-brand-foreground hover:bg-brand/90" 
+            : "text-muted-foreground hover:text-foreground hover:bg-muted"
         }`}
       >
         <FileText className="h-4 w-4" />
@@ -32,8 +32,8 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({
         onClick={() => onToggle(true)}
         className={`flex items-center gap-2 px-3 py-1.5 text-xs ${
           isPropertyView 
-            ? "bg-blue-600 text-white hover:bg-blue-700" 
-            : "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+            ? "bg-brand text-brand-foreground hover:bg-brand/90" 
+            : "text-muted-foreground hover:text-foreground hover:bg-muted"
         }`}
       >
         <Home className="h-4 w-4" />
