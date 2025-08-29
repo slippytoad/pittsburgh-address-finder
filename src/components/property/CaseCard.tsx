@@ -2,16 +2,15 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { History, ChevronDown, ChevronUp } from 'lucide-react';
+import { History } from 'lucide-react';
 import { GroupedCase } from '@/types/propertyTypes';
 import { CaseCardHeader } from './CaseCardHeader';
 import { CaseCardStatus } from './CaseCardStatus';
 import { CaseCardOutcome } from './CaseCardOutcome';
 import { CaseCardInstructions } from './CaseCardInstructions';
 import { CaseCardDescription } from './CaseCardDescription';
-import { CaseCardRecord } from './CaseCardRecord';
 import { CaseHistoryDialog } from './CaseHistoryDialog';
+import { CaseViewDialog } from './CaseViewDialog';
 interface CaseCardProps {
   groupedCase: GroupedCase;
   defaultExpanded?: boolean;
@@ -22,8 +21,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   defaultExpanded = false,
   isHighlighted = false
 }) => {
-  const [isOpen, setIsOpen] = useState(defaultExpanded);
   const [showCaseHistory, setShowCaseHistory] = useState(false);
+  const [showCaseView, setShowCaseView] = useState(false);
 
   // Get the primary address from the first record and extract just the street
   const fullAddress = groupedCase.records[0]?.address || 'Unknown Address';
@@ -75,10 +74,8 @@ export const CaseCard: React.FC<CaseCardProps> = ({
   const isNew = earliestDate && new Date(earliestDate) > oneWeekAgo;
   const isUpdated = !isNew && groupedCase.latestDate && new Date(groupedCase.latestDate) > oneWeekAgo;
   return <Card className={`border-2 rounded-lg hover:bg-muted/50 transition-all duration-300 pt-5 ${isHighlighted ? 'ring-2 ring-blue-500 bg-blue-50 border-blue-300' : 'border-gray-300 hover:border-gray-400'}`}>
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleTrigger asChild>
-          <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors p-0">
-            <div className="flex flex-col gap-4 p-6 relative my-0 py-0">
+      <CardHeader className="cursor-pointer hover:bg-gray-50 transition-colors p-0" onClick={() => setShowCaseView(true)}>
+        <div className="flex flex-col gap-4 p-6 relative my-0 py-0">
               
               {/* Desktop Layout - Two Column Structure */}
               <div className="hidden sm:grid sm:grid-cols-[40%_60%] sm:gap-8">
@@ -171,62 +168,24 @@ export const CaseCard: React.FC<CaseCardProps> = ({
               </div>
 
               
-              {/* Bottom section with Case History (right) and Chevron (center) */}
-              <div className="flex items-center pt-2 my-0 py-[10px] relative">
-                <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center text-gray-400">
-                  {isOpen ? <ChevronUp className="h-6 w-6 my-[9px]" /> : <ChevronDown className="h-6 w-6" />}
-                </div>
-                <div className="ml-auto">
-                  <Button variant="outline" size="sm" onClick={e => {
+              {/* Bottom section with Case History button */}
+              <div className="flex items-center justify-end pt-2 my-0 py-[10px]">
+                <Button variant="outline" size="sm" onClick={e => {
                   e.stopPropagation();
                   setShowCaseHistory(true);
                 }} className="flex items-center gap-2">
-                    <History className="h-4 w-4" />
-                    Case History
-                  </Button>
-                </div>
+                  <History className="h-4 w-4" />
+                  Case History
+                </Button>
               </div>
             </div>
           </CardHeader>
-        </CollapsibleTrigger>
-        
-        <CollapsibleContent>
-          <CardContent className="pt-0 p-0">
-            <div className="space-y-6 px-6 pb-6">
-              {(() => {
-              // Group records by violation code section
-              const recordsByCodeSection = groupedCase.records.reduce((acc, record) => {
-                const codeSection = record.violation_code_section || 'Unknown Code Section';
-                if (!acc[codeSection]) {
-                  acc[codeSection] = [];
-                }
-                acc[codeSection].push(record);
-                return acc;
-              }, {} as Record<string, typeof groupedCase.records>);
-
-              // Sort code sections alphabetically
-              const sortedCodeSections = Object.keys(recordsByCodeSection).sort();
-              return sortedCodeSections.map(codeSection => <div key={codeSection} className="space-y-4">
-                    {/* Code Section Header */}
-                    <div className="pb-2 border-b border-gray-300">
-                      <h4 className="font-semibold text-gray-800 text-base">
-                        {codeSection.toLowerCase().replace(/\b\w/g, l => l.toUpperCase())}
-                      </h4>
-                    </div>
-                    
-                    {/* Records under this code section */}
-                    <div className="space-y-4">
-                      {recordsByCodeSection[codeSection].map((record, index) => <CaseCardRecord key={record._id || index} record={record} index={index} />)}
-                    </div>
-                  </div>);
-            })()}
-            </div>
-          </CardContent>
-        </CollapsibleContent>
-      </Collapsible>
       
       {/* Case History Dialog */}
       <CaseHistoryDialog isOpen={showCaseHistory} onOpenChange={setShowCaseHistory} groupedCase={groupedCase} />
+      
+      {/* Case View Dialog */}
+      <CaseViewDialog isOpen={showCaseView} onOpenChange={setShowCaseView} groupedCase={groupedCase} />
     </Card>;
 };
 export default CaseCard;
