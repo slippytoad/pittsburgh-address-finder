@@ -25,16 +25,14 @@ export interface FilterResult {
 export const fetchViolationsFromDatabase = async (): Promise<PropertyRecord[]> => {
   console.log('Fetching violations from database...');
   
-  const { data: violations, error } = await supabase
-    .from('violations')
-    .select('*')
-    .order('investigation_date', { ascending: false });
+  const { data: response, error } = await supabase.functions.invoke('get-violations');
 
   if (error) {
     console.error('Error fetching violations:', error);
     throw new Error(`Failed to fetch violations: ${error.message}`);
   }
 
+  const violations = response?.data || [];
   console.log('Fetched', violations?.length || 0, 'violations from database');
 
   // Map the database format to the expected PropertyRecord format
