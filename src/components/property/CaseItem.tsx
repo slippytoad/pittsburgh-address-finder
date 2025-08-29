@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { GroupedCase } from '@/types/propertyTypes';
 import { getStatusColor, formatDate } from '@/utils/propertyUtils';
 import { supabase } from '@/integrations/supabase/client';
-import { CaseHistoryDialog } from './CaseHistoryDialog';
+import { CaseViewDialog } from './CaseViewDialog';
 
 interface CaseItemProps {
   groupedCase: GroupedCase;
@@ -15,7 +15,7 @@ export const CaseItem: React.FC<CaseItemProps> = ({
   isHighlighted = false 
 }) => {
   const [violationDescriptions, setViolationDescriptions] = useState<string[]>([]);
-  const [showCaseHistory, setShowCaseHistory] = useState(false);
+  const [showCaseView, setShowCaseView] = useState(false);
 
   useEffect(() => {
     const fetchViolationDescriptions = async () => {
@@ -62,7 +62,7 @@ export const CaseItem: React.FC<CaseItemProps> = ({
   }, [groupedCase?.records]);
 
   const handleClick = () => {
-    setShowCaseHistory(true);
+    setShowCaseView(true);
   };
 
   // Check if case is new or updated
@@ -117,10 +117,10 @@ export const CaseItem: React.FC<CaseItemProps> = ({
         
       </div>
 
-      {/* Case History Dialog */}
-      <CaseHistoryDialog
-        isOpen={showCaseHistory}
-        onOpenChange={setShowCaseHistory}
+      {/* Case View Dialog */}
+      <CaseViewDialog
+        isOpen={showCaseView}
+        onOpenChange={setShowCaseView}
         groupedCase={groupedCase}
       />
     </>
