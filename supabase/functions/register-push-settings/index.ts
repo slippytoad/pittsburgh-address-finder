@@ -8,6 +8,7 @@ const corsHeaders = {
 interface PushSettingsRequest {
   device_token: string;
   platform: string;
+  user_id?: string;
   permission_granted?: boolean;
   app_version?: string;
   device_model?: string;
@@ -25,45 +26,13 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Get the authorization header
-    const authHeader = req.headers.get('Authorization');
-    console.log(`🔐 Authorization header present: ${!!authHeader}`);
-    if (!authHeader) {
-      console.log('❌ Missing Authorization header - returning 401');
-      return new Response(
-        JSON.stringify({ error: 'Authorization header required' }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
-
-    // Create Supabase client
+    // Create Supabase client with service role for anonymous access
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: authHeader },
-        },
-      }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Get the current user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      console.log(`❌ Auth validation failed - Error: ${authError?.message || 'No user'} - returning 401`);
-      return new Response(
-        JSON.stringify({ error: 'Invalid or expired token' }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
-    }
-    
-    console.log(`✅ User authenticated successfully: ${user.id}`);
+    console.log('✅ Anonymous access enabled for push settings registration');
 
     // Parse request body
     const body: PushSettingsRequest = await req.json();
@@ -81,9 +50,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Prepare data for upsert
+    // Prepare data for upsert (use device_token as identifier for anonymous users)
     const pushSettingsData = {
-      user_id: user.id,
+      user_id: body.user_id || null, // Allow null for anonymous users
       device_token: body.device_token,
       platform: body.platform,
       permission_granted: body.permission_granted ?? true,
@@ -98,7 +67,7 @@ Deno.serve(async (req) => {
     const { data, error } = await supabase
       .from('push_settings')
       .upsert(pushSettingsData, {
-        onConflict: 'user_id,device_token',
+        onConflict: 'device_token',
         ignoreDuplicates: false
       })
       .select()
@@ -115,7 +84,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`✅ Push settings registered successfully for user ${user.id}, device: ${body.device_token.substring(0, 10)}...`);
+    console.log(`✅ Push settings registered successfully for device: ${body.device_token.substring(0, 10)}...`);
 
     return new Response(
       JSON.stringify({ 
