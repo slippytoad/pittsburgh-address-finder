@@ -50,7 +50,7 @@ export const CaseCardStatus: React.FC<CaseCardStatusProps> = ({
   return <div className="flex items-center gap-2 min-w-0 overflow-hidden">
       {/* New/Updated Badge */}
       {(isNew || isUpdated) && <Badge variant="brand" className="flex-shrink-0 whitespace-nowrap py-0">
-          {isNew ? 'New' : 'Updated'}
+          {isNew ? 'NEW' : 'UPDATED'}
         </Badge>}
       <Badge variant={getStatusColor(currentStatus)} className="flex-shrink-0 whitespace-nowrap">
         <span className="truncate max-w-[120px]">{currentStatus}</span>
