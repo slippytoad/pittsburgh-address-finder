@@ -95,7 +95,7 @@ export const CaseItem: React.FC<CaseItemProps> = ({
             {/* New/Updated Badge */}
             {(isNew || isUpdated) && (
               <Badge variant="default" className="bg-blue-600 text-white">
-                {isNew ? 'New' : 'Updated'}
+                {isNew ? 'NEW' : 'UPDATED'}
               </Badge>
             )}
             <Badge variant={getStatusColor(groupedCase.currentStatus)} className="flex-shrink-0">
