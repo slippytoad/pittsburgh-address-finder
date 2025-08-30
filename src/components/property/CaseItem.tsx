@@ -94,7 +94,7 @@ export const CaseItem: React.FC<CaseItemProps> = ({
           <div className="flex items-center gap-2">
             {/* New/Updated Badge */}
             {(isNew || isUpdated) && (
-              <Badge variant="default" className="bg-blue-600 text-white">
+              <Badge variant="brand" className="flex-shrink-0 whitespace-nowrap py-0">
                 {isNew ? 'NEW' : 'UPDATED'}
               </Badge>
             )}
