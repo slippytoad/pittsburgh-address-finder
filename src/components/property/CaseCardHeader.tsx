@@ -23,13 +23,7 @@ export const CaseCardHeader: React.FC<CaseCardHeaderProps> = ({
     <div className="flex flex-col gap-3 min-w-0 flex-1">
       {/* Address Section */}
       <div className="flex items-center gap-2 min-w-0">
-        <div className="h-5 w-5 flex-shrink-0">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="text-brand">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <path d="M12 8v4"/>
-            <circle cx="12" cy="15" r="1"/>
-          </svg>
-        </div>
+        <MapPin className="h-5 w-5 text-brand flex-shrink-0" />
         <CardTitle className="text-lg font-bold truncate">
           {formattedStreetAddress}
         </CardTitle>
